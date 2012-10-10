@@ -4,7 +4,7 @@
  *
  * @section mp_introduction Introduction
  *
- * DooCore is a ROOT-/RooFit/Boost-based framework providing central base 
+ * DooCore is a ROOT-/RooFit-/Boost-based framework providing central base 
  * functionality which is needed in nearly all ROOT/RooFit applications in high
  * energy physics analyses.
  *
@@ -47,7 +47,7 @@
  * SVN. Create a @c build directory where you invoke CMake and install DooCore.
  * 
  * @code
- * cmake -DCMAKE_INSTALL_PREFIX=$DOOFITSYS /path/of/doocore/source
+ * cmake -DCMAKE_INSTALL_PREFIX=$DOOCORESYS /path/of/doocore/source
  * make
  * make install
  * @endcode
@@ -66,7 +66,7 @@
  * # This is where you want to put the provided FindDooCore.cmake.
  * set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
  * 
- * # Try to find DooCore (this requires $DOOFITSYS to be set)
+ * # Try to find DooCore (this requires $DOOCORESYS to be set)
  * find_package(DooCore)
  * 
  * # Tell CMake to also use DooCore includes and libraries in its search path for
