@@ -20,6 +20,7 @@ class TH2D;
 class TCanvas;
 class TTree;
 class TFile;
+class TLegend;
 
 class RooAbsPdf;
 class RooPlot;
@@ -27,6 +28,15 @@ class RooAbsRealLValue;
 class RooDataSet;
 class RooArgSet;
 
+/**
+ * @namespace doocore::lutils
+ * @brief Legacy utils for DooSoftware core functionality
+ * 
+ * This is the jumble of all utils functions that came to us back in the 
+ * inclusive phi days (and everythin added simce then). It might be a good idea
+ * to move the functionality into better grouped namespaces/libraries and let
+ * this one die for good.
+ */
 namespace doocore {
 namespace lutils {
 /** @class concurrent_queue
@@ -111,7 +121,7 @@ enum TerminalColor {
 //	
 // plots
 //
-void		setStyle(TString option="");
+void		setStyle(TString option="LHCb");
 void		setHotColdPalette(TH2* h=0);
 void		setRedBluePalette(TH2* h=0);
 
@@ -124,11 +134,15 @@ void		drawOrdered(TH1* h1, TH1* h2, TH1* h3=0, TH1* h4=0);
 
 void		addEtaPtLabels(TH2D* h);
 
-void 		PlotSimple(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar,  TString pDir = "", bool plot_logy = false, TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
+void 		PlotSimple(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,  TString pDir = "", bool plot_logy = false, TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
 
 void 		PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, 
-                      TString pDir = "", bool normalize = true, bool plot_logy = false, 
+                      TString pDir = "", bool normalize_residuals = true, bool plot_logy = false,
                       TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
+
+void 		PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF,
+	                      TString pDir, bool normalize_residuals, bool plot_logy,
+	                      TLegend * label, bool plot_logx = false);
 
 ///Do an Asymmetry Plot for a given NTuple the name of the time variable and a variable name that is used for a cut (+/-1) to separate two mixing states
 void plotAsymmetry(TString pPlotName, TTree * pTuple, TString pVarTime, TString pVarMix, int pBins = 20, double pRngMax = 0.01, double pRngMin = 0.00, TString pTimeUnit = "ns");

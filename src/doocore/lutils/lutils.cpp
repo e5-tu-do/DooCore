@@ -20,6 +20,7 @@
 #include "TCanvas.h"
 #include "TTree.h"
 #include "TFile.h"
+#include "TLegend.h"
 
 // from RooFit
 #include "RooPlot.h"
@@ -316,16 +317,16 @@ void doocore::lutils::printSystemRecources(TString cmd)
 
 void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir)
 {
-  sinfo << "doocore::lutils::printPlot(...): printing plots..." << endl;
+  sinfo << "doocore::lutils::printPlot(...): printing plots..." << endmsg;
 
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
 
-//	system("mkdir -p " + dir+"eps/");
+	system("mkdir -p " + dir+"eps/");
 	system("mkdir -p " + dir+"C/");
 	system("mkdir -p " + dir+"png/");
 	system("mkdir -p " + dir+"pdf/");
 
-//  c->Print(dir+"eps/" + name + ".eps");
+  c->Print(dir+"eps/" + name + ".eps");
 	c->Print(dir+"C/"   + name + ".C");
   c->Print(dir+"png/" + name + ".png");
   c->Print(dir+"pdf/" + name + ".pdf");
@@ -626,7 +627,7 @@ void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAb
                           TString pDir, bool normalize, bool plot_logy,
                           TLatex label, bool plot_logx
                           ) {
-//	setStyle();
+	setStyle();
   gStyle->SetTitle(0);
   
   // some global definitions
@@ -701,6 +702,95 @@ void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAb
   pad = (TPad*)c1.cd(0);
   label.SetTextSize(0.05);
   label.Draw();
+  
+  printPlot(&c1, pName, pDir);
+  
+  // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
+  delete residFrame;
+}
+
+void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF,
+                          TString pDir, bool normalize, bool plot_logy,
+                          TLegend * label, bool plot_logx
+                          ) {
+	setStyle();
+  gStyle->SetTitle(0);
+  
+  // some global definitions
+  double pad_border       = 0.02;
+  double pad_relysplit    = 0.3;
+  double left_margin      = 0.16;
+  double top_label_size   = 0.06;
+  double top_title_offset = 1.2;
+  double title2label_size_ratio = 1.1;
+  
+  // derived definitions
+  double pad_ysplit     = (1.0-2.*pad_border)*pad_relysplit;
+  double bottom_label_size = top_label_size*(1.-pad_relysplit)/pad_relysplit;
+  double bottom_title_offset = top_title_offset/(1.-pad_relysplit)*pad_relysplit;
+  
+  double plot_min = pFrame->GetXaxis()->GetXmin();
+  double plot_max = pFrame->GetXaxis()->GetXmax();
+  
+  TCanvas c1("c1","c1",900,900);
+  c1.Divide(1,2);
+  
+  TPad* pad = (TPad*)c1.cd(1);
+  if (label) {
+		label->Draw();
+	}
+  if(plot_logy){
+    pad->SetLogy(1);
+  }
+  if (plot_logx) {
+    pad->SetLogx(1);
+  }
+  pad->SetPad(pad_border,pad_ysplit,1.-pad_border,1.-pad_border);
+  pad->SetLeftMargin(left_margin);
+  pad->SetBottomMargin(0.);
+  
+	RooHist* resid = pFrame->residHist(0,0,normalize);
+  pFrame->SetLabelSize(0.0,"x");
+  pFrame->SetLabelSize(top_label_size,"y");
+  pFrame->SetTitleSize(top_label_size*title2label_size_ratio,"y");
+  pFrame->SetXTitle("");
+  pFrame->GetYaxis()->SetTitleOffset(top_title_offset);
+  //pFrame->SetMaximum(1.3*pFrame->GetMaximum());
+  
+	pFrame->Draw();
+  
+  // lower frame with residuals plot
+  pad = (TPad*)c1.cd(2);
+  pad->SetPad(pad_border,pad_border,1.-pad_border,pad_ysplit);
+  pad->SetLeftMargin(left_margin);
+  pad->SetTopMargin(0.);
+  pad->SetBottomMargin(0.4);
+  if (plot_logx) {
+    pad->SetLogx(1);
+  }
+  RooPlot * residFrame = pVar->frame(RooFit::Title("Residuals"));
+  
+  residFrame->GetXaxis()->SetLimits(plot_min,plot_max);
+  
+  residFrame->addPlotable(resid, "P");
+  residFrame->SetAxisRange(-5.8,5.8,"Y");
+  
+  residFrame->SetTitle("");
+  if (normalize){
+    residFrame->SetYTitle("Pull");
+  } else {
+    residFrame->SetYTitle("Residual");
+  }
+  residFrame->SetLabelSize(bottom_label_size, "xy");
+  residFrame->SetTitleSize(bottom_label_size*title2label_size_ratio, "xy");
+  residFrame->GetYaxis()->SetTitleOffset(bottom_title_offset);
+  residFrame->GetYaxis()->SetNdivisions(5,5,0);
+  residFrame->Draw();
+  
+  pad = (TPad*)c1.cd(0);
+	if (label) {
+  	label->Draw();
+	}
   
   printPlot(&c1, pName, pDir);
   

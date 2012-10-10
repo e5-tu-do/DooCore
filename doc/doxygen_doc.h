@@ -108,3 +108,7 @@
  *
  */
 
+/**
+ * @namespace doocore
+ * @brief Global DooCore namespace
+ */
