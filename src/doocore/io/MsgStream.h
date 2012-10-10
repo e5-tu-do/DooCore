@@ -12,6 +12,13 @@
 #include "RooAbsArg.h"
 #include "RooRealVar.h"
 
+/**
+ * @namespace doocore::io
+ * @brief DooCore input/output namespace
+ * 
+ * This namespace contains all DooCore functionality that deals with 
+ * input/output tasks (like MsgStream for terminal output).
+ */
 namespace doocore {
 namespace io {
 /*! \class doocore::io::MsgStream 

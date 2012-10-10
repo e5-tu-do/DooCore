@@ -9,6 +9,12 @@
 
 // forward declarations
 
+/**
+ * @namespace doocore::system
+ * @brief DooCore system namespace
+ *
+ * This namespace contains all system-related DooCore functionality.
+ */
 namespace doocore {
 namespace system {
   /** @class FileLock
