@@ -35,6 +35,22 @@ namespace io {
  *   RooDataSet& data = etuple.ConvertToDataSet("cutVar == 1"));
  * }
  * @endcode
+ *
+ * What is EasyTuple doing behind the curtain? First, the ROOT file 
+ * @c tuplefile.root is being opened and the TTree @c Bs2Jpsif0 inside is 
+ * opened. Afterwards, all branches not in the import RooArgSet are being 
+ * deactivated for performance reasons (see Performance section below). 
+ *
+ * In the next call to doocore::io::EasyTuple::ConvertToDataSet() the tuple is 
+ * converted to a RooDataSet while it is further reduced by the supplied cut 
+ * string. The RooDataSet is returned as reference.
+ * 
+ * EasyTuple takes care of internal pointers and deletes them upon destruction 
+ * so the user does not have to bother with bookkeeping. It's as simple as that.
+ *
+ * @section et_performance Performance
+ *
+ * As EasyTuple...
  */
 class EasyTuple {
  public:
