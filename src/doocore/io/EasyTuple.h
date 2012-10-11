@@ -50,7 +50,11 @@ namespace io {
  *
  * @section et_performance Performance
  *
- * As EasyTuple...
+ * As EasyTuple is deactivating all unnecessary branches, looping over the tree
+ * or converting to a RooDataSet is quite fast. In some real case studies, the 
+ * conversion to a RooDataSet took a few seconds compared to several minutes 
+ * when not deactivating the branches (and compared to a few split seconds when
+ * directly using a reduced fit tuple without unnecessary branches).
  */
 class EasyTuple {
  public:
