@@ -32,12 +32,12 @@ namespace io {
  * int main() {
  *   // standard use case: open tuple as RooDataSet
  *   EasyTuple etuple("tuplefile.root", "Bs2Jpsif0", 
- *                    RooArgSet(varMass,varProptime,varOmega,cutVar"));
+ *                    RooArgSet(varMass,varProptime,varOmega,cutVar));
  *   RooDataSet& data = etuple.ConvertToDataSet("cutVar == 1"));
  *
  *   // other use case: open tuple and get TTree to iterate by hand
  *   EasyTuple etuple2("tuplefile.root", "Bs2Jpsif0",
- *                     RooArgSet(varMass,varProptime,varOmega,cutVar"));
+ *                     RooArgSet(varMass,varProptime,varOmega,cutVar));
  *   TTree& tree = etuple2.tree();
  * }
  * @endcode
