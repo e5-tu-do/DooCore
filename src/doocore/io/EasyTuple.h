@@ -24,7 +24,17 @@ namespace io {
  *
  * @section et_usage Usage
  *
- * ...
+ * Usage of EasyTuple is simple. Consider this example:
+ * 
+ * @code
+ * #include "doocore/io/EasyTuple.h"
+ *
+ * int main() {
+ *   EasyTuple etuple("tuplefile.root", "Bs2Jpsif0", 
+ *                    RooArgSet(varMass,varProptime,varOmega,cutVar"));
+ *   RooDataSet& data = etuple.ConvertToDataSet("cutVar == 1"));
+ * }
+ * @endcode
  */
 class EasyTuple {
  public:
