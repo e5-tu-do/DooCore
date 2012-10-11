@@ -190,25 +190,7 @@ void		Symmetrize(TMatrixD &m);
  *  @return pair of (double,double) as (min,max) to use for plotting
  */
 std::pair<double,double> MedianLimitsForTuple(const RooDataSet& dataset, std::string var_name);
-
-/**
- *  @brief Get TTree with decativated branches for faster RooFit import
- *
- *  This function will open a TFile, get a TTree inside and deactivate all 
- *  unnecessary branches so a import in RooFit is much faster
- *
- *  @param file_name file name of TFile to open
- *  @param tree_name tree name in TFile to open
- *  @param argset RooArgSet of parameters to activate
- *  @return pointer to TFile and TTree with (de)activated branches
- *
- *  @code
- *  std::pair<TFile*,TTree*> file_tree = LoadTTreeActivatedBranches("myfile.root", "mytree", observables);
- *  TTree* tree = file_tree.second;
- *  @endcode
- */
-std::pair<TFile*,TTree*> LoadTTreeActivatedBranches(std::string file_name, std::string tree_name, const RooArgSet& argset);
-
+  
 } // namespace lutils
 } // namespace doocore
 

@@ -871,30 +871,4 @@ void doocore::lutils::plotAsymmetry(TString pPlotName, TTree * pTuple, TString p
         delete hUpAsy;
 }
   
-std::pair<TFile*,TTree*> doocore::lutils::LoadTTreeActivatedBranches(std::string file_name, std::string tree_name, const RooArgSet& argset) {
-  TFile* file = new TFile(file_name.c_str());
-  
-  if (file == NULL || file->IsZombie() || file->GetNkeys() <= 1) {
-    serr << "File " << file_name << " could not be opened properly." << endmsg;
-    throw 1;
-  }
-  
-  TTree* tree = dynamic_cast<TTree*>(file->Get(tree_name.c_str()));
-  if (tree == NULL) {
-    serr << "Tree " << tree_name << " could not be opened properly." << endmsg;
-    throw 2;
-  }
-  
-  tree->SetBranchStatus("*", 0);
-  
-  RooLinkedListIter* it  = (RooLinkedListIter*)argset.createIterator();
-  RooAbsArg*         arg = NULL;
-  
-  while ((arg=(RooAbsArg*)it->Next())) {
-    tree->SetBranchStatus(arg->GetName(), 1);
-  }
-  delete it;
-  
-  return make_pair<TFile*,TTree*>(file, tree);
-}
 
