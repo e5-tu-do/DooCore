@@ -17,6 +17,7 @@
 
 // from Project
 #include "doocore/io/MsgStream.h"
+#include "doocore/lutils/lutils.h"
 
 namespace doocore {
 namespace system {

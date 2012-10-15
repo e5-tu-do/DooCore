@@ -4,11 +4,11 @@ namespace doocore {
 namespace io {
 int MsgStream::indent_ = 0;
 
-MsgStream serr   (doocore::lutils::kTextRed);
-MsgStream swarn  (doocore::lutils::kTextYellow);
-MsgStream sinfo  (doocore::lutils::kTextGreen);
-MsgStream scfg   (doocore::lutils::kTextBlue);
-MsgStream sout   (doocore::lutils::kTextNone);
-MsgStream sdebug (doocore::lutils::kTextNone);
+MsgStream serr   (kTextRed);
+MsgStream swarn  (kTextYellow);
+MsgStream sinfo  (kTextGreen);
+MsgStream scfg   (kTextBlue);
+MsgStream sout   (kTextNone);
+MsgStream sdebug (kTextNone);
 } // namespace utils
 } // namespace doofit

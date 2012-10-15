@@ -1,7 +1,6 @@
 #ifndef DOOCORE_IO_MSGSTREAM_H
 #define DOOCORE_IO_MSGSTREAM_H
 
-#include "doocore/lutils/lutils.h"
 #include <iostream>
 #include <sstream> 
 #include <cstring>
@@ -21,6 +20,20 @@
  */
 namespace doocore {
 namespace io {
+  
+/// Terminal color enum to be used for example in MsgStream class.
+enum TerminalColor {
+  kTextBlack   = 0,
+  kTextRed     = 1,
+  kTextGreen   = 2,
+  kTextYellow  = 3,
+  kTextBlue    = 4,
+  kTextMagenta = 5,
+  kTextCyan    = 6,
+  kTextWhite   = 7,
+  kTextNone    = -1
+};
+  
 /*! \class doocore::io::MsgStream 
  * \brief A class for message output using different messages and colors.
  *
@@ -36,7 +49,7 @@ namespace io {
  *
  * The user can define their own MsgStream as well:
  * \code
- * MsgStream mymsgstream(doocore::lutils::kTextBlue);
+ * MsgStream mymsgstream(kTextBlue);
  * mymsgstream << "My own stream" << endmsg;
  * \endcode
  */
@@ -47,11 +60,11 @@ public:
    *
    *  @param color The color to be used for this stream
    */
-  MsgStream(doocore::lutils::TerminalColor color) : text_color_(color), is_active_(true) {}
+  MsgStream(TerminalColor color) : text_color_(color), is_active_(true) {}
   /**
    *  \brief Default constructor for standard uncolored output
    */
-  MsgStream() : text_color_(doocore::lutils::kTextNone), is_active_(true) {}
+  MsgStream() : text_color_(kTextNone), is_active_(true) {}
   
   /**
    *  \brief Get the internal std::ostringstream
@@ -74,10 +87,10 @@ public:
    */
   MsgStream& doOutput() {
     if (is_active_) {
-      if (!doocore::lutils::TerminalIsRedirected()) doocore::lutils::SetTerminalColor(text_color_);
+      if (!TerminalIsRedirected()) SetTerminalColor(text_color_);
       std::cout << std::string(indent_, ' ');
       std::cout << os_.str() << std::endl;
-      if (!doocore::lutils::TerminalIsRedirected()) doocore::lutils::ResetTerminal();
+      if (!TerminalIsRedirected()) ResetTerminal();
     }
     os_.str("");
       
@@ -154,6 +167,33 @@ public:
   
 protected:
   /**
+   *  @brief Check if terminal is redirected to suppress control characters
+   */
+  bool TerminalIsRedirected() {
+    if (!isatty(fileno(stdout))){
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  /**
+   *  @brief Set terminal color
+   */
+  void SetTerminalColor(TerminalColor color) {
+    if (color != kTextNone) {
+      printf("%c[%d;%dm",27,1,30+color);
+    }
+  }
+  
+  /**
+   *  @brief Reset terminal color
+   */
+  void ResetTerminal() {
+    printf("%c[%dm",27,0);
+  }
+  
+  /**
    *  \brief Flush the internal std::ostringstream and output.
    */
   void flush() { os_.flush(); doOutput(); }
@@ -161,7 +201,7 @@ protected:
   /// \brief Internal std::ostringstream for data.
   std::ostringstream os_;            
   /// \brief Text color for output.
-  doocore::lutils::TerminalColor text_color_;  
+  TerminalColor text_color_;
   
   /// \brief determining if stream is active or not (i.e. printing)
   bool is_active_;

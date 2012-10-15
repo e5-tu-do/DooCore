@@ -104,20 +104,6 @@ public:
   }
 };
 
-
-/// Terminal color enum to be used for example in MsgStream class.
-enum TerminalColor {
-  kTextBlack   = 0,
-  kTextRed     = 1,
-  kTextGreen   = 2,
-  kTextYellow  = 3,
-  kTextBlue    = 4,
-  kTextMagenta = 5,
-  kTextCyan    = 6,
-  kTextWhite   = 7,
-  kTextNone    = -1
-};
-
 //	
 // plots
 //
@@ -155,15 +141,6 @@ void 		printSystemRecources(TString cmd);
 /// \brief Sleep, i.e. halt everything.
 /// \param sleep_time Time to sleep in seconds.
 void    Sleep(double sleep_time);
-
-/// \brief Set the terminal color.
-///
-/// \param color The color to be used from now on.
-void    SetTerminalColor(TerminalColor color);
-/// Reset the terminal color to none again.
-void    ResetTerminal();
-/// Check if terminal is a tty
-bool TerminalIsRedirected();
 
 //
 // math

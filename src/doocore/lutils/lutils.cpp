@@ -413,24 +413,6 @@ void doocore::lutils::Sleep(double sleep_time) {
   boost::this_thread::sleep(boost::posix_time::microseconds(sleep_time*1e6));
 }
 
-void doocore::lutils::SetTerminalColor(TerminalColor color) {
-  if (color != kTextNone) {
-    printf("%c[%d;%dm",27,1,30+color);
-  }
-}
-
-void doocore::lutils::ResetTerminal() {
-  printf("%c[%dm",27,0);
-}
-
-bool doocore::lutils::TerminalIsRedirected() {
-  if (!isatty(fileno(stdout))){
-    return true;
-  } else {
-    return false;
-  }
-} 
-
 /*
  * round doubles
  */
