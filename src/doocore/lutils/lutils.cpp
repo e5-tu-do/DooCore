@@ -810,6 +810,12 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
     minmax.second = entries[num_entries-1]+0.1*(entries[num_entries-1]-entries[0]);
   }
   
+  // if still empty range, go from -1 to +1
+  if (minmax.first == 0 && minmax.second == 0) {
+    minmax.first  = -1;
+    minmax.second = +1;
+  }
+  
   return minmax;
 }
 
