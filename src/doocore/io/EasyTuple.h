@@ -3,6 +3,7 @@
 
 // from STL
 #include <string>
+#include <vector>
 
 // forward decalarations
 class RooArgSet;
@@ -32,10 +33,21 @@ namespace io {
  * int main() {
  *   using namespace doocore::io;
  *
+ *   // define a RooRealVar and a RooFormulaVar which will later be added 
+ *   // automatically
+ *   RooRealVar varMass("varMass", "varMass", 5000, 6000);
+ *   RooFormulaVar varMassShift("varMassShift", "varMassShift", 
+ *                              "@0-5.0", RooArgList(varMass));
+ *   // define more variables...
+ *
  *   // standard use case: open tuple as RooDataSet
  *   EasyTuple etuple("tuplefile.root", "Bs2Jpsif0", 
- *                    RooArgSet(varMass,varProptime,varOmega,cutVar));
+ *                    RooArgSet(varMass,varMassShift,varOmega,cutVar));
  *   RooDataSet& data = etuple.ConvertToDataSet("cutVar == 1");
+ *
+ *   // print the tuple - notice that the RooFormulaVar varMassShift has 
+ *   // automatically been added.
+ *   data.Print();
  *
  *   // other use case: open tuple and get TTree to iterate by hand
  *   EasyTuple etuple2("tuplefile.root", "Bs2Jpsif0",
@@ -144,7 +156,7 @@ class EasyTuple {
    *  @return the converted dataset
    */
   RooDataSet& ConvertToDataSet(const RooArgSet& argset, const std::string& cut="");
-  
+    
  protected:
   
  private:

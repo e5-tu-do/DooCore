@@ -2,6 +2,7 @@
 
 // from STL
 #include <string>
+#include <vector>
 
 // from ROOT
 #include "TFile.h"
@@ -12,6 +13,7 @@
 #include "RooLinkedListIter.h"
 #include "RooAbsArg.h"
 #include "RooDataSet.h"
+#include "RooFormulaVar.h"
 
 // from project
 #include "doocore/io/MsgStream.h"
@@ -45,7 +47,15 @@ doocore::io::EasyTuple::EasyTuple(const std::string& file_name, const std::strin
   RooAbsArg*         arg = NULL;
   
   while ((arg=(RooAbsArg*)it->Next())) {
-    tree_->SetBranchStatus(arg->GetName(), 1);
+    RooRealVar* var = dynamic_cast<RooRealVar*>(arg);
+    
+    if (var != NULL) {
+      if (tree_->GetBranch(arg->GetName()) == NULL) {
+        swarn << "Branch " << arg->GetName() << " not in tree. Ignoring." << endmsg;
+      } else {
+        tree_->SetBranchStatus(arg->GetName(), 1);
+      }
+    }
   }
   delete it;
 }
@@ -72,10 +82,33 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, co
     throw 3;
   }
   
+  // filter out formula vars
+  RooLinkedListIter* it  = (RooLinkedListIter*)argset.createIterator();
+  RooAbsArg*         arg = NULL;
+  RooArgSet          new_set;
+  std::vector<RooFormulaVar*> formulas;
+  
+  while ((arg=(RooAbsArg*)it->Next())) {
+    RooFormulaVar* formula = dynamic_cast<RooFormulaVar*>(arg);
+    
+    if (formula == NULL) {
+      new_set.add(*arg);
+    } else {
+      formulas.push_back(formula);
+    }
+  }
+  delete it;
+  
   if (cut.length() == 0) {
-    dataset_ = new RooDataSet("dataset","dataset",argset,Import(*tree_));
+    dataset_ = new RooDataSet("dataset","dataset",new_set,Import(*tree_));
   } else {
-    dataset_ = new RooDataSet("dataset","dataset",argset,Cut(cut.c_str()),Import(*tree_));
+    dataset_ = new RooDataSet("dataset","dataset",new_set,Cut(cut.c_str()),Import(*tree_));
+  }
+  
+  for (std::vector<RooFormulaVar*>::const_iterator it = formulas.begin();
+       it != formulas.end(); ++it) {
+    sinfo << "Adding formula " << (*it)->GetName() << " to dataset." << endmsg;
+    dataset_->addColumn(**it);
   }
   
   return *dataset_;

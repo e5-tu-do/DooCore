@@ -1,1 +1,1 @@
-
+add_subdirectory(TestEasyTuple)
