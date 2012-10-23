@@ -28,7 +28,7 @@ doocore::io::EasyTuple::EasyTuple(const std::string& file_name, const std::strin
   file_ = new TFile(file_name.c_str());
   argset_ = new RooArgSet(argset);
   
-  if (file_ == NULL || file_->IsZombie() || file_->GetNkeys() <= 1) {
+  if (file_ == NULL || file_->IsZombie() || file_->GetNkeys() <= 0) {
     serr << "File " << file_name << " could not be opened properly." << endmsg;
     throw 1;
   }
