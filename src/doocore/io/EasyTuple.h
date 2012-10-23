@@ -130,6 +130,9 @@ class EasyTuple {
    *  returned. The internally stored argset will be used. An optional cut can 
    *  be supplied to further reduce the dataset.
    *
+   *  RooFormulaVars in the argset will automatically be added to the dataset
+   *  and therewith converted to real variables in the dataset.
+   *
    *  If the dataset has already been converted, this function will throw an
    *  exception (reconverting the dataset is not supported). If you just want to
    *  get the already converted dataset again, use dataset().
@@ -147,7 +150,10 @@ class EasyTuple {
    *  (de)activation upon construction. An optional cut can be supplied to 
    *  further reduce the dataset.
    * 
-   *  If the dataset has already been converted, this function will throw an 
+   *  RooFormulaVars in the argset will automatically be added to the dataset
+   *  and therewith converted to real variables in the dataset.
+   *
+   *  If the dataset has already been converted, this function will throw an
    *  exception (reconverting the dataset is not supported). If you just want to
    *  get the already converted dataset again, use dataset().
    *
