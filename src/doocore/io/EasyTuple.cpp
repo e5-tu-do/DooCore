@@ -113,3 +113,22 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, co
   
   return *dataset_;
 }
+
+RooRealVar& doocore::io::EasyTuple::Var(const std::string& name) {
+  if (dataset_ != NULL && dataset_->get()->find(name.c_str()) != NULL) {
+    RooRealVar* var = dynamic_cast<RooRealVar*>(dataset_->get()->find(name.c_str()));
+    if (var != NULL) {
+      return *var;
+    } else {
+      serr << "Variable " << name << " in dataset is not of type RooRealVar." << endmsg;
+      throw 5;
+    }
+  } else {
+    serr << "Variable " << name << " not in dataset or tuple not converted to dataset." << endmsg;
+    throw 5;
+  }
+}
+
+const RooRealVar& doocore::io::EasyTuple::Var(const std::string& name) const {
+  return const_cast<doocore::io::EasyTuple*>(this)->Var(name);
+}

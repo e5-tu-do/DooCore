@@ -12,11 +12,14 @@ int main() {
   using namespace doocore::io;
   
   RooRealVar varMass("varMass", "varMass", 5000, 6000);
-  RooFormulaVar varMassShift("varMassShift", "varMassShift", "@0-5.0", RooArgList(varMass));
+  RooFormulaVar varMassShift_formula("varMassShift", "varMassShift", "@0-5.0", RooArgList(varMass));
   
   // standard use case: open tuple as RooDataSet
-  EasyTuple etuple("test.root", "Bs2Jpsif0", RooArgSet(varMass, varMassShift));
+  EasyTuple etuple("test.root", "Bs2Jpsif0", RooArgSet(varMass, varMassShift_formula));
   RooDataSet& data = etuple.ConvertToDataSet();
+  
+  RooRealVar& varMassShift = etuple.Var("varMassShift");
+  varMassShift.Print();
   
   data.Print();
 }

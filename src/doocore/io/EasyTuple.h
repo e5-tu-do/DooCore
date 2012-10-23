@@ -10,6 +10,7 @@ class RooArgSet;
 class TFile;
 class TTree;
 class RooDataSet;
+class RooRealVar;
 
 namespace doocore {
 namespace io {
@@ -162,7 +163,31 @@ class EasyTuple {
    *  @return the converted dataset
    */
   RooDataSet& ConvertToDataSet(const RooArgSet& argset, const std::string& cut="");
-    
+  
+  /**
+   *  @brief Access variable in dataset
+   *
+   *  After the tuple has been converted to a RooDataSet, use this function to 
+   *  access any RooRealVar in the RooDataSet. If not found or tuple not 
+   *  converted to a dataset, an exception is thrown.
+   *
+   *  @param name name of the variable
+   *  @return reference to the appropriate RooRealVar in the dataset
+   */
+  const RooRealVar& Var(const std::string& name) const;
+
+  /**
+   *  @brief Access variable in dataset
+   *
+   *  After the tuple has been converted to a RooDataSet, use this function to
+   *  access any RooRealVar in the RooDataSet. If not found or tuple not
+   *  converted to a dataset, an exception is thrown.
+   *
+   *  @param name name of the variable
+   *  @return reference to the appropriate RooRealVar in the dataset
+   */
+  RooRealVar& Var(const std::string& name);
+  
  protected:
   
  private:
