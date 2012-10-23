@@ -47,8 +47,10 @@ namespace io {
  *   RooDataSet& data = etuple.ConvertToDataSet("cutVar == 1");
  *
  *   // print the tuple - notice that the RooFormulaVar varMassShift has 
- *   // automatically been added.
+ *   // automatically been added and that the accessed variable is of type
+ *   // RooRealVar.
  *   data.Print();
+ *   etuple.Var("varMassShift").Print();
  *
  *   // other use case: open tuple and get TTree to iterate by hand
  *   EasyTuple etuple2("tuplefile.root", "Bs2Jpsif0",
