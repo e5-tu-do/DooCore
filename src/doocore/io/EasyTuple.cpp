@@ -14,6 +14,8 @@
 #include "RooAbsArg.h"
 #include "RooDataSet.h"
 #include "RooFormulaVar.h"
+#include "RooCategory.h"
+#include "RooRealVar.h"
 
 // from project
 #include "doocore/io/MsgStream.h"
@@ -48,8 +50,9 @@ doocore::io::EasyTuple::EasyTuple(const std::string& file_name, const std::strin
   
   while ((arg=(RooAbsArg*)it->Next())) {
     RooRealVar* var = dynamic_cast<RooRealVar*>(arg);
+    RooCategory* cat = dynamic_cast<RooCategory*>(arg);
     
-    if (var != NULL) {
+    if (var != NULL || cat != NULL) {
       if (tree_->GetBranch(arg->GetName()) == NULL) {
         swarn << "Branch " << arg->GetName() << " not in tree. Ignoring." << endmsg;
       } else {
