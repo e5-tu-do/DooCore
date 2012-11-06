@@ -94,6 +94,18 @@ class EasyTuple {
   EasyTuple(const std::string& file_name, const std::string& tree_name, const RooArgSet& argset);
   
   /**
+   *  @brief Constructor for EasyTuple based on a given TTree
+   *
+   *  Based on the supplied TTree, EasyTuple will deactivate all branches not in
+   *  the supplied RooArgSet. EasyTuple will not assume ownership over the 
+   *  supplied TTree but may deactivate branches in it.
+   *
+   *  @param tree TTree to use
+   *  @param argset RooArgSet of parameters to activate
+   */
+  EasyTuple(TTree* tree, const RooArgSet& argset);
+  
+  /**
    *  @brief Destructor for EasyTuple
    */
   ~EasyTuple();

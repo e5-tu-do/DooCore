@@ -63,10 +63,38 @@ doocore::io::EasyTuple::EasyTuple(const std::string& file_name, const std::strin
   delete it;
 }
 
+doocore::io::EasyTuple::EasyTuple(TTree* tree, const RooArgSet& argset)
+: file_(NULL),
+tree_(tree),
+argset_(NULL),
+dataset_(NULL)
+{
+  argset_ = new RooArgSet(argset);
+    
+  tree_->SetBranchStatus("*", 0);
+  
+  RooLinkedListIter* it  = (RooLinkedListIter*)argset.createIterator();
+  RooAbsArg*         arg = NULL;
+  
+  while ((arg=(RooAbsArg*)it->Next())) {
+    RooRealVar* var = dynamic_cast<RooRealVar*>(arg);
+    RooCategory* cat = dynamic_cast<RooCategory*>(arg);
+    
+    if (var != NULL || cat != NULL) {
+      if (tree_->GetBranch(arg->GetName()) == NULL) {
+        swarn << "Branch " << arg->GetName() << " not in tree. Ignoring." << endmsg;
+      } else {
+        tree_->SetBranchStatus(arg->GetName(), 1);
+      }
+    }
+  }
+  delete it;
+}
+
 doocore::io::EasyTuple::~EasyTuple() {
   if (dataset_ != NULL) delete dataset_;
   if (argset_ != NULL) delete argset_;
-  if (tree_ != NULL) delete tree_;
+  if (tree_ != NULL && file_!= NULL) delete tree_;
   if (file_ != NULL) delete file_;
 }
 
