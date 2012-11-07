@@ -16,6 +16,7 @@
 #include "RooFormulaVar.h"
 #include "RooCategory.h"
 #include "RooRealVar.h"
+#include "RooCmdArg.h"
 
 // from project
 #include "doocore/io/MsgStream.h"
@@ -103,11 +104,33 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const std::string& cut) {
     serr << "Internal argset not set. Cannot convert to RooDataSet without this." << endmsg;
     throw 4;
   }
-  
+    
   return ConvertToDataSet(*argset_, cut);
 }
 
-RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, const std::string& cut) {
+RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooCmdArg& arg1,
+                                                     const RooCmdArg& arg2,
+                                                     const RooCmdArg& arg3,
+                                                     const RooCmdArg& arg4,
+                                                     const RooCmdArg& arg5,
+                                                     const RooCmdArg& arg6,
+                                                     const RooCmdArg& arg7) {
+  if (argset_ == NULL) {
+    serr << "Internal argset not set. Cannot convert to RooDataSet without this." << endmsg;
+    throw 4;
+  }
+  
+  return ConvertToDataSet(*argset_, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+}
+
+RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset,
+                                                     const RooCmdArg& arg1,
+                                                     const RooCmdArg& arg2,
+                                                     const RooCmdArg& arg3,
+                                                     const RooCmdArg& arg4,
+                                                     const RooCmdArg& arg5,
+                                                     const RooCmdArg& arg6,
+                                                     const RooCmdArg& arg7) {
   if (dataset_ != NULL) {
     serr << "Dataset was converted before. Maybe you want to use doocore::io::EasyTuple::dataset()." << endmsg;
     throw 3;
@@ -130,11 +153,8 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, co
   }
   delete it;
   
-  if (cut.length() == 0) {
-    dataset_ = new RooDataSet("dataset","dataset",new_set,Import(*tree_));
-  } else {
-    dataset_ = new RooDataSet("dataset","dataset",new_set,Cut(cut.c_str()),Import(*tree_));
-  }
+  dataset_ = new RooDataSet("dataset","dataset",new_set,Import(*tree_), arg1,
+                            arg2, arg3, arg4, arg5, arg6, arg7);
   
   for (std::vector<RooFormulaVar*>::const_iterator it = formulas.begin();
        it != formulas.end(); ++it) {
@@ -143,6 +163,19 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, co
   }
   
   return *dataset_;
+}
+
+RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, const std::string& cut) {
+  swarn << "doocore::io::EasyTuple::ConvertToDataSet(const std::string& cut) and doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, const std::string& cut) are deprecated." << endmsg;
+  swarn << "These functions will be removed in a future version of DooCore. Please use the appropriate versions with RooCmdArgs instead:" << endmsg;
+  swarn << " - doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, const RooCmdArg& arg1, ...)" << endmsg;
+  swarn << " - doocore::io::EasyTuple::ConvertToDataSet(const RooCmdArg& arg1, ...)" << endmsg;
+  
+  if (cut.length() == 0) {
+    return ConvertToDataSet(argset);
+  } else {
+    return ConvertToDataSet(argset, Cut(cut.c_str()));
+  }
 }
 
 RooRealVar& doocore::io::EasyTuple::Var(const std::string& name) {

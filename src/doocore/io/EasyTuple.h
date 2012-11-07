@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 
+// from RooFit
+#include "RooCmdArg.h"
+
 // forward decalarations
 class RooArgSet;
 class TFile;
@@ -139,10 +142,41 @@ class EasyTuple {
   RooDataSet& dataset() {return *dataset_;}
   
   /**
-   *  @brief Get RooDataSet based on opened TTree and supplied optional cut
+   *  @brief Get RooDataSet based on opened TTree and supplied optional RooCmdArgs
    *
    *  The internal tree will be converted into a RooDataSet and this RooDataSet
-   *  returned. The internally stored argset will be used. An optional cut can 
+   *  returned. The internally stored argset will be used. Optional cuts or 
+   *  arguments can be supplied as RooCmdArgs.
+   *
+   *  RooFormulaVars in the argset will automatically be added to the dataset
+   *  and therewith converted to real variables in the dataset.
+   *
+   *  If the dataset has already been converted, this function will throw an
+   *  exception (reconverting the dataset is not supported). If you just want to
+   *  get the already converted dataset again, use dataset().
+   *
+   *  @param arg1 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg2 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg3 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg4 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg5 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg6 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg7 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @return the converted dataset
+   */
+  RooDataSet& ConvertToDataSet(const RooCmdArg& arg1 = RooCmdArg(),
+                               const RooCmdArg& arg2 = RooCmdArg(),
+                               const RooCmdArg& arg3 = RooCmdArg(),
+                               const RooCmdArg& arg4 = RooCmdArg(),
+                               const RooCmdArg& arg5 = RooCmdArg(),
+                               const RooCmdArg& arg6 = RooCmdArg(),
+                               const RooCmdArg& arg7 = RooCmdArg());
+  
+  /**
+   *  @brief (DEPRECATED) Get RooDataSet based on opened TTree and supplied optional cut
+   *
+   *  The internal tree will be converted into a RooDataSet and this RooDataSet
+   *  returned. The internally stored argset will be used. An optional cut can
    *  be supplied to further reduce the dataset.
    *
    *  RooFormulaVars in the argset will automatically be added to the dataset
@@ -152,19 +186,21 @@ class EasyTuple {
    *  exception (reconverting the dataset is not supported). If you just want to
    *  get the already converted dataset again, use dataset().
    *
+   *  This function is deprecated and will be removed in a future version.
+   *
    *  @param cut optional cut to reduce dataset
    *  @return the converted dataset
    */
-  RooDataSet& ConvertToDataSet(const std::string& cut="");
+  RooDataSet& ConvertToDataSet(const std::string& cut);
   
   /**
-   *  @brief Get RooDataSet based on opened TTree and supplied argset and cut
+   *  @brief Get RooDataSet based on opened TTree and supplied argset and optional RooCmdArgs
    *
    *  The internal tree will be converted into a RooDataSet and this RooDataSet
    *  returned. The supplied argset has to be a subset of the variables used for
-   *  (de)activation upon construction. An optional cut can be supplied to 
-   *  further reduce the dataset.
-   * 
+   *  (de)activation upon construction. Optional cuts or arguments can be 
+   *  supplied as RooCmdArgs.
+   *
    *  RooFormulaVars in the argset will automatically be added to the dataset
    *  and therewith converted to real variables in the dataset.
    *
@@ -173,10 +209,46 @@ class EasyTuple {
    *  get the already converted dataset again, use dataset().
    *
    *  @param argset the RooArgSet used for conversion
+   *  @param arg1 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg2 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg3 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg4 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg5 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg6 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @param arg7 optional RooCmdArg as in RooDataSet::RooDataSet(...)
+   *  @return the converted dataset
+   */
+  RooDataSet& ConvertToDataSet(const RooArgSet& argset,
+                               const RooCmdArg& arg1 = RooCmdArg(),
+                               const RooCmdArg& arg2 = RooCmdArg(),
+                               const RooCmdArg& arg3 = RooCmdArg(),
+                               const RooCmdArg& arg4 = RooCmdArg(),
+                               const RooCmdArg& arg5 = RooCmdArg(),
+                               const RooCmdArg& arg6 = RooCmdArg(),
+                               const RooCmdArg& arg7 = RooCmdArg());
+  
+  /**
+   *  @brief (DEPRECATED) Get RooDataSet based on opened TTree and supplied argset and cut
+   *
+   *  The internal tree will be converted into a RooDataSet and this RooDataSet
+   *  returned. The supplied argset has to be a subset of the variables used for
+   *  (de)activation upon construction. An optional cut can be supplied to
+   *  further reduce the dataset.
+   *
+   *  RooFormulaVars in the argset will automatically be added to the dataset
+   *  and therewith converted to real variables in the dataset.
+   *
+   *  If the dataset has already been converted, this function will throw an
+   *  exception (reconverting the dataset is not supported). If you just want to
+   *  get the already converted dataset again, use dataset().
+   *
+   *  This function is deprecated and will be removed in a future version.
+   *
+   *  @param argset the RooArgSet used for conversion
    *  @param cut optional cut to reduce dataset
    *  @return the converted dataset
    */
-  RooDataSet& ConvertToDataSet(const RooArgSet& argset, const std::string& cut="");
+  RooDataSet& ConvertToDataSet(const RooArgSet& argset, const std::string& cut);
   
   /**
    *  @brief Access variable in dataset

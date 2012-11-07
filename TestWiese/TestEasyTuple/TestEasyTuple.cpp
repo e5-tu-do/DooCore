@@ -1,3 +1,5 @@
+// from STL
+#include <string>
 
 // from RooFit
 #include "RooDataSet.h"
@@ -16,7 +18,7 @@ int main() {
   
   // standard use case: open tuple as RooDataSet
   EasyTuple etuple("test.root", "Bs2Jpsif0", RooArgSet(varMass, varMassShift_formula));
-  RooDataSet& data = etuple.ConvertToDataSet();
+  RooDataSet& data = etuple.ConvertToDataSet(std::string("varMass>5200"));
   
   RooRealVar& varMassShift = etuple.Var("varMassShift");
   varMassShift.Print();
