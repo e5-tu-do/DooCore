@@ -3,6 +3,7 @@
 
 // from STL
 #include <string>
+#include <vector>
 
 // from ROOT
 
@@ -83,6 +84,13 @@ class EasyConfig {
    *  @return an std::string
    */
   std::string getString(std::string name);
+
+  /**
+   *  @brief Get vector of strings from config file
+   *
+   *  @return an std::vector<std::string>
+   */
+  std::vector<std::string> getVoStrings(std::string name);
 
   /**
    *  @brief Get boolean from config file

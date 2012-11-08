@@ -20,7 +20,9 @@ namespace doocore {
 namespace config {
 Summary *Summary::instance_ = NULL;
 
-Summary::Summary(){}
+Summary::Summary(){
+  debug_mode_ = false;
+}
 
 Summary::Summary(const Summary&){}
 
