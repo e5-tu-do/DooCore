@@ -44,7 +44,7 @@ doocore::io::EasyTuple::EasyTuple(const std::string& file_name, const std::strin
     throw 2;
   }
   
-  tree_->SetBranchStatus("*", 0);
+  if (argset.getSize() > 0) tree_->SetBranchStatus("*", 0);
   
   RooLinkedListIter* it  = (RooLinkedListIter*)argset.createIterator();
   RooAbsArg*         arg = NULL;
@@ -71,8 +71,8 @@ argset_(NULL),
 dataset_(NULL)
 {
   argset_ = new RooArgSet(argset);
-    
-  tree_->SetBranchStatus("*", 0);
+  
+  if (argset.getSize() > 0) tree_->SetBranchStatus("*", 0);
   
   RooLinkedListIter* it  = (RooLinkedListIter*)argset.createIterator();
   RooAbsArg*         arg = NULL;

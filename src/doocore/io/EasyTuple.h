@@ -7,6 +7,7 @@
 
 // from RooFit
 #include "RooCmdArg.h"
+#include "RooArgSet.h"
 
 // forward decalarations
 class RooArgSet;
@@ -94,7 +95,7 @@ class EasyTuple {
    *  @param tree_name tree name in TFile to open
    *  @param argset RooArgSet of parameters to activate
    */
-  EasyTuple(const std::string& file_name, const std::string& tree_name, const RooArgSet& argset);
+  EasyTuple(const std::string& file_name, const std::string& tree_name, const RooArgSet& argset=RooArgSet());
   
   /**
    *  @brief Constructor for EasyTuple based on a given TTree
@@ -106,7 +107,7 @@ class EasyTuple {
    *  @param tree TTree to use
    *  @param argset RooArgSet of parameters to activate
    */
-  EasyTuple(TTree* tree, const RooArgSet& argset);
+  EasyTuple(TTree* tree, const RooArgSet& argset=RooArgSet());
   
   /**
    *  @brief Destructor for EasyTuple
