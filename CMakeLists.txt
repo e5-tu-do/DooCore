@@ -31,6 +31,8 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 project(DooCore)
 cmake_minimum_required(VERSION 2.6)
 
+install(FILES external/FindDooCore.cmake DESTINATION cmake/Modules)
+
 FIND_PACKAGE(Boost 1.48 COMPONENTS program_options filesystem regex thread system random REQUIRED)
 find_package(ROOT REQUIRED)
 
