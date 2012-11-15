@@ -86,7 +86,7 @@ class Summary {
   void Print();
 
   /// not yet implemented (write to output file)
-  void Write(TString filename);
+  void Write(std::string filename="");
   
   /// not yet implemented
   void StartClock();

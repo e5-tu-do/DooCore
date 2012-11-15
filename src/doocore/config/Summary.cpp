@@ -74,8 +74,24 @@ void Summary::Print(){
   doocore::io::scfg << "" << doocore::io::endmsg;
 }
 
-void Summary::Write(TString filename) {
-  // to be implemented
+void Summary::Write(std::string filename) {
+  doocore::io::MsgStream fileoutput(doocore::io::kTextBlue, filename);
+
+  fileoutput << "- ==================== Summary ====================" << doocore::io::endmsg;
+  for(size_t i = 0; i < log_.size(); ++i)
+  {
+    if (log_.at(i).first == "Summary::SECTION"){
+      fileoutput << "- -------------------- " << log_.at(i).second << " --------------------" << doocore::io::endmsg;
+    }
+    else if(log_.at(i).first == "Summary::HLINE"){
+      fileoutput << "- --------------------------------------------------" << doocore::io::endmsg;
+    }
+    else{
+      fileoutput << "--- " << log_.at(i).first << "\r\t\t\t\t" << " : " << log_.at(i).second << doocore::io::endmsg;
+    }
+  }
+  fileoutput << "- ==================================================" << doocore::io::endmsg;
+  fileoutput << "" << doocore::io::endmsg;
 }
 
 void Summary::StartClock() {

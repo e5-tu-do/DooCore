@@ -2,6 +2,7 @@
 #define DOOCORE_IO_MSGSTREAM_H
 
 #include <iostream>
+#include <fstream>
 #include <sstream> 
 #include <cstring>
 
@@ -60,7 +61,12 @@ public:
    *
    *  @param color The color to be used for this stream
    */
-  MsgStream(TerminalColor color) : text_color_(color), is_active_(true) {}
+  MsgStream(TerminalColor color, const std::string& outfile_name="") : text_color_(color), is_active_(true) {
+    if(outfile_name.length()>0){
+      filestream_.open(outfile_name.c_str());
+    }
+  }
+
   /**
    *  \brief Default constructor for standard uncolored output
    */
@@ -91,6 +97,10 @@ public:
       std::cout << std::string(indent_, ' ');
       std::cout << os_.str() << std::endl;
       if (!TerminalIsRedirected()) ResetTerminal();
+      if (filestream_.is_open()){
+        filestream_ << std::string(indent_, ' ');
+        filestream_ << os_.str() << std::endl;
+      }
     }
     os_.str("");
       
@@ -210,6 +220,11 @@ protected:
    *  \brief Indent for new lines.
    */
   static int indent_;
+
+  /**
+   *  \brief Stream for file output.
+   */
+   std::ofstream filestream_;
 };
 
 /// \brief MsgStream function to end a message (i.e. newline) and force the output. 
