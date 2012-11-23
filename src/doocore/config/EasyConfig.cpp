@@ -58,7 +58,7 @@ std::vector<std::string> EasyConfig::getVoStrings(std::string name){
   std::set<std::string> set;
   std::vector<std::string> vec;
   BOOST_FOREACH(boost::property_tree::ptree::value_type &t, ptree_.get_child(name))
-  set.insert(t.second.data());
+  set.insert(t.first.data());
   if (debug_mode_) doocore::io::swarn << "Key: " << name << ", Values: " << doocore::io::endmsg;
   for(std::set<std::string>::iterator it = set.begin(); it != set.end(); it++){
     if (debug_mode_) doocore::io::swarn << "\t\t\t" << (*it) << doocore::io::endmsg;

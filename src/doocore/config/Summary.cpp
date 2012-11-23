@@ -8,10 +8,12 @@
 
 // from ROOT
 #include <TString.h>
+#include <TCut.h>
 
 // from TMVA
 
 // from BOOST
+#include <boost/lexical_cast.hpp>
 
 // from DooCore
 #include "doocore/io/MsgStream.h"
@@ -45,7 +47,52 @@ void Summary::Add(TString description, TString argument){
   tpair.first = description;
   tpair.second = argument;
   log_.push_back(tpair);
-  if(debug_mode_) {doocore::io::sinfo << description << " with value " << argument << " saved to project summary." << doocore::io::endmsg;}
+  if(debug_mode_) {doocore::io::sinfo << tpair.first  << " with value " << tpair.second << " saved to project summary." << doocore::io::endmsg;}
+}
+
+void Summary::Add(TString description, TCut argument){
+  std::pair< TString,TString > tpair;
+  tpair.first = description;
+  tpair.second = argument.GetName();
+  log_.push_back(tpair);
+  if(debug_mode_) {doocore::io::sinfo << tpair.first  << " with value " << tpair.second << " saved to project summary." << doocore::io::endmsg;}
+}
+
+void Summary::Add(TString description, bool argument){
+  std::pair< TString,TString > tpair;
+  tpair.first = description;
+  if (argument){
+    tpair.second = "true";
+  }
+  else{
+    tpair.second = "false";
+  }
+  log_.push_back(tpair);
+  if(debug_mode_) {doocore::io::sinfo << tpair.first  << " with value " << tpair.second << " saved to project summary." << doocore::io::endmsg;}
+}
+
+void Summary::Add(TString description, std::string argument){
+  std::pair< TString,TString > tpair;
+  tpair.first = description;
+  tpair.second = argument;
+  log_.push_back(tpair);
+  if(debug_mode_) {doocore::io::sinfo << tpair.first  << " with value " << tpair.second << " saved to project summary." << doocore::io::endmsg;}
+}
+
+void Summary::Add(TString description, double argument){
+  std::pair< TString,TString > tpair;
+  tpair.first = description;
+  tpair.second = boost::lexical_cast<std::string>(argument);
+  log_.push_back(tpair);
+  if(debug_mode_) {doocore::io::sinfo << tpair.first  << " with value " << tpair.second << " saved to project summary." << doocore::io::endmsg;}
+}
+
+void Summary::Add(TString description, int argument){
+  std::pair< TString,TString > tpair;
+  tpair.first = description;
+  tpair.second = boost::lexical_cast<std::string>(argument);
+  log_.push_back(tpair);
+  if(debug_mode_) {doocore::io::sinfo << tpair.first  << " with value " << tpair.second << " saved to project summary." << doocore::io::endmsg;}
 }
 
 void Summary::AddSection(TString name){

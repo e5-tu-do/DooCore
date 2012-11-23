@@ -15,6 +15,7 @@
 // from here
 
 // forward declarations
+class TCut;
 
 namespace doocore {
 namespace config {
@@ -69,6 +70,11 @@ class Summary {
    *  @brief add a key/value pair to the summary
    */
   void Add(TString description, TString argument);
+  void Add(TString description, TCut argument);
+  void Add(TString description, bool argument);
+  void Add(TString description, std::string argument);
+  void Add(TString description, double argument);
+  void Add(TString description, int argument);
   
   /**
    *  @brief add a section to the summary
