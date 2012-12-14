@@ -841,10 +841,7 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
   }
   std::sort(entries.begin(), entries.end());
 
-  doocore::io::sinfo << "min " << entries[0] << " max " << entries[num_entries-1] << doocore::io::endmsg;
-
   int idx_median = num_entries/2;       
-  doocore::io::sinfo << "median " << idx_median << " : " << entries[idx_median] << doocore::io::endmsg;
   std::pair<double, double> minmax;
   
   minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
@@ -874,9 +871,6 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
     minmax.first  = -1;
     minmax.second = +1;
   }
-  
-  doocore::io::sinfo << "minmax first " << minmax.first << doocore::io::endmsg;
-  doocore::io::sinfo << "minmax second " << minmax.second << doocore::io::endmsg;
 
   return minmax;
 }
