@@ -799,6 +799,14 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
   minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
   minmax.second = -4*entries[idx_median]+5*entries[(int)(num_entries-idx_median*0.32)];
   
+  // if computed range is larger than min/max value choose those
+  if (minmax.first < entries[0]){
+  	minmax.first = entries[0];
+  }
+  if (minmax.second > entries[num_entries-1]){
+  	minmax.second = entries[num_entries-1];
+  }
+  
   if (minmax.first >= minmax.second) {
     minmax.first  = entries[idx_median]*(minmax.first  > 0 ? 0.98 : 1.02);
     minmax.second = entries[idx_median]*(minmax.second > 0 ? 1.02 : 0.98);
@@ -816,6 +824,60 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
     minmax.second = +1;
   }
   
+  return minmax;
+}
+
+std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std::string var_name) {
+  int num_entries = tree.GetEntries();
+  std::vector<double> entries(num_entries);
+  
+  // convert entries into vector (for sorting)
+  float entry;
+  tree.SetBranchAddress(TString(var_name), &entry);
+  for (int i = 0; i < num_entries; ++i)
+  {
+    tree.GetEvent(i);
+    entries[i] = entry;
+  }
+  std::sort(entries.begin(), entries.end());
+
+  doocore::io::sinfo << "min " << entries[0] << " max " << entries[num_entries-1] << doocore::io::endmsg;
+
+  int idx_median = num_entries/2;       
+  doocore::io::sinfo << "median " << idx_median << " : " << entries[idx_median] << doocore::io::endmsg;
+  std::pair<double, double> minmax;
+  
+  minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
+  minmax.second = -4*entries[idx_median]+5*entries[(int)(num_entries-idx_median*0.32)];
+
+  // if computed range is larger than min/max value choose those
+  if (minmax.first < entries[0]){
+  	minmax.first = entries[0];
+  }
+  if (minmax.second > entries[num_entries-1]){
+  	minmax.second = entries[num_entries-1];
+  }
+
+  if (minmax.first >= minmax.second) {
+    minmax.first  = entries[idx_median]*(minmax.first  > 0 ? 0.98 : 1.02);
+    minmax.second = entries[idx_median]*(minmax.second > 0 ? 1.02 : 0.98);
+  }
+  
+  // if everything fails, just take all
+  if (minmax.first == 0 && minmax.second == 0) {
+    minmax.first  = entries[0]-0.1*(entries[num_entries-1]-entries[0]);
+    minmax.second = entries[num_entries-1]+0.1*(entries[num_entries-1]-entries[0]);
+  }
+  
+  // if still empty range, go from -1 to +1
+  if (minmax.first == 0 && minmax.second == 0) {
+    minmax.first  = -1;
+    minmax.second = +1;
+  }
+  
+  doocore::io::sinfo << "minmax first " << minmax.first << doocore::io::endmsg;
+  doocore::io::sinfo << "minmax second " << minmax.second << doocore::io::endmsg;
+
   return minmax;
 }
 

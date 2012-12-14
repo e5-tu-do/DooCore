@@ -167,7 +167,20 @@ void		Symmetrize(TMatrixD &m);
  *  @return pair of (double,double) as (min,max) to use for plotting
  */
 std::pair<double,double> MedianLimitsForTuple(const RooDataSet& dataset, std::string var_name);
-  
+/**
+ *  @brief Median limits for tuple (here: TTree)
+ *
+ *  This function will evaluate the distribution of the variable with name 
+ *  var_name in the tree. It will return a pair as (min, max) as plotting
+ *  range for the distribution neglecting outliers by a quantile based 
+ *  approach.
+ *
+ *  @param dataset RooDataSet to evaluate
+ *  @param var_name name of variable in dataset to evaluate
+ *  @return pair of (double,double) as (min,max) to use for plotting
+ */
+std::pair<double,double> MedianLimitsForTuple(TTree& tree, std::string var_name); 
+
 } // namespace lutils
 } // namespace doocore
 
