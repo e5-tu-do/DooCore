@@ -520,6 +520,55 @@ void doocore::lutils::drawOrdered(TH1* h1, TH1* h2, TH1* h3, TH1* h4)
 	}
 }
 
+/*
+ * Given up to four histograms, draw the largest one first, then
+ * the smaller ones upon it in order. This is to avoid the clash with the "same"
+ * option of TH1::DrawNormalized().
+ */
+void doocore::lutils::drawNormalizedOrdered(TH1* h1, TH1* h2, TH1* h3, TH1* h4)
+{
+	TH1* h[4];
+	h[0] = h1;
+	h[1] = h2;
+	h[2] = h3;
+	h[3] = h4;
+	
+	int nmax = 2;
+	if ( h3!=0 ) nmax++;
+	if ( h4!=0 ) nmax++;
+	
+	// copy over axes because the plot will have the axes from
+	// the histogram we draw first
+	for ( int i=1; i<nmax; i++ )
+	{
+		h[i]->GetXaxis()->SetTitle(h[0]->GetXaxis()->GetTitle());
+		h[i]->GetYaxis()->SetTitle(h[0]->GetYaxis()->GetTitle());
+	}	
+	
+	int ord[4] = {0};
+
+	for ( int i=0; i<nmax; i++ )
+	{
+		int greaterThan = 0;
+		
+		for ( int j=0; j<nmax; j++ )
+		{
+			if ( h[i]->GetMaximum() > h[j]->GetMaximum() ) greaterThan++;
+		}
+		
+		ord[nmax-1-greaterThan] = i;
+	}
+	
+	// don't use up all plot space
+	h[ord[0]]->GetYaxis()->SetRangeUser(0., h[ord[0]]->GetMaximum()*1.3);
+	
+	for ( int i=0; i<nmax; i++ )
+	{
+		cout << "doocore::lutils::DrawNormalizedOrdered() : Drawing " << h[ord[i]]->GetName() << " ..." << endl;
+		if ( i==0 ) h[ord[i]]->DrawNormalized();
+		else        h[ord[i]]->DrawNormalized("same");
+	}
+}
 
 /*
  * Symmetrize a matrix by copying the upper left triangle

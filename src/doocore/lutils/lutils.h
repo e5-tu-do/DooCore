@@ -107,26 +107,27 @@ public:
 //	
 // plots
 //
-void		setStyle(TString option="LHCb");
-void		setHotColdPalette(TH2* h=0);
-void		setRedBluePalette(TH2* h=0);
+void setStyle(TString option="LHCb");
+void setHotColdPalette(TH2* h=0);
+void setRedBluePalette(TH2* h=0);
 
-void		printPlotOpenStack(TCanvas* c, TString name, TString dir="");
-void		printPlot(TCanvas* c, TString name, TString dir="");
-void		printPlotCloseStack(TCanvas* c, TString name, TString dir="");
+void printPlotOpenStack(TCanvas* c, TString name, TString dir="");
+void printPlot(TCanvas* c, TString name, TString dir="");
+void printPlotCloseStack(TCanvas* c, TString name, TString dir="");
 
-void		drawDate(float x1=0.10, float y1=0.02, float x2=0.5, float y2=0.1);	
-void		drawOrdered(TH1* h1, TH1* h2, TH1* h3=0, TH1* h4=0);
+void drawDate(float x1=0.10, float y1=0.02, float x2=0.5, float y2=0.1);	
+void drawOrdered(TH1* h1, TH1* h2, TH1* h3=0, TH1* h4=0);
+void drawNormalizedOrdered(TH1* h1, TH1* h2, TH1* h3=0, TH1* h4=0);
 
-void		addEtaPtLabels(TH2D* h);
+void addEtaPtLabels(TH2D* h);
 
-void 		PlotSimple(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,  TString pDir = "", bool plot_logy = false, TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
+void PlotSimple(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,  TString pDir = "", bool plot_logy = false, TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
 
-void 		PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, 
+void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, 
                       TString pDir = "", bool normalize_residuals = true, bool plot_logy = false,
                       TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
 
-void 		PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF,
+void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF,
 	                      TString pDir, bool normalize_residuals, bool plot_logy,
 	                      TLegend * label, bool plot_logx = false);
 
