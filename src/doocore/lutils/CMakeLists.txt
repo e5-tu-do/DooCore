@@ -1,5 +1,5 @@
-add_library(LUtils SHARED lutils.cpp lutils.h)
-target_link_libraries(LUtils IO ${ROOT_LIBRARIES} ${ROOFIT_LIBRARIES} ${Boost_LIBRARIES})
-install(TARGETS LUtils DESTINATION lib)
+add_library(dcLUtils SHARED lutils.cpp lutils.h)
+target_link_libraries(dcLUtils dcIO ${ROOT_LIBRARIES} ${ROOFIT_LIBRARIES} ${Boost_LIBRARIES})
+install(TARGETS dcLUtils DESTINATION lib)
 install(FILES lutils.h DESTINATION include/doocore/lutils)
 
