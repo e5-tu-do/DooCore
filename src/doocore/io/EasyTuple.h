@@ -110,6 +110,13 @@ class EasyTuple {
   EasyTuple(TTree* tree, const RooArgSet& argset=RooArgSet());
   
   /**
+   *  @brief Copy constructor for EasyTuple
+   *
+   *  @param other other EasyTuple to copy
+   */
+  EasyTuple(const EasyTuple& other);
+  
+  /**
    *  @brief Destructor for EasyTuple
    */
   ~EasyTuple();
@@ -294,6 +301,10 @@ class EasyTuple {
    *  @brief Internal RooDataSet pointer
    */
   RooDataSet* dataset_;
+  /**
+   *  @brief Tree name in TFile for copying
+   */
+  std::string tree_name_;
 }; // class EasyTuple
 } // namespace utils
 } // namespace doofit

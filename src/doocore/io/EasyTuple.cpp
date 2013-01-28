@@ -28,7 +28,8 @@ doocore::io::EasyTuple::EasyTuple(const std::string& file_name, const std::strin
 : file_(NULL),
   tree_(NULL),
   argset_(NULL),
-  dataset_(NULL)
+  dataset_(NULL),
+  tree_name_(tree_name)
 {
   file_ = new TFile(file_name.c_str());
   argset_ = new RooArgSet(argset);
@@ -90,6 +91,53 @@ dataset_(NULL)
     }
   }
   delete it;
+}
+
+doocore::io::EasyTuple::EasyTuple(const EasyTuple& other)
+: file_(NULL),
+tree_(NULL),
+argset_(NULL),
+dataset_(NULL),
+tree_name_(other.tree_name_)
+{
+  sdebug << "Invoking EasyTuple copy constructor" << endmsg;
+  argset_ = new RooArgSet(*other.argset_);
+  
+  if (file_ == NULL) {
+    tree_ = other.tree_;
+  } else {
+    file_ = new TFile(other.file_->GetName());
+    
+    if (file_ == NULL || file_->IsZombie() || file_->GetNkeys() <= 0) {
+      serr << "File could not be opened properly." << endmsg;
+      throw 1;
+    }
+    
+    tree_ = dynamic_cast<TTree*>(file_->Get(tree_name_.c_str()));
+    if (tree_ == NULL) {
+      serr << "Tree " << tree_name_ << " could not be opened properly." << endmsg;
+      throw 2;
+    }
+    
+    if (argset_->getSize() > 0) tree_->SetBranchStatus("*", 0);
+    
+    RooLinkedListIter* it  = (RooLinkedListIter*)argset_->createIterator();
+    RooAbsArg*         arg = NULL;
+    
+    while ((arg=(RooAbsArg*)it->Next())) {
+      RooRealVar* var = dynamic_cast<RooRealVar*>(arg);
+      RooCategory* cat = dynamic_cast<RooCategory*>(arg);
+      
+      if (var != NULL || cat != NULL) {
+        if (tree_->GetBranch(arg->GetName()) == NULL) {
+          swarn << "Branch " << arg->GetName() << " not in tree. Ignoring." << endmsg;
+        } else {
+          tree_->SetBranchStatus(arg->GetName(), 1);
+        }
+      }
+    }
+    delete it;
+  }
 }
 
 doocore::io::EasyTuple::~EasyTuple() {
