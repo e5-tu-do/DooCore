@@ -100,10 +100,9 @@ argset_(NULL),
 dataset_(NULL),
 tree_name_(other.tree_name_)
 {
-  sdebug << "Invoking EasyTuple copy constructor" << endmsg;
   argset_ = new RooArgSet(*other.argset_);
   
-  if (file_ == NULL) {
+  if (other.file_ == NULL) {
     tree_ = other.tree_;
   } else {
     file_ = new TFile(other.file_->GetName());
@@ -137,6 +136,10 @@ tree_name_(other.tree_name_)
       }
     }
     delete it;
+    
+    if (other.dataset_ != NULL) {
+      dataset_ = new RooDataSet(*other.dataset_);
+    }
   }
 }
 
