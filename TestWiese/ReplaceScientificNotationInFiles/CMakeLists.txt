@@ -1,0 +1,3 @@
+add_executable(ReplaceScientificNotationInFiles ReplaceScientificNotationInFiles.cpp)
+
+target_link_libraries(ReplaceScientificNotationInFiles dcIO ${ALL_LIBRARIES})

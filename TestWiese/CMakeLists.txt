@@ -1,1 +1,2 @@
 add_subdirectory(TestEasyTuple)
+add_subdirectory(ReplaceScientificNotationInFiles)
