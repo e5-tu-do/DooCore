@@ -28,12 +28,20 @@ namespace system {
 namespace tools {
 
 /**
- *  @brief Create directory
+ *  @brief Separate path and filename
  *
- *  Create directory...
+ *  Given the complete path as input argument, the path and filename are returned as std::pair<std::string, std::string>
  *
  */
-void CreateDirectory(std::string target_directory);
+std::pair<std::string, std::string> SeparatePathAndFilename(std::string complete_path);
+
+/**
+ *  @brief Remove file
+ *
+ *  Remove file...
+ *
+ */
+void RemoveFile(std::string target_file);
 
 /**
  *  @brief Copy file to given directory
@@ -43,7 +51,22 @@ void CreateDirectory(std::string target_directory);
  *  created.
  *
  */
-void CopyToDirectory(std::string source_file, std::string target_directory);
+void CopyFileToDirectory(std::string source_file, std::string target_directory);
+
+/**
+ *  @brief Replace target_file by source file
+ *
+ *
+ */
+void ReplaceFile(std::string source_file, std::string target_file);
+
+/**
+ *  @brief Create directory
+ *
+ *  Create directory...
+ *
+ */
+void CreateDirectory(std::string target_directory);
 
 }; // namespace tools
 } // namespace system

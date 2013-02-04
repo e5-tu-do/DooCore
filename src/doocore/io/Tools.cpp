@@ -2,8 +2,6 @@
 
 // from STL
 #include <iostream>
-#include <fstream>
-#include <ostream>
 
 // from ROOT
 
@@ -13,7 +11,6 @@
 
 // from BOOST
 #include "boost/filesystem.hpp"
-// #include <boost/xpressive/xpressive.hpp>
 #include "boost/regex.hpp"
 #include "boost/lexical_cast.hpp"
 
@@ -29,12 +26,9 @@ namespace io {
 
 namespace tools {
   
-void ReplaceScientificNotationInFiles(std::string filename){
-  bool debug_mode = true;
-
+void ReplaceScientificNotationInFile(std::string filename, bool debug_mode){
   /// regex
   boost::regex expr("(\\d*)e(\\+|\\-)0+([0-9]*)");
-  boost::regex expr2("\\d*e(\\+|\\-)0+[0-9]*");
   boost::match_results<std::string::const_iterator> what;
 
   /// open input file
@@ -42,15 +36,16 @@ void ReplaceScientificNotationInFiles(std::string filename){
   filestr.open(filename.c_str());
 
   /// create temp file
-  fstream tmpfilestr;
-  tmpfilestr.open("tmp.txt");
+  std::string tmpfilename = "tmp_2e7ed4bc-a50d-4bb8-b1d9-f85a39d91aec.txt";
+  ofstream tmpfilestr;
+  tmpfilestr.open(tmpfilename.c_str());
 
   std::string in_line;
   std::string out_line;
 
-  if (filestr.is_open())
+  if ((filestr.is_open()) && (tmpfilestr.is_open()))
   {
-    while ( filestr.good() )
+    while ((filestr.good()) && (tmpfilestr.good()))
     {
       getline(filestr,in_line);
       std::string zeros;
@@ -77,12 +72,16 @@ void ReplaceScientificNotationInFiles(std::string filename){
         tmpfilestr << out_line << "\n";
       }
       else {
-        doocore::io::swarn << "-warning- " << "RegExFindAndReplace -- RegEx matching failed" << doocore::io::endmsg;
+        doocore::io::swarn << "-warning- " << "ReplaceScientificNotationInFiles -- RegEx matching failed" << doocore::io::endmsg;
+        tmpfilestr << in_line << "\n";
       }
     }
   }
   filestr.close();
   tmpfilestr.close();
+
+  boost::filesystem::copy_file(tmpfilename, filename, boost::filesystem::copy_option::overwrite_if_exists);
+  boost::filesystem::remove(tmpfilename);
 }
 
 } // namespace tools

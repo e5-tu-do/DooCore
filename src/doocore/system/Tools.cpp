@@ -23,36 +23,62 @@ namespace doocore {
 namespace system {
 
 namespace tools {
+
+std::pair<std::string, std::string> SeparatePathAndFilename(std::string complete_path){
+  bool debug_mode = true;
+  if (debug_mode) doocore::io::serr << "-debug- " << "starting SeparatePathAndFilename…" << doocore::io::endmsg;
   
+  std::pair<std::string, std::string> path_and_filename;
+
+  boost::regex expr("^(.*/)([^/]*)$");
+  boost::match_results<std::string::const_iterator> what;
+
+  if( regex_search( complete_path, what, expr ) ){
+    std::string dir( what[1].first, what[1].second );
+    std::string filename( what[2].first, what[2].second );    
+
+    path_and_filename.first = dir;
+    path_and_filename.second = filename;
+  }
+  else {
+    doocore::io::swarn << "-warning- " << "SeparatePathAndFilename -- RegEx matching failed" << doocore::io::endmsg;
+  }
+  if (debug_mode) doocore::io::serr << "-debug- \t" << "Path: " << path_and_filename.first << doocore::io::endmsg;
+  if (debug_mode) doocore::io::serr << "-debug- \t" << "Filename: " << path_and_filename.second << doocore::io::endmsg;
+  return path_and_filename;
+}
+
+void RemoveFile(std::string target_file){
+  boost::filesystem::remove(target_file);
+}
+
+void CopyFileToDirectory(std::string source_file, std::string target_directory){
+  bool debug_mode = false;
+  boost::regex expr("^(.*/)([^/]*)$");
+  boost::match_results<std::string::const_iterator> what;
+  
+  std::pair<std::string, std::string> path_and_filename = SeparatePathAndFilename(source_file);
+
+  boost::filesystem::path source(path_and_filename.first + path_and_filename.second);
+  boost::filesystem::path target(target_directory + "/" + path_and_filename.second);
+
+  if (!(boost::filesystem::exists(target_directory))){
+    doocore::io::swarn << "-warning- " << "Target directory '" + target_directory + "' does not exists! Create directory...." << doocore::io::endmsg;
+    boost::filesystem::create_directories(target_directory);
+  }
+  boost::filesystem::copy_file(source, target, boost::filesystem::copy_option::overwrite_if_exists);
+  if (debug_mode) doocore::io::serr << "-debug- " << "copied file '" << path_and_filename.second << "' to output directory '" << target_directory << "'" << doocore::io::endmsg;
+}
+
+void ReplaceFile(std::string source_file, std::string target_file){
+  boost::filesystem::copy_file(source_file, target_file, boost::filesystem::copy_option::overwrite_if_exists);
+}
+
 void CreateDirectory(std::string target_directory){
   bool debug_mode = false;
   if (debug_mode) doocore::io::serr << "-debug- " << "Create directory '" << target_directory << "'" << doocore::io::endmsg;
   boost::filesystem::create_directories(target_directory);
-}  
-
-void CopyToDirectory(std::string source_file, std::string target_directory){
-  bool debug_mode = false;
-  boost::regex expr("^(.*/)([^/]*)$");
-  boost::match_results<std::string::const_iterator> what;
-    
-  if( regex_search( source_file, what, expr ) ) {
-    std::string dir( what[1].first, what[1].second );
-    std::string filename( what[2].first, what[2].second );    
-
-    boost::filesystem::path source(dir + filename);
-    boost::filesystem::path target(target_directory + "/" + filename);
-
-    if (!(boost::filesystem::exists(target_directory))){
-      doocore::io::swarn << "-warning- " << "Target directory '" + target_directory + "' does not exists! Create directory...." << doocore::io::endmsg;
-      boost::filesystem::create_directories(target_directory);
-    }
-    boost::filesystem::copy_file(source, target, boost::filesystem::copy_option::overwrite_if_exists);
-    if (debug_mode) doocore::io::serr << "-debug- " << "copied file '" << filename << "' to output directory '" << target_directory << "'" << doocore::io::endmsg;
-  }
-  else {
-    doocore::io::swarn << "-warning- " << "CopyToDirectory -- RegEx matching failed" << doocore::io::endmsg;
-  }
-}
+} 
 
 } // namespace tools
 } // namespace system

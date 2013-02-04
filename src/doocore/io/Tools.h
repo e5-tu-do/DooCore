@@ -33,7 +33,7 @@ namespace tools {
  * 
  * 
  */
-void ReplaceScientificNotationInFiles(std::string filename);
+void ReplaceScientificNotationInFile(std::string filename, bool debug_mode=false);
 
 }; // namespace tools
 } // namespace io
