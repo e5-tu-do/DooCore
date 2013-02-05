@@ -572,6 +572,49 @@ void doocore::lutils::drawNormalizedOrdered(TH1* h1, TH1* h2, TH1* h3, TH1* h4)
 }
 
 /*
+ * Given a vector of histogram pointers, draw the largest one first, then
+ * the smaller ones upon it in order. This is to avoid the clash with the "same"
+ * option of TH1::DrawNormalized().
+ */
+void doocore::lutils::drawNormalizedOrdered(std::vector<TH1*> hists)
+{
+	int nhists = hists.size();
+	std::vector<int> ord;
+
+	// copy over axes because the plot will have the axes from
+	// the histogram we draw first
+	for ( int i=1; i<nhists; i++ )
+	{
+		hists[i]->GetXaxis()->SetTitle(hists[0]->GetXaxis()->GetTitle());
+		hists[i]->GetYaxis()->SetTitle(hists[0]->GetYaxis()->GetTitle());
+	}	
+	
+	// int ord[nhists] = {0};
+
+	for ( int i=0; i<nhists; i++ )
+	{
+		int greaterThan = 0;
+		
+		for ( int j=0; j<nhists; j++ )
+		{
+			if ( hists[i]->GetMaximum() > hists[j]->GetMaximum() ) greaterThan++;
+		}
+		
+		ord[nhists-1-greaterThan] = i;
+	}
+	
+	// don't use up all plot space
+	hists[ord[0]]->GetYaxis()->SetRangeUser(0., hists[ord[0]]->GetMaximum()*1.3);
+	
+	for ( int i=0; i<nhists; i++ )
+	{
+		cout << "doocore::lutils::DrawNormalizedOrdered() : Drawing " << hists[ord[i]]->GetName() << " ..." << endl;
+		if ( i==0 ) hists[ord[i]]->DrawNormalized();
+		else        hists[ord[i]]->DrawNormalized("same");
+	}
+}
+
+/*
  * Symmetrize a matrix by copying the upper left triangle
  * to the lower right one, which needs to be entirely filled
  * with zeroes.
@@ -902,7 +945,7 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
   std::vector<double> entries;
   
   // convert entries into vector (for sorting)
-  float entry;
+  double entry;
   tree.SetBranchAddress(TString(var_name), &entry);
   for (int i = 0; i < num_entries; ++i)
   {
