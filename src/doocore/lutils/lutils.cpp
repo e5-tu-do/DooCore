@@ -579,7 +579,8 @@ void doocore::lutils::drawNormalizedOrdered(TH1* h1, TH1* h2, TH1* h3, TH1* h4)
 void doocore::lutils::drawNormalizedOrdered(std::vector<TH1*> hists)
 {
 	int nhists = hists.size();
-	std::vector<int> ord;
+	doocore::io::serr << "-debug- " << "#hists " << nhists << doocore::io::endmsg;
+	std::vector<int> ord(nhists);
 
 	// copy over axes because the plot will have the axes from
 	// the histogram we draw first
@@ -945,7 +946,7 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
   std::vector<double> entries;
   
   // convert entries into vector (for sorting)
-  double entry;
+  float entry;
   tree.SetBranchAddress(TString(var_name), &entry);
   for (int i = 0; i < num_entries; ++i)
   {
