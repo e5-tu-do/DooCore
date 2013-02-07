@@ -169,6 +169,7 @@ void		Symmetrize(TMatrixD &m);
  *  @return pair of (double,double) as (min,max) to use for plotting
  */
 std::pair<double,double> MedianLimitsForTuple(const RooDataSet& dataset, std::string var_name);
+
 /**
  *  @brief Median limits for tuple (here: TTree)
  *
