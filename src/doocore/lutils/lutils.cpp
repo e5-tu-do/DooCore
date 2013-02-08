@@ -672,7 +672,7 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, const RooAbsRe
   double plot_min = pFrame->GetXaxis()->GetXmin();
   double plot_max = pFrame->GetXaxis()->GetXmax();
   
-  TCanvas c1("c1","c1",900,630);
+  TCanvas c1("c1","c1",900,900);
   TPad* pad = (TPad*)c1.cd();
   label.Draw();
   if(plot_logy){
