@@ -955,6 +955,7 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
       entries.push_back(entry);
     }
   }
+  tree.ResetBranchAddress(tree.GetBranch(TString(var_name)));
   std::sort(entries.begin(), entries.end());
 
   int idx_median = entries.size()/2;       
