@@ -672,7 +672,7 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, const RooAbsRe
   double plot_min = pFrame->GetXaxis()->GetXmin();
   double plot_max = pFrame->GetXaxis()->GetXmax();
   
-  TCanvas c1("c1","c1",900,900);
+  TCanvas c1("c1","c1",900,630);
   TPad* pad = (TPad*)c1.cd();
   label.Draw();
   if(plot_logy){
@@ -876,6 +876,14 @@ void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAb
 
 std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet& dataset, std::string var_name) {
   int num_entries = dataset.numEntries();
+  std::pair<double, double> minmax;
+
+  if (num_entries == 0) {
+    minmax.first  = 0;
+    minmax.second = 1;
+    return minmax;
+  }
+  
   std::vector<double> entries;
   
   // convert entries into vector (for sorting)
@@ -896,7 +904,6 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
 //    sdebug << entries[i] << endmsg;
 //  }
   
-  std::pair<double, double> minmax;
   
   minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
   minmax.second = -4*entries[idx_median]+5*entries[(int)(entries.size()-idx_median*0.32)];
@@ -934,6 +941,9 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
     minmax.first  = -1;
     minmax.second = +1;
   }
+    
+  minmax.first  = minmax.first*(minmax.first  > 0 ? 0.85 : 1.15);
+  minmax.second = minmax.second*(minmax.second > 0 ? 1.15 : 0.85);
 
 //  sdebug << "first: " << minmax.first << endmsg;
 //  sdebug << "second: " << minmax.second << endmsg;
