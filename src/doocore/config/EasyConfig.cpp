@@ -20,14 +20,20 @@ namespace doocore {
 namespace config {
 EasyConfig::EasyConfig(int argc, char *argv[]){
   debug_mode_=false;
-  std::string filename;
+  std::string filename = "";
   for (int i = 0; i < argc; ++i)
   {
-    if (strcmp(argv[i], "-c")==0){
+    if ((strcmp(argv[i], "-c")==0) && (i+1<argc)){
       filename = argv[i+1];
     }
   }
-  LoadConfigFile(filename);
+  if (filename!=""){
+    LoadConfigFile(filename);
+  }
+  else{
+    doocore::io::serr << "-ERROR- " << "No command line argument passed to EasyConfig!" << doocore::io::endmsg;
+    doocore::io::serr << "-ERROR- " << "Use '-c' followed by the config file name as command line argument!" << doocore::io::endmsg;
+  }
 }
 
 EasyConfig::EasyConfig(std::string filename){
