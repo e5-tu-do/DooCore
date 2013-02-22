@@ -19,6 +19,13 @@
 // forward declarations
 
 namespace doocore {
+/*! @namespace doocore::config
+ * @brief Collection of program configuration tools
+ *
+ * This namespace is a collection of tools for program configuration
+ *
+ */
+
 namespace config {
 /*! @class doocore::config::EasyConfig
  * @brief Easy configuration through config files from outside the code
@@ -63,6 +70,18 @@ namespace config {
  */
 class EasyConfig {
  public:
+  /**
+   *  @brief Constructor for EasyConfig with interprets given command line arguments
+   *
+   *  Based on the supplied command line arguments the property tree will be populated
+   *  and is ready to use.
+   *
+   *  To understand a given argument as the string to the option file, use the "-c" before the argument
+   *
+   *  @param filename file name of config file to use
+   */
+  EasyConfig(int argc, char *argv[]);
+
   /**
    *  @brief Constructor for EasyConfig with config file to use
    *

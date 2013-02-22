@@ -18,6 +18,18 @@
 
 namespace doocore {
 namespace config {
+EasyConfig::EasyConfig(int argc, char *argv[]){
+  debug_mode_=false;
+  std::string filename;
+  for (int i = 0; i < argc; ++i)
+  {
+    if (strcmp(argv[i], "-c")==0){
+      filename = argv[i+1];
+    }
+  }
+  LoadConfigFile(filename);
+}
+
 EasyConfig::EasyConfig(std::string filename){
   debug_mode_ = false;
   LoadConfigFile(filename);
