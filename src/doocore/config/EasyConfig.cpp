@@ -67,7 +67,7 @@ void EasyConfig::DisplayPTree(const boost::property_tree::ptree& tree, const int
 }
 
 std::string EasyConfig::getString(std::string name){
-  std::string tmp = ptree_.get<std::string>(name);
+  std::string tmp = ptree_.get(name, "");
   if (debug_mode_) doocore::io::swarn << "Key: " << name << ", Value: " << tmp << doocore::io::endmsg;
   return tmp;
 }
@@ -86,19 +86,19 @@ std::vector<std::string> EasyConfig::getVoStrings(std::string name){
 }
 
 bool EasyConfig::getBool(std::string name){
-  bool tmp = ptree_.get<bool>(name);
+  bool tmp = ptree_.get(name, false);
   if (debug_mode_) doocore::io::swarn << "Key: " << name << ", Value: " << tmp << doocore::io::endmsg;
   return tmp;
 }
 
 int EasyConfig::getInt(std::string name){
-  int tmp = ptree_.get<int>(name);
+  int tmp = ptree_.get(name, 0);
   if (debug_mode_) doocore::io::swarn << "Key: " << name << ", Value: " << tmp << doocore::io::endmsg;
   return tmp;
 }
 
 double EasyConfig::getDouble(std::string name){
-  double tmp = ptree_.get<double>(name);
+  double tmp = ptree_.get(name, 0.0);
   if (debug_mode_) doocore::io::swarn << "Key: " << name << ", Value: " << tmp << doocore::io::endmsg;
   return tmp;
 }
