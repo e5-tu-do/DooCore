@@ -67,6 +67,10 @@ namespace config {
  *   decision "false"
  * }
  * @endcode
+ * 
+ * WARNING: If your variable is not set in the config file, a default value will be used!
+ * WARNING: The default value is 'false' for bools, '0' for ints, '0.0' for doubles and an emptry string for strings!
+ * 
  */
 class EasyConfig {
  public:
