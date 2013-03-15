@@ -102,6 +102,13 @@ class EasyConfig {
   ~EasyConfig();
   
   /**
+   *  @brief Get the underlying property tree
+   *
+   *  @return a boost::property_tree::ptree
+   */
+  boost::property_tree::ptree getPTree();
+
+  /**
    *  @brief Get string from config file
    *
    *  @return an std::string
