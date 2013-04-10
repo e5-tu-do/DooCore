@@ -203,7 +203,9 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset,
     }
   }
   delete it;
-  
+ 
+  // temp: copy tree tree_ = tree_->CopyTree("", "", 20000);
+ 
   dataset_ = new RooDataSet("dataset","dataset",new_set,Import(*tree_), arg1,
                             arg2, arg3, arg4, arg5, arg6, arg7);
   
