@@ -29,7 +29,8 @@ doocore::io::EasyTuple::EasyTuple(const std::string& file_name, const std::strin
   tree_(NULL),
   argset_(NULL),
   dataset_(NULL),
-  tree_name_(tree_name)
+  tree_name_(tree_name),
+  num_maximum_events_(-1)
 {
   file_ = new TFile(file_name.c_str());
   argset_ = new RooArgSet(argset);
@@ -69,7 +70,8 @@ doocore::io::EasyTuple::EasyTuple(TTree* tree, const RooArgSet& argset)
 : file_(NULL),
 tree_(tree),
 argset_(NULL),
-dataset_(NULL)
+dataset_(NULL),
+num_maximum_events_(-1)
 {
   argset_ = new RooArgSet(argset);
   
@@ -98,7 +100,8 @@ doocore::io::EasyTuple::EasyTuple(const EasyTuple& other)
 tree_(NULL),
 argset_(NULL),
 dataset_(NULL),
-tree_name_(other.tree_name_)
+tree_name_(other.tree_name_),
+num_maximum_events_(other.num_maximum_events_)
 {
   argset_ = new RooArgSet(*other.argset_);
   
@@ -136,6 +139,10 @@ tree_name_(other.tree_name_)
       }
     }
     delete it;
+
+    if (num_maximum_events_>=0) {
+      set_num_maximum_events(num_maximum_events_);
+    }
     
     if (other.dataset_ != NULL) {
       dataset_ = new RooDataSet(*other.dataset_);
@@ -204,7 +211,9 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset,
   }
   delete it;
  
-  // temp: copy tree tree_ = tree_->CopyTree("", "", 20000);
+  //temp: copy tree 
+  //tree_ = tree_->CopyTree("", "", 800000);
+  //tree_->SetEntries(300000);
  
   dataset_ = new RooDataSet("dataset","dataset",new_set,Import(*tree_), arg1,
                             arg2, arg3, arg4, arg5, arg6, arg7);

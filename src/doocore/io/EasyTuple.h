@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 
+// from ROOT
+#include "TTree.h"
+
 // from RooFit
 #include "RooCmdArg.h"
 #include "RooArgSet.h"
@@ -12,7 +15,6 @@
 // forward decalarations
 class RooArgSet;
 class TFile;
-class TTree;
 class RooDataSet;
 class RooRealVar;
 
@@ -281,7 +283,14 @@ class EasyTuple {
    *  @return reference to the appropriate RooRealVar in the dataset
    */
   RooRealVar& Var(const std::string& name);
-  
+ 
+  /**
+   *  @brief Set maximum number of events to process in tree
+   *
+   *  @param num_maximum_events maximum number of events to process
+   */
+  void set_num_maximum_events(int num_maximum_events) { num_maximum_events_ = num_maximum_events; tree_->SetEntries(num_maximum_events_); }
+ 
  protected:
   
  private:
@@ -305,6 +314,11 @@ class EasyTuple {
    *  @brief Tree name in TFile for copying
    */
   std::string tree_name_;
+
+  /**
+   *  @brief Event size limit for tree
+   **/
+  int num_maximum_events_;
 }; // class EasyTuple
 } // namespace utils
 } // namespace doofit
