@@ -1,10 +1,12 @@
 #ifndef DOOCORE_IO_MSGSTREAM_H
 #define DOOCORE_IO_MSGSTREAM_H
 
+// from STL
 #include <iostream>
 #include <fstream>
 #include <sstream> 
 #include <cstring>
+#include <vector>
 
 #include "TStopwatch.h"
 #include "RooArgSet.h"
@@ -244,6 +246,23 @@ inline MsgStream& endmsg(MsgStream& s) {
 template<typename T>
 inline MsgStream& operator<<(MsgStream& lhs, const T& arg) {
   lhs.stream() << arg;
+  return lhs;
+}
+  
+/**
+ *  @brief Print a vector via MsgStream
+ */
+template<typename T>
+inline MsgStream& operator<<(MsgStream& lhs, const std::vector<T>& arg) {
+  if (arg.size() > 0) {
+    lhs.stream() << "(";
+    lhs.stream() << arg.front();
+    for (typename std::vector<T>::const_iterator it = arg.begin()+1;
+         it != arg.end(); ++it) {
+      lhs.stream() << ", " << *it;
+    }
+    lhs.stream() << ")";
+  }
   return lhs;
 }
 
