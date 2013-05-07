@@ -654,7 +654,7 @@ void doocore::lutils::addEtaPtLabels(TH2D* h)
 	h->GetYaxis()->SetTitle("y");
 }
 
-void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, TString pDir, bool plot_logy, TLatex label, bool plot_logx) {
+void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex label, bool plot_logx) {
 //	setStyle();
   gStyle->SetTitle(0);
   

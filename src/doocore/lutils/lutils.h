@@ -123,7 +123,7 @@ void drawNormalizedOrdered(std::vector<TH1*> hists);
 
 void addEtaPtLabels(TH2D* h);
 
-void PlotSimple(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,  TString pDir = "", bool plot_logy = false, TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
+void PlotSimple(TString pName, RooPlot * pFrame, TString pDir = "", bool plot_logy = false, TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
 
 
 ///Do a run test as in http://de.wikipedia.org/wiki/Run-Test
