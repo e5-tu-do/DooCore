@@ -18,7 +18,9 @@ class TH1;
 class TH2;
 class TH1D;
 class TH2D;
+class TF1;
 class TCanvas;
+class TPad;
 class TTree;
 class TFile;
 class TLegend;
@@ -134,6 +136,26 @@ TH1D 		GetPulls(RooPlot * pFrame, bool normalize = true);
 void PreparePadForPulls(TCanvas * c1, RooPlot * pFrame, bool plot_logx, bool plot_logy,
 												double & top_label_size, double & top_title_offset, double & title2label_size_ratio,
 												double & bottom_label_size, double & bottom_title_offset);
+
+/**
+ *  @brief Create a plot of the pull distribution and fit a Gaussian to that
+ *
+ *  Due to ROOT limitations, all objects created inside this function need to 
+ *  persist until the Canvas is saved completely. Therefore, these objects are
+ *  created on the heap and returned via the pointers f_gauss_norm through 
+ *  legend. The caller is responsible of deleting these.
+ *
+ *  @param pulls pulls vs. bins of fit
+ *  @param pad TPad to draw on
+ *  @param f_gauss_norm normal Gaussian PDF to draw (will be created)
+ *  @param f_gauss_fit fitted Gaussian PDF to draw (will be created)
+ *  @param h_pulls histogram with pull distribution (will be created)
+ *  @param h_error error band of Gaussian fit (will be created)
+ *  @param legend legend with information (will be created)
+ */
+void PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend);
+
+  
 ///Plot a distribution histogram of the pulls overlaid with a Gaussian
 void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
 ///Construct and plot a pull histogram beneath a RooPlot. The last added dataset and curve are used to calculate the pulls.
