@@ -16,6 +16,7 @@
 // forward declarations
 class TH1;
 class TH2;
+class TH1D;
 class TH2D;
 class TCanvas;
 class TTree;
@@ -123,6 +124,30 @@ void drawNormalizedOrdered(std::vector<TH1*> hists);
 void addEtaPtLabels(TH2D* h);
 
 void PlotSimple(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,  TString pDir = "", bool plot_logy = false, TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
+
+
+///Do a run test as in http://de.wikipedia.org/wiki/Run-Test
+double RunTest(const TH1 & hist);
+///Returns a residual HISTOGRAM and no fucking RooHist TGraph for the given RooPlot
+TH1D 		GetPulls(RooPlot * pFrame, bool normalize = true);
+///Prepare canvas with two pads for pull and residual plots, returns numbers for text formatting
+void PreparePadForPulls(TCanvas * c1, RooPlot * pFrame, bool plot_logx, bool plot_logy,
+												double & top_label_size, double & top_title_offset, double & title2label_size_ratio,
+												double & bottom_label_size, double & bottom_title_offset);
+///Plot a distribution histogram of the pulls overlaid with a Gaussian
+void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
+///Construct and plot a pull histogram beneath a RooPlot. The last added dataset and curve are used to calculate the pulls.
+///The last bool defines a grey (true) or colored (false) scheme for the pull fill color.
+///Note the parameter list has been adapted with respect to the Plot residuals function.
+void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "", bool plot_logy = false,
+                      bool plot_logx = false, bool greyscale = true, TLatex label = TLatex(1.,1.,""));
+///Overloaded version for compatibility with Legends (no idea how to solve this nicely Tobi 2013-04-17)
+void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "", bool plot_logy = false,
+                      bool plot_logx = false, bool greyscale = true, TLegend * label = NULL);
+///Overladed PlotPulls function for compatibility with old parameter list
+void PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF,
+                      TString pDir = "", bool normalize_residuals = true, bool plot_logy = false,
+                      TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
 
 void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, 
                       TString pDir = "", bool normalize_residuals = true, bool plot_logy = false,
