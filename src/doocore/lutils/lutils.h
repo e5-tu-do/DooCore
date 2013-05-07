@@ -162,14 +162,14 @@ void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
 ///The last bool defines a grey (true) or colored (false) scheme for the pull fill color.
 ///Note the parameter list has been adapted with respect to the Plot residuals function.
 void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "", bool plot_logy = false,
-                      bool plot_logx = false, bool greyscale = true, TLatex label = TLatex(1.,1.,""));
+                      bool plot_logx = false, bool greyscale = true, TLatex label = TLatex(1.,1.,""), std::string gauss_suffix="_Gauss");
 ///Overloaded version for compatibility with Legends (no idea how to solve this nicely Tobi 2013-04-17)
 void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "", bool plot_logy = false,
-                      bool plot_logx = false, bool greyscale = true, TLegend * label = NULL);
+               bool plot_logx = false, bool greyscale = true, TLegend * label = NULL, std::string gauss_suffix="_Gauss");
 ///Overladed PlotPulls function for compatibility with old parameter list
 void PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF,
                       TString pDir = "", bool normalize_residuals = true, bool plot_logy = false,
-                      TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
+                      TLatex label = TLatex(1.,1.,""), bool plot_logx = false, std::string gauss_suffix="_Gauss");
 
 void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, 
                       TString pDir = "", bool normalize_residuals = true, bool plot_logy = false,

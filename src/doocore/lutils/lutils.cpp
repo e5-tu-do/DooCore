@@ -949,11 +949,11 @@ void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) 
   delete legend;
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool normalize, bool plot_logy, TLatex label, bool plot_logx) {
+void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool normalize, bool plot_logy, TLatex label, bool plot_logx, std::string gauss_suffix) {
   PlotPulls(pName, pFrame, pDir, plot_logy, plot_logx, true, label);
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex label) {
+void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex label, std::string gauss_suffix) {
   gStyle->SetTitle(0);
   
   TCanvas c1("c_Utils","c_Utils",900,900);
@@ -1074,13 +1074,13 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-	PlotGauss(pName+"Gauss", pulls, pDir);
+	PlotGauss(pName+gauss_suffix, pulls, pDir);
 
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label) {
+void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label, std::string gauss_suffix) {
   gStyle->SetTitle(0);
   
   TCanvas c1("c_Utils","c_Utils",900,900);
@@ -1203,7 +1203,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-	PlotGauss(pName+"Gauss", pulls, pDir);
+	PlotGauss(pName+gauss_suffix, pulls, pDir);
 
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
@@ -1212,8 +1212,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   
 void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, 
                           TString pDir, bool normalize, bool plot_logy,
-                          TLatex label, bool plot_logx
-                          ) {
+                          TLatex label, bool plot_logx) {
 	setStyle();
   gStyle->SetTitle(0);
   
