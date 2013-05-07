@@ -50,7 +50,7 @@ void doocore::lutils::setStyle(TString option)
 {
 	if (option == "LHCb") {
 		// Use times new roman, precision 2
-	  Int_t lhcbFont        = 132;  // Old LHCb style: 62;
+//	  Int_t kLHCbFont        = 132;  // Old LHCb style: 62;
 	  // Line thickness
 	  Double_t lhcbWidth    = 2.00; // Old LHCb style: 3.00;
 	  // Text size
@@ -87,18 +87,18 @@ void doocore::lutils::setStyle(TString option)
 	  lhcbStyle->SetPadLeftMargin(0.14);
     
 	  // use large fonts
-	  lhcbStyle->SetTextFont(lhcbFont);
+	  lhcbStyle->SetTextFont(kLHCbFont);
 	  lhcbStyle->SetTextSize(lhcbTSize);
-	  lhcbStyle->SetLabelFont(lhcbFont,"x");
-	  lhcbStyle->SetLabelFont(lhcbFont,"y");
-	  lhcbStyle->SetLabelFont(lhcbFont,"z");
+	  lhcbStyle->SetLabelFont(kLHCbFont,"x");
+	  lhcbStyle->SetLabelFont(kLHCbFont,"y");
+	  lhcbStyle->SetLabelFont(kLHCbFont,"z");
 	  lhcbStyle->SetLabelSize(lhcbTSize,"x");
 	  lhcbStyle->SetLabelSize(lhcbTSize,"y");
 	  lhcbStyle->SetLabelSize(lhcbTSize,"z");
-	  lhcbStyle->SetTitleFont(lhcbFont);
-	  lhcbStyle->SetTitleFont(lhcbFont,"x");
-	  lhcbStyle->SetTitleFont(lhcbFont,"y");
-	  lhcbStyle->SetTitleFont(lhcbFont,"z");
+	  lhcbStyle->SetTitleFont(kLHCbFont);
+	  lhcbStyle->SetTitleFont(kLHCbFont,"x");
+	  lhcbStyle->SetTitleFont(kLHCbFont,"y");
+	  lhcbStyle->SetTitleFont(kLHCbFont,"z");
 	  lhcbStyle->SetTitleSize(1.2*lhcbTSize,"x");
 	  lhcbStyle->SetTitleSize(1.2*lhcbTSize,"y");
 	  lhcbStyle->SetTitleSize(1.2*lhcbTSize,"z");
@@ -132,7 +132,7 @@ void doocore::lutils::setStyle(TString option)
 	  lhcbStyle->SetTitleFillColor(0);
 	  lhcbStyle->SetTitleStyle(0);
 	  lhcbStyle->SetTitleBorderSize(0);
-	  lhcbStyle->SetTitleFont(lhcbFont,"title");
+	  lhcbStyle->SetTitleFont(kLHCbFont,"title");
 	  lhcbStyle->SetTitleX(0.0);
 	  lhcbStyle->SetTitleY(1.0);
 	  lhcbStyle->SetTitleW(1.0);
@@ -140,7 +140,7 @@ void doocore::lutils::setStyle(TString option)
     
 	  // look of the statistics box:
 	  lhcbStyle->SetStatBorderSize(0);
-	  lhcbStyle->SetStatFont(lhcbFont);
+	  lhcbStyle->SetStatFont(kLHCbFont);
 	  lhcbStyle->SetStatFontSize(0.05);
 	  lhcbStyle->SetStatX(0.9);
 	  lhcbStyle->SetStatY(0.9);
@@ -839,6 +839,8 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
 }
 
 void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend) {
+  setStyle();
+  
   h_pulls = new TH1D("hGauss","hGauss;Pull [#sigma];Number of bins",10,-5,5);
   
 	for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
@@ -911,6 +913,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	sErr = f_gauss_fit->GetParError(2);
 	
   legend = new TLegend(0.2,0.65,0.48,0.93);
+  legend->SetTextFont(kLHCbFont);
 	legend->SetTextSize(0.04);
 	legend->SetHeader(Form("Run test: #it{p} = %.2f",RunTest(pulls)));
 	legend->AddEntry(h_error,Form("#splitline{Gaussian fit}{#scale[0.7]{#Delta#it{N}=%.0f#pm%.0f, #Delta#mu=%.2f#pm%.2f, #Delta#sigma=%.2f#pm%.2f}}",nVal, nErr, mVal, mErr, sVal, sErr),"lf");

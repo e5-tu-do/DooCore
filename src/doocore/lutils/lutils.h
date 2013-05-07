@@ -107,6 +107,8 @@ public:
   }
 };
 
+const int kLHCbFont = 132;
+  
 //	
 // plots
 //
