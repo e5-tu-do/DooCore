@@ -940,7 +940,7 @@ void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) 
   TLegend* legend = NULL;
   
   PlotPullDistributionWithGaussian(pulls, c1, f_gauss_norm, f_gauss_fit, h_pulls, h_error, legend);
-	printPlot(&c1, pName+"Gauss", pDir);
+	printPlot(&c1, pName, pDir);
   
   delete f_gauss_norm;
   delete f_gauss_fit;
@@ -1074,7 +1074,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-	PlotGauss(pName, pulls, pDir);
+	PlotGauss(pName+"Gauss", pulls, pDir);
 
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
@@ -1203,7 +1203,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-	PlotGauss(pName, pulls, pDir);
+	PlotGauss(pName+"Gauss", pulls, pDir);
 
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
