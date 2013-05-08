@@ -93,7 +93,7 @@ std::vector<std::string> EasyConfig::getVoStrings(std::string name){
 bool EasyConfig::getBool(std::string name){
   bool tmp = ptree_.get(name, false);
   if (debug_mode_) doocore::io::swarn << "Key: " << name << ", Value: " << tmp << doocore::io::endmsg;
-  if (debug_mode_ && && (tmp == false)) doocore::io::swarn << "-warning- \t EasyConfig: " << "Check if variable '" << name << "' is set properly in the config file. Default value is set!" << doocore::io::endmsg;
+  if (debug_mode_ && (tmp == false)) doocore::io::swarn << "-warning- \t EasyConfig: " << "Check if variable '" << name << "' is set properly in the config file. Default value is set!" << doocore::io::endmsg;
   return tmp;
 }
 
