@@ -19,6 +19,7 @@
 #include "TH2D.h"
 #include "TPaveText.h"
 #include "TCanvas.h"
+#include "TPad.h"
 #include "TTree.h"
 #include "TFile.h"
 #include "TLegend.h"
@@ -49,7 +50,7 @@ void doocore::lutils::setStyle(TString option)
 {
 	if (option == "LHCb") {
 		// Use times new roman, precision 2
-	  Int_t lhcbFont        = 132;  // Old LHCb style: 62;
+//	  Int_t kLHCbFont        = 132;  // Old LHCb style: 62;
 	  // Line thickness
 	  Double_t lhcbWidth    = 2.00; // Old LHCb style: 3.00;
 	  // Text size
@@ -86,18 +87,18 @@ void doocore::lutils::setStyle(TString option)
 	  lhcbStyle->SetPadLeftMargin(0.14);
     
 	  // use large fonts
-	  lhcbStyle->SetTextFont(lhcbFont);
+	  lhcbStyle->SetTextFont(kLHCbFont);
 	  lhcbStyle->SetTextSize(lhcbTSize);
-	  lhcbStyle->SetLabelFont(lhcbFont,"x");
-	  lhcbStyle->SetLabelFont(lhcbFont,"y");
-	  lhcbStyle->SetLabelFont(lhcbFont,"z");
+	  lhcbStyle->SetLabelFont(kLHCbFont,"x");
+	  lhcbStyle->SetLabelFont(kLHCbFont,"y");
+	  lhcbStyle->SetLabelFont(kLHCbFont,"z");
 	  lhcbStyle->SetLabelSize(lhcbTSize,"x");
 	  lhcbStyle->SetLabelSize(lhcbTSize,"y");
 	  lhcbStyle->SetLabelSize(lhcbTSize,"z");
-	  lhcbStyle->SetTitleFont(lhcbFont);
-	  lhcbStyle->SetTitleFont(lhcbFont,"x");
-	  lhcbStyle->SetTitleFont(lhcbFont,"y");
-	  lhcbStyle->SetTitleFont(lhcbFont,"z");
+	  lhcbStyle->SetTitleFont(kLHCbFont);
+	  lhcbStyle->SetTitleFont(kLHCbFont,"x");
+	  lhcbStyle->SetTitleFont(kLHCbFont,"y");
+	  lhcbStyle->SetTitleFont(kLHCbFont,"z");
 	  lhcbStyle->SetTitleSize(1.2*lhcbTSize,"x");
 	  lhcbStyle->SetTitleSize(1.2*lhcbTSize,"y");
 	  lhcbStyle->SetTitleSize(1.2*lhcbTSize,"z");
@@ -131,7 +132,7 @@ void doocore::lutils::setStyle(TString option)
 	  lhcbStyle->SetTitleFillColor(0);
 	  lhcbStyle->SetTitleStyle(0);
 	  lhcbStyle->SetTitleBorderSize(0);
-	  lhcbStyle->SetTitleFont(lhcbFont,"title");
+	  lhcbStyle->SetTitleFont(kLHCbFont,"title");
 	  lhcbStyle->SetTitleX(0.0);
 	  lhcbStyle->SetTitleY(1.0);
 	  lhcbStyle->SetTitleW(1.0);
@@ -139,7 +140,7 @@ void doocore::lutils::setStyle(TString option)
     
 	  // look of the statistics box:
 	  lhcbStyle->SetStatBorderSize(0);
-	  lhcbStyle->SetStatFont(lhcbFont);
+	  lhcbStyle->SetStatFont(kLHCbFont);
 	  lhcbStyle->SetStatFontSize(0.05);
 	  lhcbStyle->SetStatX(0.9);
 	  lhcbStyle->SetStatY(0.9);
@@ -654,7 +655,7 @@ void doocore::lutils::addEtaPtLabels(TH2D* h)
 	h->GetYaxis()->SetTitle("y");
 }
 
-void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, TString pDir, bool plot_logy, TLatex label, bool plot_logx) {
+void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex label, bool plot_logx) {
 //	setStyle();
   gStyle->SetTitle(0);
   
@@ -837,106 +838,125 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
   return pulls;
 }
 
-void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) {
-	TCanvas c1("c_Utils","c_Utils",900,900);
-	
-	TH1D hGauss("hGauss","hGauss;Pull [#sigma];Number of bins",10,-5,5);
+void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend) {
+  setStyle();
+  
+  h_pulls = new TH1D("hGauss","hGauss;Pull [#sigma];Number of bins",10,-5,5);
+  
 	for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
-		hGauss.Fill(pulls.GetBinContent(i));
+		h_pulls->Fill(pulls.GetBinContent(i));
 	}
-	TF1 fGauss("fGauss","gaus(0)/([2]*sqrt(2*3.1415))",-5,5);
-	fGauss.SetParameter(0,pulls.GetNbinsX());
-	fGauss.SetParameter(1,0);
-	fGauss.SetParameter(2,1);
-	fGauss.SetLineColor(kBlack);
-	//fGauss.SetFillColor(18);
-	//fGauss.SetFillStyle(1001);
-	fGauss.SetLineWidth(4);
+	f_gauss_norm = new TF1("fGauss","gaus(0)/([2]*sqrt(2*3.1415))",-5,5);
+	f_gauss_norm->SetParameter(0,pulls.GetNbinsX());
+	f_gauss_norm->SetParameter(1,0);
+	f_gauss_norm->SetParameter(2,1);
+	f_gauss_norm->SetLineColor(kBlack);
+	//f_gauss_norm->SetFillColor(18);
+	//f_gauss_norm->SetFillStyle(1001);
+	f_gauss_norm->SetLineWidth(4);
 	
-	TF1 fFit("fFit","gaus(0)/([2]*sqrt(2*3.1415))",-5,5);
-	fFit.SetParameter(0,pulls.GetNbinsX());
-	fFit.SetParameter(1,0);
-	fFit.SetParameter(2,1);
-	fFit.SetLineColor(12);
-	fFit.SetLineStyle(kDashed);
-	fFit.SetLineWidth(4);
-		
-	hGauss.SetFillColor(16);
-	hGauss.SetFillStyle(1001);
-	hGauss.SetLineColor(kBlack);
-	hGauss.SetLineWidth(2);
+  f_gauss_fit = new TF1("fFit","gaus(0)/([2]*sqrt(2*3.1415))",-5,5);
+	f_gauss_fit->SetParameter(0,pulls.GetNbinsX());
+	f_gauss_fit->SetParameter(1,0);
+	f_gauss_fit->SetParameter(2,1);
+	f_gauss_fit->SetLineColor(12);
+	f_gauss_fit->SetLineStyle(kDashed);
+	f_gauss_fit->SetLineWidth(4);
+  
+	h_pulls->SetFillColor(16);
+	h_pulls->SetFillStyle(1001);
+	h_pulls->SetLineColor(kBlack);
+	h_pulls->SetLineWidth(2);
 	
-	c1.cd(0);
-	fGauss.Draw();	
+	pad.cd(0);
+	f_gauss_norm->Draw();
 	
-	hGauss.Fit("fFit");
+	h_pulls->Fit("fFit");
 	
 	//Get error Band Histogram
-	TH1D hError("hError","hError",500,-5,5);
-	for (unsigned i = 1; i <= hError.GetNbinsX(); ++i) {
+	h_error = new TH1D("hError","hError",500,-5,5);
+	for (unsigned i = 1; i <= h_error->GetNbinsX(); ++i) {
 		const Double_t pos = -5. + double(i)*10./500.+(10./500./2);
 		
-		Double_t dev0 = fFit.GradientPar(0, &pos, 0.01);
-		Double_t dev1 = fFit.GradientPar(1, &pos, 0.01);
-		Double_t dev2 = fFit.GradientPar(2, &pos, 0.01);
+		Double_t dev0 = f_gauss_fit->GradientPar(0, &pos, 0.01);
+		Double_t dev1 = f_gauss_fit->GradientPar(1, &pos, 0.01);
+		Double_t dev2 = f_gauss_fit->GradientPar(2, &pos, 0.01);
 		
-		double err0 = fFit.GetParError(0);
-		double err1 = fFit.GetParError(1);
-		double err2 = fFit.GetParError(2);
+		double err0 = f_gauss_fit->GetParError(0);
+		double err1 = f_gauss_fit->GetParError(1);
+		double err2 = f_gauss_fit->GetParError(2);
 		
 		double error = sqrt(dev0*dev0*err0*err0+dev1*dev1*err1*err1+dev2*dev2*err2*err2);
 		
-		hError.SetBinContent(i,fFit.Eval(pos));
-		hError.SetBinError(i,error);
+		h_error->SetBinContent(i,f_gauss_fit->Eval(pos));
+		h_error->SetBinError(i,error);
 	}
 	
-	hError.SetFillColor(12);
-	hError.SetFillStyle(3001);
-	hError.SetLineColor(12);
-	hError.SetLineStyle(kDashed);
-	hError.SetLineWidth(4);
-	hError.SetMarkerStyle(0);
+	h_error->SetFillColor(12);
+	h_error->SetFillStyle(3001);
+	h_error->SetLineColor(12);
+	h_error->SetLineStyle(kDashed);
+	h_error->SetLineWidth(4);
+	h_error->SetMarkerStyle(0);
 	
-	hGauss.SetMaximum(hGauss.GetMaximum()+4*sqrt(hGauss.GetMaximum()));
+	h_pulls->SetMaximum(h_pulls->GetMaximum()+4*sqrt(h_pulls->GetMaximum()));
 	
 	//legend
 	double nVal, nErr, mVal, mErr, sVal, sErr;
 	
-	nVal = pulls.GetNbinsX() - fFit.GetParameter(0);
-	mVal = fFit.GetParameter(1);
-	sVal = fFit.GetParameter(2)-1;
+	nVal = pulls.GetNbinsX() - f_gauss_fit->GetParameter(0);
+	mVal = f_gauss_fit->GetParameter(1);
+	sVal = f_gauss_fit->GetParameter(2)-1;
 	
-	nErr = fFit.GetParError(0);
-	mErr = fFit.GetParError(1);
-	sErr = fFit.GetParError(2);
+	nErr = f_gauss_fit->GetParError(0);
+	mErr = f_gauss_fit->GetParError(1);
+	sErr = f_gauss_fit->GetParError(2);
 	
-	TLegend leg(0.2,0.65,0.48,0.93);
-	leg.SetTextSize(0.04);
-	leg.SetHeader(Form("Run test: #it{p} = %.2f",RunTest(pulls)));
-	leg.AddEntry(&hError,Form("#splitline{Gaussian fit}{#scale[0.7]{#Delta#it{N}=%.0f#pm%.0f, #Delta#mu=%.2f#pm%.2f, #Delta#sigma=%.2f#pm%.2f}}",nVal, nErr, mVal, mErr, sVal, sErr),"lf");
-	leg.AddEntry(&fGauss,"Normal distribution","l");
-	leg.AddEntry(&hGauss,"Pull distribution","f");
-	leg.SetFillColor(0);
+  legend = new TLegend(0.2,0.65,0.48,0.93);
+  legend->SetTextFont(kLHCbFont);
+	legend->SetTextSize(0.04);
+	legend->SetHeader(Form("Run test: #it{p} = %.2f",RunTest(pulls)));
+	legend->AddEntry(h_error,Form("#splitline{Gaussian fit}{#scale[0.7]{#Delta#it{N}=%.0f#pm%.0f, #Delta#mu=%.2f#pm%.2f, #Delta#sigma=%.2f#pm%.2f}}",nVal, nErr, mVal, mErr, sVal, sErr),"lf");
+	legend->AddEntry(f_gauss_norm,"Normal distribution","l");
+	legend->AddEntry(h_pulls,"Pull distribution","f");
+	legend->SetFillColor(0);
 	
 	//redraw
-	hGauss.Draw();
+	h_pulls->Draw();
 	
-	leg.Draw("NCP");
+	legend->Draw("NCP");
 	
-	hGauss.Draw("same");
-	hError.Draw("E4 same");
-	fGauss.Draw("same");
+	h_pulls->Draw("same");
+	h_error->Draw("E4 same");
+	f_gauss_norm->Draw("same");
 	
-	gPad->RedrawAxis(); 
-	
-	printPlot(&c1, pName+"Gauss", pDir);
+	gPad->RedrawAxis();
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool normalize, bool plot_logy, TLatex label, bool plot_logx) {
+void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) {
+	TCanvas c1("c_Utils","c_Utils",900,900);
+  
+  TF1* f_gauss_norm = NULL;
+  TF1* f_gauss_fit = NULL;
+  TH1* h_pulls = NULL;
+  TH1* h_error = NULL;
+  TLegend* legend = NULL;
+  
+  PlotPullDistributionWithGaussian(pulls, c1, f_gauss_norm, f_gauss_fit, h_pulls, h_error, legend);
+	printPlot(&c1, pName, pDir);
+  
+  delete f_gauss_norm;
+  delete f_gauss_fit;
+  delete h_pulls;
+  delete h_error;
+  delete legend;
+}
+
+void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool normalize, bool plot_logy, TLatex label, bool plot_logx, std::string gauss_suffix) {
   PlotPulls(pName, pFrame, pDir, plot_logy, plot_logx, true, label);
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex label) {
+void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex label, std::string gauss_suffix) {
   gStyle->SetTitle(0);
   
   TCanvas c1("c_Utils","c_Utils",900,900);
@@ -1057,13 +1077,13 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-	PlotGauss(pName, pulls, pDir);
+	PlotGauss(pName+gauss_suffix, pulls, pDir);
 
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label) {
+void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label, std::string gauss_suffix) {
   gStyle->SetTitle(0);
   
   TCanvas c1("c_Utils","c_Utils",900,900);
@@ -1186,7 +1206,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-	PlotGauss(pName, pulls, pDir);
+	PlotGauss(pName+gauss_suffix, pulls, pDir);
 
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
@@ -1195,8 +1215,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   
 void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, 
                           TString pDir, bool normalize, bool plot_logy,
-                          TLatex label, bool plot_logx
-                          ) {
+                          TLatex label, bool plot_logx) {
 	setStyle();
   gStyle->SetTitle(0);
   

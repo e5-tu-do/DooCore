@@ -18,7 +18,9 @@ class TH1;
 class TH2;
 class TH1D;
 class TH2D;
+class TF1;
 class TCanvas;
+class TPad;
 class TTree;
 class TFile;
 class TLegend;
@@ -105,6 +107,8 @@ public:
   }
 };
 
+const int kLHCbFont = 132;
+  
 //	
 // plots
 //
@@ -123,7 +127,7 @@ void drawNormalizedOrdered(std::vector<TH1*> hists);
 
 void addEtaPtLabels(TH2D* h);
 
-void PlotSimple(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,  TString pDir = "", bool plot_logy = false, TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
+void PlotSimple(TString pName, RooPlot * pFrame, TString pDir = "", bool plot_logy = false, TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
 
 
 ///Do a run test as in http://de.wikipedia.org/wiki/Run-Test
@@ -134,20 +138,40 @@ TH1D 		GetPulls(RooPlot * pFrame, bool normalize = true);
 void PreparePadForPulls(TCanvas * c1, RooPlot * pFrame, bool plot_logx, bool plot_logy,
 												double & top_label_size, double & top_title_offset, double & title2label_size_ratio,
 												double & bottom_label_size, double & bottom_title_offset);
+
+/**
+ *  @brief Create a plot of the pull distribution and fit a Gaussian to that
+ *
+ *  Due to ROOT limitations, all objects created inside this function need to 
+ *  persist until the Canvas is saved completely. Therefore, these objects are
+ *  created on the heap and returned via the pointers f_gauss_norm through 
+ *  legend. The caller is responsible of deleting these.
+ *
+ *  @param pulls pulls vs. bins of fit
+ *  @param pad TPad to draw on
+ *  @param f_gauss_norm normal Gaussian PDF to draw (will be created)
+ *  @param f_gauss_fit fitted Gaussian PDF to draw (will be created)
+ *  @param h_pulls histogram with pull distribution (will be created)
+ *  @param h_error error band of Gaussian fit (will be created)
+ *  @param legend legend with information (will be created)
+ */
+void PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend);
+
+  
 ///Plot a distribution histogram of the pulls overlaid with a Gaussian
 void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
 ///Construct and plot a pull histogram beneath a RooPlot. The last added dataset and curve are used to calculate the pulls.
 ///The last bool defines a grey (true) or colored (false) scheme for the pull fill color.
 ///Note the parameter list has been adapted with respect to the Plot residuals function.
 void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "", bool plot_logy = false,
-                      bool plot_logx = false, bool greyscale = true, TLatex label = TLatex(1.,1.,""));
+                      bool plot_logx = false, bool greyscale = true, TLatex label = TLatex(1.,1.,""), std::string gauss_suffix="_Gauss");
 ///Overloaded version for compatibility with Legends (no idea how to solve this nicely Tobi 2013-04-17)
 void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "", bool plot_logy = false,
-                      bool plot_logx = false, bool greyscale = true, TLegend * label = NULL);
+               bool plot_logx = false, bool greyscale = true, TLegend * label = NULL, std::string gauss_suffix="_Gauss");
 ///Overladed PlotPulls function for compatibility with old parameter list
 void PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF,
                       TString pDir = "", bool normalize_residuals = true, bool plot_logy = false,
-                      TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
+                      TLatex label = TLatex(1.,1.,""), bool plot_logx = false, std::string gauss_suffix="_Gauss");
 
 void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, 
                       TString pDir = "", bool normalize_residuals = true, bool plot_logy = false,
