@@ -94,7 +94,7 @@ class EasyConfig {
    *
    *  @param filename file name of config file to use
    */
-  EasyConfig(std::string filename);
+  EasyConfig(std::string filename, bool debug_mode=false);
   
   /**
    *  @brief Destructor for EasyConfig

@@ -36,8 +36,8 @@ EasyConfig::EasyConfig(int argc, char *argv[]){
   }
 }
 
-EasyConfig::EasyConfig(std::string filename){
-  debug_mode_ = false;
+EasyConfig::EasyConfig(std::string filename, bool debug_mode){
+  debug_mode_ = debug_mode;
   LoadConfigFile(filename);
 }
 
@@ -73,7 +73,7 @@ boost::property_tree::ptree EasyConfig::getPTree(){
 std::string EasyConfig::getString(std::string name){
   std::string tmp = ptree_.get(name, "");
   if (debug_mode_) doocore::io::swarn << "Key: " << name << ", Value: " << tmp << doocore::io::endmsg;
-  if (tmp == "") doocore::io::swarn << "-warning- \t EasyConfig: " << "Check if variable '" << name << "' is set properly in the config file. Default value is set!" << doocore::io::endmsg;
+  if (debug_mode_ && (tmp == "")) doocore::io::swarn << "-warning- \t EasyConfig: " << "Check if variable '" << name << "' is set properly in the config file. Default value is set!" << doocore::io::endmsg;
   return tmp;
 }
 
@@ -93,21 +93,21 @@ std::vector<std::string> EasyConfig::getVoStrings(std::string name){
 bool EasyConfig::getBool(std::string name){
   bool tmp = ptree_.get(name, false);
   if (debug_mode_) doocore::io::swarn << "Key: " << name << ", Value: " << tmp << doocore::io::endmsg;
-  if (tmp == false) doocore::io::swarn << "-warning- \t EasyConfig: " << "Check if variable '" << name << "' is set properly in the config file. Default value is set!" << doocore::io::endmsg;
+  if (debug_mode_ && && (tmp == false)) doocore::io::swarn << "-warning- \t EasyConfig: " << "Check if variable '" << name << "' is set properly in the config file. Default value is set!" << doocore::io::endmsg;
   return tmp;
 }
 
 int EasyConfig::getInt(std::string name){
   int tmp = ptree_.get(name, 0);
   if (debug_mode_) doocore::io::swarn << "Key: " << name << ", Value: " << tmp << doocore::io::endmsg;
-  if (tmp == 0) doocore::io::swarn << "-warning- \t EasyConfig: " << "Check if variable '" << name << "' is set properly in the config file. Default value is set!" << doocore::io::endmsg;
+  if (debug_mode_ && (tmp == 0)) doocore::io::swarn << "-warning- \t EasyConfig: " << "Check if variable '" << name << "' is set properly in the config file. Default value is set!" << doocore::io::endmsg;
   return tmp;
 }
 
 double EasyConfig::getDouble(std::string name){
   double tmp = ptree_.get(name, 0.0);
   if (debug_mode_) doocore::io::swarn << "Key: " << name << ", Value: " << tmp << doocore::io::endmsg;
-  if (tmp == 0.0) doocore::io::swarn << "-warning- \t EasyConfig: " << "Check if variable '" << name << "' is set properly in the config file. Default value is set!" << doocore::io::endmsg;
+  if (debug_mode_ && (tmp == 0.0)) doocore::io::swarn << "-warning- \t EasyConfig: " << "Check if variable '" << name << "' is set properly in the config file. Default value is set!" << doocore::io::endmsg;
   return tmp;
 }
 } // namespace config
