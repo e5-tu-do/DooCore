@@ -127,9 +127,28 @@ void drawNormalizedOrdered(std::vector<TH1*> hists);
 
 void addEtaPtLabels(TH2D* h);
 
-void PlotSimple(TString pName, RooPlot * pFrame, TString pDir = "", bool plot_logy = false, TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
+/**
+ *  @brief Plot simple RooPlot frame with correct formatting
+ *
+ *  For a given RooPlot, this function will plot it and save it to common 
+ *  formats in files. 
+ *
+ *  @param pName Name for the output file (e.g. "mass" results in files "mass.pdf", "mass.eps" and so on
+ *  @param pFrame RooPlot to plot
+ *  @param label Label to plot in the plots (can be TLatex(1.,1.,"") for no label)
+ *  @param pDir Directory to put plots in (will be created on demand)
+ *  @param plot_logy whether to plot with log scale on y axis
+ *  @param plot_logx whether to plot with log scale on x axis
+ */
+void PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir = "", bool plot_logy = false, bool plot_logx = false);
 
-
+/**
+ *  @brief (DEPRECATED:) Plot simple RooPlot frame
+ *
+ *  Just a compatibility wrapper for the other PlotSimple function.
+ */
+void PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex& label, bool plot_logx = false) { PlotSimple(pName, pFrame, label, pDir, plot_logy, plot_logx); }
+  
 ///Do a run test as in http://de.wikipedia.org/wiki/Run-Test
 double RunTest(const TH1 & hist);
 ///Returns a residual HISTOGRAM and no fucking RooHist TGraph for the given RooPlot
@@ -163,23 +182,29 @@ void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
 ///Construct and plot a pull histogram beneath a RooPlot. The last added dataset and curve are used to calculate the pulls.
 ///The last bool defines a grey (true) or colored (false) scheme for the pull fill color.
 ///Note the parameter list has been adapted with respect to the Plot residuals function.
-void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "", bool plot_logy = false,
-                      bool plot_logx = false, bool greyscale = true, TLatex label = TLatex(1.,1.,""), std::string gauss_suffix="_Gauss");
+void PlotPulls(TString pName, RooPlot * pFrame, TLatex& label,
+               TString pDir = "", bool plot_logy = false,
+               bool plot_logx = false, bool greyscale = true,
+               std::string gauss_suffix="_Gauss");
 ///Overloaded version for compatibility with Legends (no idea how to solve this nicely Tobi 2013-04-17)
-void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "", bool plot_logy = false,
-               bool plot_logx = false, bool greyscale = true, TLegend * label = NULL, std::string gauss_suffix="_Gauss");
+void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "",
+               bool plot_logy = false, bool plot_logx = false,
+               bool greyscale = true, TLegend * label = NULL,
+               std::string gauss_suffix="_Gauss");
 ///Overladed PlotPulls function for compatibility with old parameter list
-void PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF,
-                      TString pDir = "", bool normalize_residuals = true, bool plot_logy = false,
-                      TLatex label = TLatex(1.,1.,""), bool plot_logx = false, std::string gauss_suffix="_Gauss");
+void PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,
+               RooAbsPdf * pPDF, TLatex& label, TString pDir = "",
+               bool normalize_residuals = true, bool plot_logy = false,
+               bool plot_logx = false, std::string gauss_suffix="_Gauss");
 
-void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, 
-                      TString pDir = "", bool normalize_residuals = true, bool plot_logy = false,
-                      TLatex label = TLatex(1.,1.,""), bool plot_logx = false);
+void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar,
+                   RooAbsPdf * pPDF, TLatex& label, TString pDir = "",
+                   bool normalize_residuals = true, bool plot_logy = false,
+                   bool plot_logx = false);
 
-void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF,
-	                      TString pDir, bool normalize_residuals, bool plot_logy,
-	                      TLegend * label, bool plot_logx = false);
+void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,
+                   RooAbsPdf * pPDF, TString pDir, bool normalize_residuals,
+                   bool plot_logy, TLegend * label = NULL, bool plot_logx = false);
 
 ///Do an Asymmetry Plot for a given NTuple the name of the time variable and a variable name that is used for a cut (+/-1) to separate two mixing states
 void plotAsymmetry(TString pPlotName, TTree * pTuple, TString pVarTime, TString pVarMix, int pBins = 20, double pRngMax = 0.01, double pRngMin = 0.00, TString pTimeUnit = "ns");

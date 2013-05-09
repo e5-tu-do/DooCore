@@ -655,7 +655,7 @@ void doocore::lutils::addEtaPtLabels(TH2D* h)
 	h->GetYaxis()->SetTitle("y");
 }
 
-void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex label, bool plot_logx) {
+void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx) {
 //	setStyle();
   gStyle->SetTitle(0);
   
@@ -952,11 +952,11 @@ void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) 
   delete legend;
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool normalize, bool plot_logy, TLatex label, bool plot_logx, std::string gauss_suffix) {
-  PlotPulls(pName, pFrame, pDir, plot_logy, plot_logx, true, label);
+void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TLatex& label, TString pDir, bool normalize_residuals, bool plot_logy, bool plot_logx, std::string gauss_suffix) {
+  PlotPulls(pName, pFrame, label, pDir, plot_logy, plot_logx, true);
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex label, std::string gauss_suffix) {
+void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, std::string gauss_suffix) {
   gStyle->SetTitle(0);
   
   TCanvas c1("c_Utils","c_Utils",900,900);
@@ -1213,9 +1213,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
 }
 
   
-void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, 
-                          TString pDir, bool normalize, bool plot_logy,
-                          TLatex label, bool plot_logx) {
+void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, TLatex& label, TString pDir, bool normalize, bool plot_logy, bool plot_logx) {
 	setStyle();
   gStyle->SetTitle(0);
   
