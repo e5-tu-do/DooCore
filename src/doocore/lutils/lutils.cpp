@@ -953,6 +953,7 @@ void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) 
 }
 
 void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TLatex& label, TString pDir, bool normalize_residuals, bool plot_logy, bool plot_logx, std::string gauss_suffix) {
+  doocore::io::swarn << "doocore::lutils::PlotPulls(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
   PlotPulls(pName, pFrame, label, pDir, plot_logy, plot_logx, true);
 }
 
