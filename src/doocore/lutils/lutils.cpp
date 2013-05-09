@@ -682,7 +682,6 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label,
   
   TCanvas c1("c1","c1",900,630);
   TPad* pad = (TPad*)c1.cd();
-  label.Draw();
   if(plot_logy){
     pad->SetLogy(1);
   }
@@ -699,8 +698,9 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label,
   pFrame->GetYaxis()->SetTitleOffset(top_title_offset);
   
 	pFrame->Draw();
-            
-  pad = (TPad*)c1.cd(0);
+  
+  //pad = (TPad*)c1.cd();
+  sdebug << "doocore::lutils::PlotSimple(...): Plotting label: " << label.GetTitle() << endmsg;
   label.SetTextSize(0.05);
   label.Draw();
   
