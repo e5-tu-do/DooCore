@@ -197,6 +197,13 @@ void PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,
                bool normalize_residuals = true, bool plot_logy = false,
                bool plot_logx = false, std::string gauss_suffix="_Gauss");
 
+/**
+ *  @brief (DEPRECATED:) Plot RooPlot frame with pull distribution
+ *
+ *  Just a compatibility wrapper for the other PlotPull functions.
+ */
+void PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex& label, std::string gauss_suffix="_Gauss") { PlotPulls(pName, pFrame, label, pDir, plot_logy, plot_logx, greyscale, gauss_suffix); }
+  
 void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar,
                    RooAbsPdf * pPDF, TLatex& label, TString pDir = "",
                    bool normalize_residuals = true, bool plot_logy = false,
