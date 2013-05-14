@@ -180,22 +180,29 @@ void PreparePadForPulls(TCanvas * c1, RooPlot * pFrame, bool plot_logx, bool plo
 void PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend);
 
   
-///Plot a distribution histogram of the pulls overlaid with a Gaussian
+/**
+ *  Plot a distribution histogram of the pulls overlaid with a Gaussian
+ */
 void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
+
 ///Construct and plot a pull histogram beneath a RooPlot. The last added dataset and curve are used to calculate the pulls.
 ///The last bool defines a grey (true) or colored (false) scheme for the pull fill color.
-///Note the parameter list has been adapted with respect to the Plot residuals function.
+
+/**
+ *  Note the parameter list has been adapted with respect to the Plot residuals function.
+ */
 void PlotPulls(TString pName, RooPlot * pFrame, TLatex& label,
                TString pDir = "", bool plot_logy = false,
                bool plot_logx = false, bool greyscale = true,
                std::string gauss_suffix="_Gauss");
-///Overloaded version for compatibility with Legends (no idea how to solve this nicely Tobi 2013-04-17)
+
+/**
+ *  Overloaded version for compatibility with Legends (no idea how to solve this nicely Tobi 2013-04-17)
+ */
 void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "",
                bool plot_logy = false, bool plot_logx = false,
                bool greyscale = true, TLegend * label = NULL,
                std::string gauss_suffix="_Gauss");
-///Overladed PlotPulls function for compatibility with old parameter list
-
   
 /**
  *  @brief (DEPRECATED:) Plot RooPlot frame with pull distribution
