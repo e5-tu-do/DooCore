@@ -185,13 +185,14 @@ void PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_
  */
 void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
 
-///Construct and plot a pull histogram beneath a RooPlot. The last added dataset and curve are used to calculate the pulls.
-///The last bool defines a grey (true) or colored (false) scheme for the pull fill color.
-
 /**
  *  @brief Plot a RooPlot frame with pulls underneath
  *
  *  If unsure, you probably want to use this version.
+ *
+ *  Construct and plot a pull histogram beneath a RooPlot. The last added 
+ *  dataset and curve are used to calculate the pulls. The last bool defines a 
+ *  grey (true) or colored (false) scheme for the pull fill color.
  */
 void PlotPulls(TString pName, RooPlot * pFrame, TLatex& label,
                TString pDir = "", bool plot_logy = false,
