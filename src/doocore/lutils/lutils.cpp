@@ -701,7 +701,8 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label,
   
   //pad = (TPad*)c1.cd();
   sdebug << "doocore::lutils::PlotSimple(...): Plotting label: " << label.GetTitle() << endmsg;
-  label.SetTextSize(0.05);
+  label.SetTextSize(0.08);
+  label.SetNDC();
   label.Draw();
   
   printPlot(&c1, pName, pDir);
@@ -1086,8 +1087,9 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   gPad->RedrawAxis(); 
 
   //Draw label, possibly better on c1.cd(1) Tobi 2013-04-16
-  c1.cd(0);
-  label.SetTextSize(0.05);
+  c1.cd(1);
+  label.SetTextSize(0.08);
+  label.SetNDC();
   label.Draw();
   
   printPlot(&c1, pName, pDir);
