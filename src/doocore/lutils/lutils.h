@@ -189,7 +189,9 @@ void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
 ///The last bool defines a grey (true) or colored (false) scheme for the pull fill color.
 
 /**
- *  Note the parameter list has been adapted with respect to the Plot residuals function.
+ *  @brief Plot a RooPlot frame with pulls underneath
+ *
+ *  If unsure, you probably want to use this version.
  */
 void PlotPulls(TString pName, RooPlot * pFrame, TLatex& label,
                TString pDir = "", bool plot_logy = false,
