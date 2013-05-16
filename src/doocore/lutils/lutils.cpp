@@ -700,7 +700,6 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label,
 	pFrame->Draw();
   
   //pad = (TPad*)c1.cd();
-  sdebug << "doocore::lutils::PlotSimple(...): Plotting label: " << label.GetTitle() << endmsg;
   label.SetTextSize(0.08);
   label.SetNDC();
   label.Draw();
