@@ -717,25 +717,30 @@ double doocore::lutils::RunTest(const TH1 & hist) {
 	double pval = 0;
 	
 	for (unsigned int i = 1; i < entries; ++i) {
-		if ((double)sign * hist.GetBinContent(i) < 0) {
-			runs++;
-		}
-		
-		if (hist.GetBinContent(i) > 0) {
-			nplus++;
-			sign = 1;
-		}
-		else if (hist.GetBinContent(i) <= 0) {
-			nminus++;
-			sign = -1;
-		}
+		pval = hist.GetBinContent(i);
+    
+    // only count pulls different from zero (due to numerics != 0.0 won't work here)
+    if (TMath::Abs(pval) > 1e-4) {
+      if ((double)sign * pval < 0) {
+        runs++;
+      }
+      
+      if (pval > 0) {
+        nplus++;
+        sign = 1;
+      }
+      else if (pval <= 0) {
+        nminus++;
+        sign = -1;
+      }
+    }
 	}
 	
 	double n = nplus+nminus;
 	double expect = 2.*nplus*nminus/(n) + 1.;
 	double variance = 2.*nplus*nminus*(2.*nplus*nminus-n)/(n*n*(n-1.));
 	
-	std::cout << nplus << ";" << nminus << ";" << runs << std::endl; 
+	sdebug << "doocore::lutils::RunTest(const TH1 & hist): " << nplus << ";" << nminus << ";" << runs << endmsg;
 	
 	return (TMath::Erf((runs-expect)/sqrt(variance))+1.)/2.;
 }
@@ -820,6 +825,12 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
       limits[i]=pFrame->GetXaxis()->GetXmax();
       break;
     }
+    // for zero bins and small pulls, rather set pulls to zero
+    // if not, this will result in unrealistic small pulls in sidebands and high
+    // lifetimes
+    if (y == 0 && c < 0.5) {
+      c = 0;
+    }
     
     sdebug << "doocore::lutils::GetPulls(...): i = " << i << ", x = " << x << ", y = " << y << ", c = " << c << ", e = " << e << ", p = " << (y-c)/e << endmsg;
     
@@ -859,12 +870,15 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
   int num_pulls_used = 0;
   
 	for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
-    if (pulls.GetBinContent(i) != 0.0) {
+    // only count pulls different from zero (due to numerics != 0.0 won't work here)
+    if (TMath::Abs(pulls.GetBinContent(i)) > 1e-4) {
       sdebug << "doocore::lutils::PlotPullDistributionWithGaussian(...): p = " << pulls.GetBinContent(i) << endmsg;
       h_pulls->Fill(pulls.GetBinContent(i));
       ++num_pulls_used;
     }
 	}
+  sdebug << "doocore::lutils::PlotPullDistributionWithGaussian(...): #pulls = " << num_pulls_used << endmsg;
+
 	f_gauss_norm = new TF1("fGauss","gaus(0)/([2]*sqrt(2*3.1415))",-5,5);
 	f_gauss_norm->SetParameter(0,num_pulls_used);
 	f_gauss_norm->SetParameter(1,0);
@@ -923,7 +937,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	//legend
 	double nVal, nErr, mVal, mErr, sVal, sErr;
 	
-	nVal = pulls.GetNbinsX() - f_gauss_fit->GetParameter(0);
+	nVal = num_pulls_used - f_gauss_fit->GetParameter(0);
 	mVal = f_gauss_fit->GetParameter(1);
 	sVal = f_gauss_fit->GetParameter(2)-1;
 	
