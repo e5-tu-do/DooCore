@@ -716,25 +716,30 @@ double doocore::lutils::RunTest(const TH1 & hist) {
 	double pval = 0;
 	
 	for (unsigned int i = 1; i < entries; ++i) {
-		if ((double)sign * hist.GetBinContent(i) < 0) {
-			runs++;
-		}
-		
-		if (hist.GetBinContent(i) > 0) {
-			nplus++;
-			sign = 1;
-		}
-		else if (hist.GetBinContent(i) <= 0) {
-			nminus++;
-			sign = -1;
-		}
+		pval = hist.GetBinContent(i);
+    
+    // only count pulls different from zero (due to numerics != 0.0 won't work here)
+    if (TMath::Abs(pval) > 1e-4) {
+      if ((double)sign * pval < 0) {
+        runs++;
+      }
+      
+      if (pval > 0) {
+        nplus++;
+        sign = 1;
+      }
+      else if (pval <= 0) {
+        nminus++;
+        sign = -1;
+      }
+    }
 	}
 	
 	double n = nplus+nminus;
 	double expect = 2.*nplus*nminus/(n) + 1.;
 	double variance = 2.*nplus*nminus*(2.*nplus*nminus-n)/(n*n*(n-1.));
 	
-	std::cout << nplus << ";" << nminus << ";" << runs << std::endl; 
+//	sdebug << "doocore::lutils::RunTest(const TH1 & hist): " << nplus << ";" << nminus << ";" << runs << endmsg;
 	
 	return (TMath::Erf((runs-expect)/sqrt(variance))+1.)/2.;
 }
@@ -789,6 +794,7 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
   double x = 0;
   double y = 0;
   double e = 0;
+  double c = 0;
 
   data->GetPoint(0,x,y);
 
@@ -797,9 +803,10 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
   for (unsigned int i = 0; i < data->GetN(); ++i) {
     
     data->GetPoint(i,x,y);
+    c = curve->Eval(x);
     
     // use upper error if point lies beneath curve
-    if (y > curve->Eval(x)) {
+    if (y > c) {
       e = data->GetErrorYlow(i);
     }
     else {
@@ -807,24 +814,35 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
     }
     
     //fetch roofit fuckup
-		if ((y  != y) || (TMath::Abs(y) > 10000000000)) {y = curve->Eval(x);}
+		if ((y  != y) || (TMath::Abs(y) > 10000000000)) {y = c;}
     if ((e == 0) || (e  != e) || (TMath::Abs(e) > 10000000000)) {e = 1;}
+    if (c < 0) {
+      // forcing PDF positive definite
+      c = 0;
+    }
     if (x > pFrame->GetXaxis()->GetXmax()) {
       limits[i]=pFrame->GetXaxis()->GetXmax();
       break;
     }
+    // for zero bins and small pulls, rather set pulls to zero
+    // if not, this will result in unrealistic small pulls in sidebands and high
+    // lifetimes
+    if (y == 0 && c < 0.5) {
+      c = 0;
+    }
+//    sdebug << "doocore::lutils::GetPulls(...): i = " << i << ", x = " << x << ", y = " << y << ", c = " << c << ", e = " << e << ", p = " << (y-c)/e << endmsg;
     
     //pulls
     if (normalize) {
       limits.push_back(x+data->GetErrorXhigh(i));
-      values.push_back((y-curve->Eval(x))/e);
+      values.push_back((y-c)/e);
       errors.push_back(0);
       
     }
     //residuals
     else {
       limits.push_back(x-data->GetErrorXhigh(i));
-      values.push_back((y-curve->Eval(x)));
+      values.push_back((y-c));
       errors.push_back(e);
     }
     //DEBUG
@@ -847,12 +865,20 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
   setStyle();
   
   h_pulls = new TH1D("hGauss","hGauss;Pull [#sigma];Number of bins",10,-5,5);
+  int num_pulls_used = 0;
   
 	for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
-		h_pulls->Fill(pulls.GetBinContent(i));
+    // only count pulls different from zero (due to numerics != 0.0 won't work here)
+    if (TMath::Abs(pulls.GetBinContent(i)) > 1e-4) {
+//      sdebug << "doocore::lutils::PlotPullDistributionWithGaussian(...): p = " << pulls.GetBinContent(i) << endmsg;
+      h_pulls->Fill(pulls.GetBinContent(i));
+      ++num_pulls_used;
+    }
 	}
+//  sdebug << "doocore::lutils::PlotPullDistributionWithGaussian(...): #pulls = " << num_pulls_used << endmsg;
+
 	f_gauss_norm = new TF1("fGauss","gaus(0)/([2]*sqrt(2*3.1415))",-5,5);
-	f_gauss_norm->SetParameter(0,pulls.GetNbinsX());
+	f_gauss_norm->SetParameter(0,num_pulls_used);
 	f_gauss_norm->SetParameter(1,0);
 	f_gauss_norm->SetParameter(2,1);
 	f_gauss_norm->SetLineColor(kBlack);
@@ -861,7 +887,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	f_gauss_norm->SetLineWidth(4);
 	
   f_gauss_fit = new TF1("fFit","gaus(0)/([2]*sqrt(2*3.1415))",-5,5);
-	f_gauss_fit->SetParameter(0,pulls.GetNbinsX());
+	f_gauss_fit->SetParameter(0,num_pulls_used);
 	f_gauss_fit->SetParameter(1,0);
 	f_gauss_fit->SetParameter(2,1);
 	f_gauss_fit->SetLineColor(12);
@@ -909,7 +935,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	//legend
 	double nVal, nErr, mVal, mErr, sVal, sErr;
 	
-	nVal = pulls.GetNbinsX() - f_gauss_fit->GetParameter(0);
+	nVal = num_pulls_used - f_gauss_fit->GetParameter(0);
 	mVal = f_gauss_fit->GetParameter(1);
 	sVal = f_gauss_fit->GetParameter(2)-1;
 	
