@@ -815,6 +815,8 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
       break;
     }
     
+    sdebug << "doocore::lutils::GetPulls(...): i = " << i << ", x = " << x << ", y = " << y << ", c = " << curve->Eval(x) << ", e = " << e << endmsg;
+    
     //pulls
     if (normalize) {
       limits.push_back(x+data->GetErrorXhigh(i));
