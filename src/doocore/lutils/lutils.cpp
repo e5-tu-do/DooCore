@@ -1490,15 +1490,16 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
   
   // convert entries into vector (for sorting)
   float entry;
-  tree.SetBranchAddress(TString(var_name), &entry);
+  TBranch& branch = *tree.GetBranch(TString(var_name));
+  branch.SetAddress(&entry);
   for (int i = 0; i < num_entries; ++i)
   {
-    tree.GetEvent(i);
+    branch.GetEvent(i);
     if (isfinite(entry)) {
       entries.push_back(entry);
     }
   }
-  tree.ResetBranchAddress(tree.GetBranch(TString(var_name)));
+  branch.ResetAddress();
   std::sort(entries.begin(), entries.end());
 
   int idx_median = entries.size()/2;       
