@@ -1523,7 +1523,7 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
   sdebug << "branch address: " << tree.GetBranch(TString(var_name)) << endmsg;
   
   if (tree.GetBranch(TString(var_name)) == 0) {
-    serr << "Cannot get branch for " << var_name << " in tree " << tree.GetName() << endmsg;
+    serr << "ERROR in doocore::lutils::MedianLimitsForTuple(TTree&, std::string): Cannot get branch for " << var_name << " in tree " << tree.GetName() << ". Will return insensible results" << endmsg;
     minmax.first = +1;
     minmax.second = -1;
     return minmax;
