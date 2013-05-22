@@ -25,6 +25,7 @@
 #include "TLegend.h"
 #include "TH1D.h"
 #include "TF1.h"
+#include "TLeaf.h"
 
 // from RooFit
 #include "RooPlot.h"
@@ -1515,7 +1516,7 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
   std::vector<double> entries;
   
   // convert entries into vector (for sorting)
-  float entry;
+  double entry;
   
   std::pair<double, double> minmax;
     
@@ -1526,10 +1527,16 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
     return minmax;
   }
   TBranch& branch = *tree.GetBranch(TString(var_name));
-  branch.SetAddress(&entry);
+  TLeaf&   leaf   = *branch.GetLeaf(TString(var_name));
+  std::string type_name = leaf.GetTypeName();
+  
+  //branch.SetAddress(&entry);
   for (int i = 0; i < num_entries; ++i)
   {
     branch.GetEvent(i);
+    
+    entry = leaf.GetValue();
+    
     if (isfinite(entry)) {
       entries.push_back(entry);
     }
