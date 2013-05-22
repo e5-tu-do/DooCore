@@ -1528,8 +1528,7 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
   }
   TBranch& branch = *tree.GetBranch(TString(var_name));
   TLeaf&   leaf   = *branch.GetLeaf(TString(var_name));
-  std::string type_name = leaf.GetTypeName();
-  
+  //std::string type_name = leaf.GetTypeName();
   //branch.SetAddress(&entry);
   for (int i = 0; i < num_entries; ++i)
   {
