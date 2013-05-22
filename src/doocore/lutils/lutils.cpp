@@ -1517,8 +1517,17 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
   // convert entries into vector (for sorting)
   float entry;
   
+  std::pair<double, double> minmax;
+  
+  sdebug << "var_name: " << var_name << endmsg;
   sdebug << "branch address: " << tree.GetBranch(TString(var_name)) << endmsg;
   
+  if (tree.GetBranch(TString(var_name)) == 0) {
+    serr << "Cannot get branch for " << var_name << " in tree " << tree.GetName() << endmsg;
+    minmax.first = +1;
+    minmax.second = -1;
+    return minmax;
+  }
   TBranch& branch = *tree.GetBranch(TString(var_name));
   branch.SetAddress(&entry);
   for (int i = 0; i < num_entries; ++i)
@@ -1532,7 +1541,7 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(TTree& tree, std:
   std::sort(entries.begin(), entries.end());
 
   int idx_median = entries.size()/2;       
-  std::pair<double, double> minmax;
+  
   
   minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
   minmax.second = -4*entries[idx_median]+5*entries[(int)(entries.size()-idx_median*0.32)];
