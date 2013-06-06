@@ -3,6 +3,7 @@
 // from ROOT
 #include "TLorentzVector.h"
 #include "TRandom3.h"
+#include "TStopwatch.h"
 
 // from project
 #include "doocore/io/MsgStream.h"
@@ -30,4 +31,39 @@ int main() {
   
   sdebug << "daughter 1 mass: " << d1.M() << endmsg;
   sdebug << "daughter 2 mass: " << d2.M() << endmsg;
+  
+  double mother_mass = MotherTwoBodyWrongMassHypothesis(d1,d2,m_pi).M();
+  double wrong_mother_mass = MotherTwoBodyWrongMassHypothesis(d1,d2,m_K).M();
+  double wrong_mother_mass2 = MotherTwoBodyDecay(d1_px, d1_py, d1_pz, m_K, d2_px, d2_py, d2_pz, m_pi).M();
+  double wrong_mother_mass3 = MotherTwoBodyDecayMass(d1_px, d1_py, d1_pz, m_K, d2_px, d2_py, d2_pz, m_pi);
+  
+  sdebug << "correct mother mass: " << mother_mass << endmsg;
+  sdebug << "wrong mother mass:   " << wrong_mother_mass << endmsg;
+  sdebug << "wrong mother mass 2: " << wrong_mother_mass2 << endmsg;
+  sdebug << "wrong mother mass 3: " << wrong_mother_mass3 << endmsg;
+
+  TRandom3 rand;
+  int num_steps=10000000;
+  TStopwatch sw;
+  sw.Start();
+  for (int i=0; i<num_steps; ++i) {
+    TLorentzVector d1_n(d1_px, d1_py, d1_pz, d1_E);
+    TLorentzVector d2_n(d2_px, d2_py, d2_pz, d2_E);
+    double wrong_mother_mass = MotherTwoBodyWrongMassHypothesis(d1_n,d2_n,m_K).M();
+  }
+  sinfo << "time per call: " << sw.CpuTime()/num_steps << " s." << endmsg;
+  
+  sw.Reset();
+  sw.Start();
+  for (int i=0; i<num_steps; ++i) {
+    double wrong_mother_mass = MotherTwoBodyDecay(d1_px, d1_py, d1_pz, m_K, d2_px, d2_py, d2_pz, m_pi).M();
+  }
+  sinfo << "time per call: " << sw.CpuTime()/num_steps << " s." << endmsg;
+  
+  sw.Reset();
+  sw.Start();
+  for (int i=0; i<num_steps; ++i) {
+    double wrong_mother_mass = MotherTwoBodyDecayMass(d1_px, d1_py, d1_pz, m_K, d2_px, d2_py, d2_pz, m_pi);
+  }
+  sinfo << "time per call: " << sw.CpuTime()/num_steps << " s." << endmsg;
 }
