@@ -38,7 +38,7 @@ namespace kinematic {
  *  is calculated under the assumption that the first daughter's mass hypothesis 
  *  is wrong and needs to be replaced by another mass.
  *
- *  Time per call (on my MacBook): 1.725e-06 s 
+ *  Time per call (on my MacBook, -O0): 1.1466e-06 s
  *
  *  @param daughter1 first daughter to use with different mass hypothesis
  *  @param daughter2 second daughter
@@ -60,7 +60,7 @@ TLorentzVector MotherTwoBodyWrongMassHypothesis(const TLorentzVector& daughter1,
  *  Based on two daughter particle properties a mother particle is calculated 
  *  under the assumption of daughter's masses.
  *
- *  Time per call (on my MacBook): 2.89e-07 s
+ *  Time per call (on my MacBook, -O0): 2.853e-07 s
  *
  *  @param d1_px first daughter px
  *  @param d1_py first daughter py
@@ -102,7 +102,7 @@ TLorentzVector MotherTwoBodyDecay(double d1_px, double d1_py,
  *  under the assumption of daughter's masses. This function is more efficient 
  *  than the other functions calculating the mother's TLorentzVector.
  *
- *  Time per call (on my MacBook): 4.3e-08 s
+ *  Time per call (on my MacBook, -O0): 4.27e-08 s
  *
  *  @param d1_px first daughter px
  *  @param d1_py first daughter py
@@ -118,13 +118,14 @@ double MotherTwoBodyDecayMass(double d1_px, double d1_py,
                                   double d1_pz, double d1_m,
                                   double d2_px, double d2_py,
                                   double d2_pz, double d2_m) {
-  double d1_E = TMath::Sqrt(d1_m*d1_m + d1_px*d1_px + d1_py*d1_py + d1_pz*d1_pz);
-  double d2_E = TMath::Sqrt(d2_m*d2_m + d2_px*d2_px + d2_py*d2_py + d2_pz*d2_pz);
+//  double d1_E = TMath::Sqrt(d1_m*d1_m + d1_px*d1_px + d1_py*d1_py + d1_pz*d1_pz);
+//  double d2_E = TMath::Sqrt(d2_m*d2_m + d2_px*d2_px + d2_py*d2_py + d2_pz*d2_pz);
   
   double m_px = (d1_px+d2_px);
   double m_py = (d1_py+d2_py);
   double m_pz = (d1_pz+d2_pz);
-  double m_E  = (d1_E+d2_E);
+  double m_E  = (TMath::Sqrt(d1_m*d1_m + d1_px*d1_px + d1_py*d1_py + d1_pz*d1_pz)
+                +TMath::Sqrt(d2_m*d2_m + d2_px*d2_px + d2_py*d2_py + d2_pz*d2_pz));
   
   //return TLorentzVector(m_px, m_py, m_pz, m_e);
   

@@ -46,9 +46,9 @@ int main() {
   int num_steps=10000000;
   TStopwatch sw;
   sw.Start();
+  TLorentzVector d1_n(d1_px, d1_py, d1_pz, d1_E);
+  TLorentzVector d2_n(d2_px, d2_py, d2_pz, d2_E);
   for (int i=0; i<num_steps; ++i) {
-    TLorentzVector d1_n(d1_px, d1_py, d1_pz, d1_E);
-    TLorentzVector d2_n(d2_px, d2_py, d2_pz, d2_E);
     double wrong_mother_mass = MotherTwoBodyWrongMassHypothesis(d1_n,d2_n,m_K).M();
   }
   sinfo << "time per call: " << sw.CpuTime()/num_steps << " s." << endmsg;
