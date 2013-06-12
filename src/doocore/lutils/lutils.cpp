@@ -817,10 +817,11 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
     //fetch roofit fuckup
 		if ((y  != y) || (TMath::Abs(y) > 10000000000)) {y = c;}
     if ((e == 0) || (e  != e) || (TMath::Abs(e) > 10000000000)) {e = 1;}
-    if (c < 0) {
-      // forcing PDF positive definite
-      c = 0;
-    }
+//    if (c < 0) {
+//      // forcing PDF positive definite
+//      // commented out by Uli 12.06.2013, because Pulls for Asymmetry Plots are broken if this line is included
+//      c = 0;
+//    }
     if (x > pFrame->GetXaxis()->GetXmax()) {
       limits[i]=pFrame->GetXaxis()->GetXmax();
       break;
