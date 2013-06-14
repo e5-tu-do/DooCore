@@ -44,10 +44,10 @@
  * https://wiki.e5.physik.tu-dortmund.de/LHCb/Software/DooSoftwareUsage).
  * 
  * To build DooCore, download it either as a release version or checkout from 
- * SVN. Create a @c build directory where you invoke CMake and install DooCore.
+ * Git. Create a @c build directory where you invoke CMake and install DooCore.
  * 
  * @code
- * cmake -DCMAKE_INSTALL_PREFIX=$DOOCORESYS /path/of/doocore/source
+ * /path/of/doocore/source/scripts/rebuild_cmake.sh
  * make
  * make install
  * @endcode
