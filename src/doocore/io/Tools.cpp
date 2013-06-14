@@ -2,6 +2,7 @@
 
 // from STL
 #include <iostream>
+#include <fstream>
 
 // from ROOT
 
@@ -27,6 +28,8 @@ namespace io {
 namespace tools {
   
 void ReplaceScientificNotationInFile(std::string filename, bool debug_mode){
+  using namespace std;
+
   /// regex
   boost::regex expr("(\\d*)e(\\+|\\-)0+([0-9]*)");
   boost::match_results<std::string::const_iterator> what;
