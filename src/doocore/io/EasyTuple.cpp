@@ -2,7 +2,12 @@
 
 // from STL
 #include <string>
+#include <sstream>
 #include <vector>
+
+// from Boost
+#include <boost/assign/std/vector.hpp>
+using namespace boost::assign;
 
 // from ROOT
 #include "TFile.h"
@@ -199,24 +204,63 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset,
   RooAbsArg*         arg = NULL;
   RooArgSet          new_set;
   std::vector<RooFormulaVar*> formulas;
+  std::string        cut_variables="";
+  std::stringstream  stream_cut_variables;
   
   while ((arg=(RooAbsArg*)it->Next())) {
     RooFormulaVar* formula = dynamic_cast<RooFormulaVar*>(arg);
+    RooRealVar*    var     = dynamic_cast<RooRealVar*>(arg);
     
     if (formula == NULL) {
       new_set.add(*arg);
+      
+      if (var != NULL) {
+        if (var->hasMin()) stream_cut_variables << "&&" << var->GetName() << ">" << var->getMin();
+        if (var->hasMax()) stream_cut_variables << "&&" << var->GetName() << "<" << var->getMax();
+      }
     } else {
       formulas.push_back(formula);
     }
   }
   delete it;
- 
+   
+  // 	RooCmdArg(const char* name, Int_t i1 = 0, Int_t i2 = 0, Double_t d1 = 0, Double_t d2 = 0, const char* s1 = 0, const char* s2 = 0, const TObject* o1 = 0, const TObject* o2 = 0, const RooCmdArg* ca = 0, const char* s3 = 0, const RooArgSet* c1 = 0, const RooArgSet* c2 = 0)
+  // RooCmdArg("CutSpec",0,0,0,0,cutSpec,0,0,0) ;
+  
+  std::vector<RooCmdArg> args;
+  args += arg1, arg2, arg3, arg4, arg5, arg6, arg7;
+  bool found_cut_arg = false;
+  for (std::vector<RooCmdArg>::iterator it=args.begin(), end=args.end();
+       it != end; ++it) {
+    std::string name = it->GetName();
+    if (name == "CutSpec") {
+      stream_cut_variables << "&&" << it->getString(0);
+      
+      cut_variables = stream_cut_variables.str().substr(2);
+      sinfo << "Converting dataset with cut " << cut_variables << endmsg;
+      *it = Cut(cut_variables.c_str());
+      found_cut_arg = true;
+    }
+  }
+  if (!found_cut_arg) {
+    cut_variables = stream_cut_variables.str();
+    if (cut_variables.length() > 0) {
+      cut_variables = cut_variables.substr(2);
+      std::string name = args[6].GetName();
+      if (name != "") {
+        swarn << "doocore::io::EasyTuple::ConvertToDataSet(...): Have to delete last passed RooCmdArg " << name << " to apply necessary cut." << endmsg;
+      }
+      sinfo << "Converting dataset with cut " << cut_variables << endmsg;
+      args[6] = Cut(cut_variables.c_str());
+    }
+  }
+  
   //temp: copy tree 
   //tree_ = tree_->CopyTree("", "", 800000);
   //tree_->SetEntries(300000);
  
-  dataset_ = new RooDataSet("dataset","dataset",new_set,Import(*tree_), arg1,
-                            arg2, arg3, arg4, arg5, arg6, arg7);
+  dataset_ = new RooDataSet("dataset","dataset",new_set,Import(*tree_), args[0],
+                            args[1], args[2], args[3], args[4], args[5], args[6]);
   
   for (std::vector<RooFormulaVar*>::const_iterator it = formulas.begin();
        it != formulas.end(); ++it) {
