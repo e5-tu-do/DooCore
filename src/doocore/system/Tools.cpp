@@ -25,7 +25,7 @@ namespace system {
 namespace tools {
 
 std::pair<std::string, std::string> SeparatePathAndFilename(std::string complete_path){
-  bool debug_mode = true;
+  bool debug_mode = false;
   if (debug_mode) doocore::io::serr << "-debug- " << "starting SeparatePathAndFilename…" << doocore::io::endmsg;
   
   std::pair<std::string, std::string> path_and_filename;
@@ -46,6 +46,30 @@ std::pair<std::string, std::string> SeparatePathAndFilename(std::string complete
   if (debug_mode) doocore::io::serr << "-debug- \t" << "Path: " << path_and_filename.first << doocore::io::endmsg;
   if (debug_mode) doocore::io::serr << "-debug- \t" << "Filename: " << path_and_filename.second << doocore::io::endmsg;
   return path_and_filename;
+}
+
+std::pair<std::string, std::string> SeparateFilenameAndType(std::string complete_filename){
+  bool debug_mode = true;
+  if (debug_mode) doocore::io::serr << "-debug- " << "starting SeparateFilenameAndType" << doocore::io::endmsg;
+  
+  std::pair<std::string, std::string> filename_and_type;
+
+  boost::regex expr("^(.*)(\\..*)$");
+  boost::match_results<std::string::const_iterator> what;
+
+  if( regex_search( complete_filename, what, expr ) ){
+    std::string name( what[1].first, what[1].second );
+    std::string type( what[2].first, what[2].second );    
+
+    filename_and_type.first = name;
+    filename_and_type.second = type;
+  }
+  else {
+    doocore::io::swarn << "-warning- " << "SeparateFilenameAndType -- RegEx matching failed" << doocore::io::endmsg;
+  }
+  if (debug_mode) doocore::io::serr << "-debug- \t" << "Name: " << filename_and_type.first << doocore::io::endmsg;
+  if (debug_mode) doocore::io::serr << "-debug- \t" << "Extension: " << filename_and_type.second << doocore::io::endmsg;
+  return filename_and_type;
 }
 
 void RemoveFile(std::string target_file){

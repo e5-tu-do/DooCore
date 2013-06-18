@@ -36,6 +36,14 @@ namespace tools {
 std::pair<std::string, std::string> SeparatePathAndFilename(std::string complete_path);
 
 /**
+ *  @brief Separate filename and file type extension
+ *
+ *  Given the complete filename as input argument, the filename and file type extension are returned as std::pair<std::string, std::string>
+ *
+ */
+std::pair<std::string, std::string> SeparateFilenameAndType(std::string complete_filename);
+
+/**
  *  @brief Remove file
  *
  *  Remove file...
