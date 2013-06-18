@@ -234,7 +234,10 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset,
        it != end; ++it) {
     std::string name = it->GetName();
     if (name == "CutSpec") {
-      stream_cut_variables << "&&" << it->getString(0);
+      if (it->getString(0) != NULL) {
+        std::string user_cut_string(it->getString(0));
+        if (user_cut_string.length() > 0) stream_cut_variables << "&&" << user_cut_string;
+      }
       
       cut_variables = stream_cut_variables.str().substr(2);
       sinfo << "Converting dataset with cut " << cut_variables << endmsg;
