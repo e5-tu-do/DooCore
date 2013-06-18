@@ -49,7 +49,7 @@ std::pair<std::string, std::string> SeparatePathAndFilename(std::string complete
 }
 
 std::pair<std::string, std::string> SeparateFilenameAndType(std::string complete_filename){
-  bool debug_mode = true;
+  bool debug_mode = false;
   if (debug_mode) doocore::io::serr << "-debug- " << "starting SeparateFilenameAndType" << doocore::io::endmsg;
   
   std::pair<std::string, std::string> filename_and_type;
