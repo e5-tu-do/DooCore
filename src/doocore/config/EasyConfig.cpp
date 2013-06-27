@@ -46,7 +46,7 @@ EasyConfig::~EasyConfig(){}
 void EasyConfig::LoadConfigFile(std::string filename){
   doocore::io::sinfo << "Reading config file " << filename << "..." << doocore::io::endmsg;
   read_info(filename, ptree_);
-  DisplayPTree(ptree_);
+  if (debug_mode_) DisplayPTree(ptree_);
 }
 
 void EasyConfig::DisplayPTree(const boost::property_tree::ptree& tree, const int depth) {  

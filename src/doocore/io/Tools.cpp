@@ -39,7 +39,7 @@ void ReplaceScientificNotationInFile(std::string filename, bool debug_mode){
   filestr.open(filename.c_str());
 
   /// create temp file
-  std::string tmpfilename = "tmp_2e7ed4bc-a50d-4bb8-b1d9-f85a39d91aec.txt";
+  std::string tmpfilename = "tmp_ReplaceScientificNotationInFile_e2e7ed4bc-a50d-4bb8-b1d9-f85a39d91aec.txt";
   ofstream tmpfilestr;
   tmpfilestr.open(tmpfilename.c_str());
 
