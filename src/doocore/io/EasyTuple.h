@@ -20,6 +20,13 @@ class RooRealVar;
 
 namespace doocore {
 namespace io {
+  
+enum VariableRangeCutting {
+  kNoCuts,
+  kCutInclusive,
+  kCutExclusive
+};
+  
 /*! @class doocore::io::EasyTuple
  * @brief Easy tuple loading into TTree/RooDataSet without boilerplate code
  *
@@ -290,6 +297,19 @@ class EasyTuple {
    *  @param num_maximum_events maximum number of events to process
    */
   void set_num_maximum_events(int num_maximum_events) { num_maximum_events_ = num_maximum_events; tree_->SetEntries(num_maximum_events_); }
+  
+  /**
+   *  @brief Set cut mode for variable ranges
+   *
+   *  Determine how EasyTuple treats variable ranges. Valid values are 
+   *
+   *   - kNoCuts: Do not cut on variable ranges, ranges will be applied upon import nevertheless.
+   *   - kCutInclusive: Cut variable ranges inclusive (i.e. x>=min&&x<=max)
+   *   - kCutExclusive: Cut variable ranges exclusive (i.e. x>min&&x<max)
+   *
+   *  @param cut_variable_range cut mode for variable ranges
+   */
+  void set_cut_variable_range(VariableRangeCutting cut_variable_range) { cut_variable_range_ = cut_variable_range; }
  
  protected:
   
@@ -319,6 +339,11 @@ class EasyTuple {
    *  @brief Event size limit for tree
    **/
   int num_maximum_events_;
+  
+  /**
+   *  @brief Cut mode for variable ranges
+   **/
+  VariableRangeCutting cut_variable_range_;
 }; // class EasyTuple
 } // namespace utils
 } // namespace doofit

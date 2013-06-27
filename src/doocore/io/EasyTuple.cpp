@@ -35,7 +35,8 @@ doocore::io::EasyTuple::EasyTuple(const std::string& file_name, const std::strin
   argset_(NULL),
   dataset_(NULL),
   tree_name_(tree_name),
-  num_maximum_events_(-1)
+  num_maximum_events_(-1),
+  cut_variable_range_(kCutExclusive)
 {
   file_ = new TFile(file_name.c_str());
   argset_ = new RooArgSet(argset);
@@ -76,7 +77,8 @@ doocore::io::EasyTuple::EasyTuple(TTree* tree, const RooArgSet& argset)
 tree_(tree),
 argset_(NULL),
 dataset_(NULL),
-num_maximum_events_(-1)
+num_maximum_events_(-1),
+cut_variable_range_(kCutExclusive)
 {
   argset_ = new RooArgSet(argset);
   
@@ -106,7 +108,8 @@ tree_(NULL),
 argset_(NULL),
 dataset_(NULL),
 tree_name_(other.tree_name_),
-num_maximum_events_(other.num_maximum_events_)
+num_maximum_events_(other.num_maximum_events_),
+cut_variable_range_(other.cut_variable_range_)
 {
   argset_ = new RooArgSet(*other.argset_);
   
@@ -199,13 +202,15 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset,
     throw 3;
   }
   
-  // filter out formula vars
+  // filter out formula vars and additionally cut on all variable ranges
   RooLinkedListIter* it  = (RooLinkedListIter*)argset.createIterator();
   RooAbsArg*         arg = NULL;
   RooArgSet          new_set;
   std::vector<RooFormulaVar*> formulas;
   std::string        cut_variables="";
   std::stringstream  stream_cut_variables;
+  std::string        less_operator = cut_variable_range_==kCutInclusive ? "<=" : "<";
+  std::string        greater_operator = cut_variable_range_==kCutInclusive ? ">=" : ">";
   
   while ((arg=(RooAbsArg*)it->Next())) {
     RooFormulaVar* formula = dynamic_cast<RooFormulaVar*>(arg);
@@ -214,9 +219,9 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset,
     if (formula == NULL) {
       new_set.add(*arg);
       
-      if (var != NULL) {
-        if (var->hasMin()) stream_cut_variables << "&&" << var->GetName() << ">" << var->getMin();
-        if (var->hasMax()) stream_cut_variables << "&&" << var->GetName() << "<" << var->getMax();
+      if (var != NULL && cut_variable_range_ != kNoCuts) {
+        if (var->hasMin()) stream_cut_variables << "&&" << var->GetName() << greater_operator << var->getMin();
+        if (var->hasMax()) stream_cut_variables << "&&" << var->GetName() << less_operator << var->getMax();
       }
     } else {
       formulas.push_back(formula);
