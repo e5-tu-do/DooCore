@@ -284,6 +284,7 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, co
   swarn << "These functions will be removed in a future version of DooCore. Please use the appropriate versions with RooCmdArgs instead:" << endmsg;
   swarn << " - doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, const RooCmdArg& arg1, ...)" << endmsg;
   swarn << " - doocore::io::EasyTuple::ConvertToDataSet(const RooCmdArg& arg1, ...)" << endmsg;
+  swarn << "In these a cut can be specified via the Cut(...) RooCmdArg." << endmsg;
   
   if (cut.length() == 0) {
     return ConvertToDataSet(argset);
