@@ -320,20 +320,24 @@ void doocore::lutils::printSystemRecources(TString cmd)
 }
 
 
-void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir)
+void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_only)
 {
   sinfo << "doocore::lutils::printPlot(...): printing plots..." << endmsg;
 
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
 
-	system("mkdir -p " + dir+"eps/");
-	system("mkdir -p " + dir+"C/");
-	system("mkdir -p " + dir+"png/");
+  if (!pdf_only) {
+    system("mkdir -p " + dir+"eps/");
+    system("mkdir -p " + dir+"C/");
+    system("mkdir -p " + dir+"png/");
+  }
 	system("mkdir -p " + dir+"pdf/");
 
-  c->Print(dir+"eps/" + name + ".eps");
-	c->Print(dir+"C/"   + name + ".C");
-  c->Print(dir+"png/" + name + ".png");
+  if (!pdf_only) {
+    c->Print(dir+"eps/" + name + ".eps");
+    c->Print(dir+"C/"   + name + ".C");
+    c->Print(dir+"png/" + name + ".png");
+  }
   c->Print(dir+"pdf/" + name + ".pdf");
 }
   
