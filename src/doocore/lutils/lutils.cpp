@@ -1440,6 +1440,8 @@ void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAb
 }
 
 std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet& dataset, std::string var_name) {
+  bool debug = false;
+  
   int num_entries = dataset.numEntries();
   std::pair<double, double> minmax;
 
@@ -1460,27 +1462,31 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
     }
   }
   
-//  sdebug << "#non-finite entries neglected: " << num_entries-entries.size() << endmsg;
+//  if (debug) sdebug << "#non-finite entries neglected: " << num_entries-entries.size() << endmsg;
   
   std::sort(entries.begin(), entries.end());
   int idx_median = entries.size()/2;       
   
 //  for (int i = 0; i < entries.size(); ++i) {
-//    sdebug << entries[i] << endmsg;
+//    if (debug) sdebug << entries[i] << endmsg;
 //  }
   
+  
+  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) range: " << entries.front() << " - " << entries.back() << endmsg;
   
   minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
   minmax.second = -4*entries[idx_median]+5*entries[(int)(entries.size()-idx_median*0.32)];
   
-//  sdebug << "idx_median = " << idx_median << ", entries[idx_median] = " << entries[idx_median] << endmsg;
-//  sdebug << "(int)(idx_median*0.32) = " << (int)(idx_median*0.32) << endmsg;
-//  sdebug << "(int)(entries.size()-idx_median*0.32) = " << (int)(entries.size()-idx_median*0.32) << endmsg;
-//  sdebug << "-4*entries[idx_median] = " << -4*entries[idx_median] << endmsg;
-//  sdebug << "5*entries[(int)(idx_median*0.32)] = " << 5*entries[(int)(idx_median*0.32)] << endmsg;
-//  sdebug << "5*entries[(int)(entries.size()-idx_median*0.32)] = " << 5*entries[(int)(entries.size()-idx_median*0.32)] << endmsg;
-//  sdebug << "first: " << minmax.first << endmsg;
-//  sdebug << "second: " << minmax.second << endmsg;
+//  if (debug) sdebug << "idx_median = " << idx_median << ", entries[idx_median] = " << entries[idx_median] << endmsg;
+//  if (debug) sdebug << "(int)(idx_median*0.32) = " << (int)(idx_median*0.32) << endmsg;
+//  if (debug) sdebug << "(int)(entries.size()-idx_median*0.32) = " << (int)(entries.size()-idx_median*0.32) << endmsg;
+//  if (debug) sdebug << "-4*entries[idx_median] = " << -4*entries[idx_median] << endmsg;
+//  if (debug) sdebug << "5*entries[(int)(idx_median*0.32)] = " << 5*entries[(int)(idx_median*0.32)] << endmsg;
+//  if (debug) sdebug << "5*entries[(int)(entries.size()-idx_median*0.32)] = " << 5*entries[(int)(entries.size()-idx_median*0.32)] << endmsg;
+//  if (debug) sdebug << "first: " << minmax.first << endmsg;
+//  if (debug) sdebug << "second: " << minmax.second << endmsg;
+  
+  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after quantiles: " << minmax.first << " - " << minmax.second << endmsg;
   
   // if computed range is larger than min/max value choose those
   if (minmax.first < entries.front()){
@@ -1490,10 +1496,14 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
   	minmax.second = entries.back();
   }
   
+  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after overflow check: " << minmax.first << " - " << minmax.second << endmsg;
+
   if (minmax.first >= minmax.second) {
     minmax.first  = entries[idx_median]*(minmax.first  > 0 ? 0.98 : 1.02);
     minmax.second = entries[idx_median]*(minmax.second > 0 ? 1.02 : 0.98);
   }
+  
+  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after flip/equality check: " << minmax.first << " - " << minmax.second << endmsg;
   
   // if everything fails, just take all
   if (minmax.first == 0 && minmax.second == 0) {
@@ -1501,17 +1511,20 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
     minmax.second = entries[num_entries-1]+0.1*(entries[entries.size()-1]-entries[0]);
   }
   
+  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after zero check: " << minmax.first << " - " << minmax.second << endmsg;
+  
   // if still empty range, go from -1 to +1
   if (minmax.first == 0 && minmax.second == 0) {
     minmax.first  = -1;
     minmax.second = +1;
   }
-    
-  minmax.first  = minmax.first*(minmax.first  > 0 ? 0.85 : 1.15);
-  minmax.second = minmax.second*(minmax.second > 0 ? 1.15 : 0.85);
+  
+  // just take a little more
+  minmax.first  = minmax.first*(minmax.first  > 0 ? 0.998 : 1.002);
+  minmax.second = minmax.second*(minmax.second > 0 ? 1.002 : 0.998);
 
-//  sdebug << "first: " << minmax.first << endmsg;
-//  sdebug << "second: " << minmax.second << endmsg;
+//  if (debug) sdebug << "first: " << minmax.first << endmsg;
+//  if (debug) sdebug << "second: " << minmax.second << endmsg;
   
   return minmax;
 }
