@@ -1520,8 +1520,8 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
   }
   
   // just take a little more
-  minmax.first  = minmax.first*(minmax.first  > 0 ? 0.998 : 1.002);
-  minmax.second = minmax.second*(minmax.second > 0 ? 1.002 : 0.998);
+  minmax.first  = minmax.first*(minmax.first  > 0 ? 0.99998 : 1.00002);
+  minmax.second = minmax.second*(minmax.second > 0 ? 1.00002 : 0.99998);
 
 //  if (debug) sdebug << "first: " << minmax.first << endmsg;
 //  if (debug) sdebug << "second: " << minmax.second << endmsg;
