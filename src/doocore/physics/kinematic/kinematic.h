@@ -55,6 +55,31 @@ TLorentzVector MotherTwoBodyWrongMassHypothesis(const TLorentzVector& daughter1,
 }
 
 /**
+ *  @brief Three body wrong mass hypothesis mother calculator
+ *
+ *  Based on three TLorentzVectors (the daughter particles) a mother particle
+ *  is calculated under the assumption that the first daughter's mass hypothesis 
+ *  is wrong and needs to be replaced by another mass.
+ *
+ *  Time per call (on my MacBook, -O0): to be done
+ *
+ *  @param daughter1 first daughter to use with different mass hypothesis
+ *  @param daughter2 second daughter
+ *  @param daughter3 third daughter
+ *  @param new_mass new mass hypothesis for daughter1
+ *  @return the mother
+ */
+TLorentzVector MotherThreeBodyWrongMassHypothesis(const TLorentzVector& daughter1,
+                                                  const TLorentzVector& daughter2,
+                                                  const TLorentzVector& daughter3,
+                                                  double new_mass) {
+  TLorentzVector daughter1_new;
+  daughter1_new.SetVectM(daughter1.Vect(), new_mass);
+  
+  return daughter1_new + daughter2 + daughter3;
+}
+  
+/**
  *  @brief Two body decay mother calculator
  *
  *  Based on two daughter particle properties a mother particle is calculated 
@@ -96,6 +121,54 @@ TLorentzVector MotherTwoBodyDecay(double d1_px, double d1_py,
 }
 
 /**
+ *  @brief Three body decay mother calculator
+ *
+ *  Based on three daughter particle properties a mother particle is calculated
+ *  under the assumption of daughter's masses.
+ *
+ *  Time per call (on my MacBook, -O0): to be done
+ *
+ *  @param d1_px first daughter px
+ *  @param d1_py first daughter py
+ *  @param d1_pz first daughter pz
+ *  @param d1_m first daughter mass
+ *  @param d2_px second daughter px
+ *  @param d2_py second daughter py
+ *  @param d2_pz second daughter pz
+ *  @param d2_m second daughter mass
+ *  @param d3_px third daughter px
+ *  @param d3_py third daughter py
+ *  @param d3_pz third daughter pz
+ *  @param d3_m third daughter mass
+ *  @return the mother
+ */
+TLorentzVector MotherThreeBodyDecay(double d1_px, double d1_py,
+                                    double d1_pz, double d1_m,
+                                    double d2_px, double d2_py,
+                                    double d2_pz, double d2_m,
+                                    double d3_px, double d3_py,
+                                    double d3_pz, double d3_m) {
+  // calculation by hand more efficient
+  //  TLorentzVector daughter1;
+  //  daughter1.SetXYZM(d1_px, d1_py, d1_pz, d1_m);
+  //  TLorentzVector daughter2;
+  //  daughter2.SetXYZM(d2_px, d2_py, d2_pz, d2_m);
+  //
+  //  return daughter1 + daughter2;
+  
+  double d1_E = TMath::Sqrt(d1_m*d1_m + d1_px*d1_px + d1_py*d1_py + d1_pz*d1_pz);
+  double d2_E = TMath::Sqrt(d2_m*d2_m + d2_px*d2_px + d2_py*d2_py + d2_pz*d2_pz);
+  double d3_E = TMath::Sqrt(d3_m*d3_m + d3_px*d3_px + d3_py*d3_py + d3_pz*d3_pz);
+  
+  double m_px = (d1_px+d2_px+d3_px);
+  double m_py = (d1_py+d2_py+d3_py);
+  double m_pz = (d1_pz+d2_pz+d3_pz);
+  double m_E  = (d1_E+d2_E+d3_E);
+  
+  return TLorentzVector(m_px, m_py, m_pz, m_E);
+}
+  
+/**
  *  @brief Two body decay mother mass calculator
  *
  *  Based on two daughter particle properties a mother mass is calculated 
@@ -118,17 +191,51 @@ double MotherTwoBodyDecayMass(double d1_px, double d1_py,
                                   double d1_pz, double d1_m,
                                   double d2_px, double d2_py,
                                   double d2_pz, double d2_m) {
-//  double d1_E = TMath::Sqrt(d1_m*d1_m + d1_px*d1_px + d1_py*d1_py + d1_pz*d1_pz);
-//  double d2_E = TMath::Sqrt(d2_m*d2_m + d2_px*d2_px + d2_py*d2_py + d2_pz*d2_pz);
-  
   double m_px = (d1_px+d2_px);
   double m_py = (d1_py+d2_py);
   double m_pz = (d1_pz+d2_pz);
   double m_E  = (TMath::Sqrt(d1_m*d1_m + d1_px*d1_px + d1_py*d1_py + d1_pz*d1_pz)
                 +TMath::Sqrt(d2_m*d2_m + d2_px*d2_px + d2_py*d2_py + d2_pz*d2_pz));
-  
-  //return TLorentzVector(m_px, m_py, m_pz, m_e);
-  
+    
+  return TMath::Sqrt(m_E*m_E - (m_px*m_px + m_py*m_py + m_pz*m_pz));
+}
+
+/**
+ *  @brief Three body decay mother mass calculator
+ *
+ *  Based on three daughter particle properties a mother mass is calculated
+ *  under the assumption of daughter's masses. This function is more efficient 
+ *  than the other functions calculating the mother's TLorentzVector.
+ *
+ *  Time per call (on my MacBook, -O0): two be done
+ *
+ *  @param d1_px first daughter px
+ *  @param d1_py first daughter py
+ *  @param d1_pz first daughter pz
+ *  @param d1_m first daughter mass
+ *  @param d2_px second daughter px
+ *  @param d2_py second daughter py
+ *  @param d2_pz second daughter pz
+ *  @param d2_m second daughter mass
+ *  @param d3_px third daughter px
+ *  @param d3_py third daughter py
+ *  @param d3_pz third daughter pz
+ *  @param d3_m third daughter mass
+ *  @return the mother mass
+ */
+double MotherThreeBodyDecayMass(double d1_px, double d1_py,
+                                double d1_pz, double d1_m,
+                                double d2_px, double d2_py,
+                                double d2_pz, double d2_m,
+                                double d3_px, double d3_py,
+                                double d3_pz, double d3_m) {
+  double m_px = (d1_px+d2_px+d3_px);
+  double m_py = (d1_py+d2_py+d3_py);
+  double m_pz = (d1_pz+d2_pz+d3_pz);
+  double m_E  = (TMath::Sqrt(d1_m*d1_m + d1_px*d1_px + d1_py*d1_py + d1_pz*d1_pz)
+                +TMath::Sqrt(d2_m*d2_m + d2_px*d2_px + d2_py*d2_py + d2_pz*d2_pz)
+                +TMath::Sqrt(d3_m*d3_m + d3_px*d3_px + d3_py*d3_py + d3_pz*d3_pz));
+    
   return TMath::Sqrt(m_E*m_E - (m_px*m_px + m_py*m_py + m_pz*m_pz));
 }
 
