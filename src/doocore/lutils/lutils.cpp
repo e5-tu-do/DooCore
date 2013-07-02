@@ -9,6 +9,8 @@
 #include <sys/stat.h>
 
 // from BOOST
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
 
 // from ROOT
 #include "TROOT.h"
@@ -41,6 +43,7 @@
 
 using namespace std;
 using namespace doocore::io;
+namespace fs = boost::filesystem;
 
 /*
  * Set global layout
@@ -326,12 +329,19 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
 
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
 
+  std::vector<fs::path> paths;
   if (!pdf_only) {
-    system("mkdir -p " + dir+"eps/");
-    system("mkdir -p " + dir+"C/");
-    system("mkdir -p " + dir+"png/");
+    paths.push_back(fs::path(dir+"eps/"));
+    paths.push_back(fs::path(dir+"C/"));
+    paths.push_back(fs::path(dir+"png/"));
   }
-	system("mkdir -p " + dir+"pdf/");
+  paths.push_back(fs::path(dir+"pdf/"));
+  for (std::vector<fs::path>::const_iterator it=paths.begin(), end= paths.end();
+       it != end; ++it) {
+    if (!fs::is_directory(*it)) {
+      fs::create_directory(*it);
+    }
+  }
 
   if (!pdf_only) {
     c->Print(dir+"eps/" + name + ".eps");
@@ -348,8 +358,11 @@ void doocore::lutils::printPlotOpenStack(TCanvas* c, TString name, TString dir)
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
   
   //	system("mkdir -p " + dir+"eps/");
-  system("mkdir -p " + dir+"pdf/");
-  
+  fs::path dir_pdf(dir+"pdf/");
+  if (!fs::is_directory(dir_pdf)) {
+    fs::create_directory(dir_pdf);
+  }
+    
   //  c->Print(dir+"eps/" + name + ".eps");
   c->Print(dir+"pdf/" + name + ".pdf[");
 }
@@ -361,7 +374,7 @@ void doocore::lutils::printPlotCloseStack(TCanvas* c, TString name, TString dir)
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
   
   //	system("mkdir -p " + dir+"eps/");
-  system("mkdir -p " + dir+"pdf/");
+  //system("mkdir -p " + dir+"pdf/");
   
   //  c->Print(dir+"eps/" + name + ".eps");
   c->Print(dir+"pdf/" + name + ".pdf]");
