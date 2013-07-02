@@ -339,7 +339,7 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
   for (std::vector<fs::path>::const_iterator it=paths.begin(), end= paths.end();
        it != end; ++it) {
     if (!fs::is_directory(*it)) {
-      fs::create_directory(*it);
+      fs::create_directories(*it);
     }
   }
 
@@ -360,7 +360,7 @@ void doocore::lutils::printPlotOpenStack(TCanvas* c, TString name, TString dir)
   //	system("mkdir -p " + dir+"eps/");
   fs::path dir_pdf(dir+"pdf/");
   if (!fs::is_directory(dir_pdf)) {
-    fs::create_directory(dir_pdf);
+    fs::create_directories(dir_pdf);
   }
     
   //  c->Print(dir+"eps/" + name + ".eps");
