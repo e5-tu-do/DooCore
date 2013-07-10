@@ -142,7 +142,13 @@ class EasyConfig {
    *  @return a double value
    */
   double getDouble(std::string name);
-  
+ 
+  /**
+   * @brief Set debug mode
+   *
+   */
+  void set_debug_mode(bool debug_mode){debug_mode_ = debug_mode;}
+ 
  protected:
   
  private:
