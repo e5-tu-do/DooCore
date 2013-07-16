@@ -75,7 +75,7 @@ void ReplaceScientificNotationInFile(std::string filename, bool debug_mode){
         tmpfilestr << out_line << "\n";
       }
       else {
-        doocore::io::swarn << "-warning- " << "ReplaceScientificNotationInFiles -- RegEx matching failed" << doocore::io::endmsg;
+        if (debug_mode) doocore::io::swarn << "-warning- " << "ReplaceScientificNotationInFiles -- RegEx matching failed" << doocore::io::endmsg;
         tmpfilestr << in_line << "\n";
       }
     }
