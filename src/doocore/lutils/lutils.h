@@ -156,6 +156,8 @@ void PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, T
 double RunTest(const TH1 & hist);
 ///Returns a residual HISTOGRAM and no fucking RooHist TGraph for the given RooPlot
 TH1D 		GetPulls(RooPlot * pFrame, bool normalize = true);
+//Same as above but for checking compatibility of two histograms
+TH1D    GetPulls(TH1D* h1, TH1D* h2); 
 ///Prepare canvas with two pads for pull and residual plots, returns numbers for text formatting
 void PreparePadForPulls(TCanvas * c1, RooPlot * pFrame, bool plot_logx, bool plot_logy,
 												double & top_label_size, double & top_title_offset, double & title2label_size_ratio,
@@ -230,7 +232,10 @@ void PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bo
  *  Just a compatibility wrapper for the other PlotPull functions.
  */
 void PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex& label, std::string gauss_suffix="_Gauss");
-  
+
+//Plot Pulldistribution for two histograms
+void PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label, std::string gauss_suffix="_Gauss");
+
 void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, TLatex& label, TString pDir = "", bool normalize_residuals = true, bool plot_logy = false, bool plot_logx = false);
 
 void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool normalize_residuals, bool plot_logy, TLegend * label = NULL, bool plot_logx = false);
