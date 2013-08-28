@@ -113,35 +113,35 @@ class EasyConfig {
    *
    *  @return an std::string
    */
-  std::string getString(std::string name);
+  std::string getString(std::string name) const;
 
   /**
    *  @brief Get vector of strings from config file
    *
    *  @return an std::vector<std::string>
    */
-  std::vector<std::string> getVoStrings(std::string name);
+  std::vector<std::string> getVoStrings(std::string name) const;
 
   /**
    *  @brief Get boolean from config file
    *
    *  @return a boolean value
    */
-  bool getBool(std::string name);
+  bool getBool(std::string name) const;
 
   /**
    *  @brief Get integer from config file
    *
    *  @return an integer
    */
-  int getInt(std::string name);
+  int getInt(std::string name) const;
 
   /**
    *  @brief Get double from config file
    *
    *  @return a double value
    */
-  double getDouble(std::string name);
+  double getDouble(std::string name) const;
  
   /**
    * @brief Set debug mode
