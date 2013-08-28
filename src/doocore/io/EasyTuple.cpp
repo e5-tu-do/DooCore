@@ -234,6 +234,7 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset,
   
   std::vector<RooCmdArg> args;
   args += arg1, arg2, arg3, arg4, arg5, arg6, arg7;
+  
   bool found_cut_arg = false;
   for (std::vector<RooCmdArg>::iterator it=args.begin(), end=args.end();
        it != end; ++it) {
