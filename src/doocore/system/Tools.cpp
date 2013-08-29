@@ -78,13 +78,9 @@ void RemoveFile(std::string target_file){
 
 void CopyFileToDirectory(std::string source_file, std::string target_directory){
   bool debug_mode = false;
-  boost::regex expr("^(.*/)([^/]*)$");
-  boost::match_results<std::string::const_iterator> what;
-  
-  std::pair<std::string, std::string> path_and_filename = SeparatePathAndFilename(source_file);
 
-  boost::filesystem::path source(path_and_filename.first + path_and_filename.second);
-  boost::filesystem::path target(target_directory + "/" + path_and_filename.second);
+  boost::filesystem::path source(source_file);
+  boost::filesystem::path target(target_directory + "/" + source_file.filename());
 
   if (!(boost::filesystem::exists(target_directory))){
     doocore::io::swarn << "-warning- " << "Target directory '" + target_directory + "' does not exists! Create directory...." << doocore::io::endmsg;
