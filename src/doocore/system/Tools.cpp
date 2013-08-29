@@ -80,14 +80,15 @@ void CopyFileToDirectory(std::string source_file, std::string target_directory){
   bool debug_mode = false;
 
   boost::filesystem::path source(source_file);
-  boost::filesystem::path target(target_directory + "/" + source_file.filename());
+  boost::filesystem::path target_path(target_directory);
+  boost::filesystem::path target = target_path / source.filename();
 
   if (!(boost::filesystem::exists(target_directory))){
     doocore::io::swarn << "-warning- " << "Target directory '" + target_directory + "' does not exists! Create directory...." << doocore::io::endmsg;
     boost::filesystem::create_directories(target_directory);
   }
   boost::filesystem::copy_file(source, target, boost::filesystem::copy_option::overwrite_if_exists);
-  if (debug_mode) doocore::io::serr << "-debug- " << "copied file '" << path_and_filename.second << "' to output directory '" << target_directory << "'" << doocore::io::endmsg;
+  if (debug_mode) doocore::io::serr << "-debug- " << "copied file '" << source.filename() << "' to output directory '" << target_directory << "'" << doocore::io::endmsg;
 }
 
 void ReplaceFile(std::string source_file, std::string target_file){
