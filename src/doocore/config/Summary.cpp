@@ -158,12 +158,16 @@ void Summary::CopyFiles() {
   }
   
   for (std::set<boost::filesystem::path>::const_iterator it = files_.begin(), end = files_.end(); it != end; ++it) {
-    fs::path input  = fs::canonical(*it);
-    fs::path target = dir_output / input.filename();
-    if (fs::exists(input) && fs::is_regular_file(input)) {
-      fs::copy_file(input, target, boost::filesystem::copy_option::overwrite_if_exists);
+    if (fs::exists(*it)) {
+      fs::path input  = fs::canonical(*it);
+      fs::path target = dir_output / input.filename();
+      if (fs::exists(input) && fs::is_regular_file(input)) {
+        fs::copy_file(input, target, boost::filesystem::copy_option::overwrite_if_exists);
+      } else {
+        serr << "Summary::CopyFiles(): Cannot copy " << *it << "!" << endmsg;
+      }
     } else {
-      serr << "Summary::CopyFiles(): Cannot copy " << *it << "!" << endmsg;
+      serr << "Summary::CopyFiles(): Cannot copy " << *it << ", file not existing." << endmsg;
     }
   }
   fs::path summary_log = dir_output / fs::path("summary.log");
