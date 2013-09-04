@@ -14,6 +14,9 @@
 // from BOOST
 #include <boost/filesystem.hpp>
 
+// from DooCore
+#include <doocore/io/MsgStream.h>
+
 // from here
 
 // forward declarations
@@ -91,7 +94,7 @@ class Summary {
   /**
    *  @brief print the summary
    */
-  void Print();
+  void Print(doocore::io::MsgStream& stream=doocore::io::scfg);
 
   /// not yet implemented (write to output file)
   void Write(std::string filename="");
@@ -101,6 +104,19 @@ class Summary {
   
   /// not yet implemented
   void StopClock();
+  
+  /**
+   *  @brief Add file to run summary
+   *
+   *  Add a specific file to the run summary. The file will be copied to the
+   *  summary directory upon program termination.
+   *
+   *  @param file file to include in run summary directory
+   */
+  Summary& set_output_directory(std::string output_directory) {
+    output_directory_ = output_directory;
+    return *this;
+  }
   
   /**
    *  @brief Add file to run summary
@@ -126,7 +142,6 @@ class Summary {
 
   /// private destructor
   ~Summary() {
-    Print();
     CopyFiles();
   };
   

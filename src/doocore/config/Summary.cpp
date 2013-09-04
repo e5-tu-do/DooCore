@@ -17,7 +17,7 @@
 #include <boost/filesystem.hpp>
 
 // from DooCore
-#include "doocore/io/MsgStream.h"
+#include <doocore/io/MsgStream.h>
 
 namespace doocore {
 namespace config {
@@ -107,48 +107,33 @@ void Summary::AddHLine(){
   Add("Summary::HLINE", "");
 }
 
-void Summary::Print(){
+void Summary::Print(doocore::io::MsgStream& stream){
   using namespace doocore::io;
   
-  doocore::io::scfg << "- ==================== Summary ====================" << doocore::io::endmsg;
+  stream << "- ==================== Summary ====================" << doocore::io::endmsg;
   for(size_t i = 0; i < log_.size(); ++i)
   {
     if (log_.at(i).first == "Summary::SECTION"){
-      doocore::io::scfg << "- -------------------- " << log_.at(i).second << " --------------------" << doocore::io::endmsg;
+      stream << "- -------------------- " << log_.at(i).second << " --------------------" << doocore::io::endmsg;
     }
     else if(log_.at(i).first == "Summary::HLINE"){
-      doocore::io::scfg << "- --------------------------------------------------" << doocore::io::endmsg;
+      stream << "- --------------------------------------------------" << doocore::io::endmsg;
     }
     else{
-      doocore::io::scfg << "--- " << log_.at(i).first << "\r\t\t\t\t" << " : " << log_.at(i).second << doocore::io::endmsg;
+      stream << "--- " << log_.at(i).first << "\r\t\t\t\t" << " : " << log_.at(i).second << doocore::io::endmsg;
     }
   }
-  scfg << "The following files are added to the run summary: " << endmsg;
+  stream << "The following files are added to the run summary: " << endmsg;
   for (std::set<boost::filesystem::path>::const_iterator it = files_.begin(), end = files_.end(); it != end; ++it) {
-    scfg << " " << *it << endmsg;
+    stream << " " << *it << endmsg;
   }
-  doocore::io::scfg << "- ==================================================" << doocore::io::endmsg;
-  doocore::io::scfg << "" << doocore::io::endmsg;
+  stream << "- ==================================================" << doocore::io::endmsg;
+  stream << "" << doocore::io::endmsg;
 }
 
 void Summary::Write(std::string filename) {
   doocore::io::MsgStream fileoutput(doocore::io::kTextBlue, filename);
-
-  fileoutput << "- ==================== Summary ====================" << doocore::io::endmsg;
-  for(size_t i = 0; i < log_.size(); ++i)
-  {
-    if (log_.at(i).first == "Summary::SECTION"){
-      fileoutput << "- -------------------- " << log_.at(i).second << " --------------------" << doocore::io::endmsg;
-    }
-    else if(log_.at(i).first == "Summary::HLINE"){
-      fileoutput << "- --------------------------------------------------" << doocore::io::endmsg;
-    }
-    else{
-      fileoutput << "--- " << log_.at(i).first << "\r\t\t\t\t" << " : " << log_.at(i).second << doocore::io::endmsg;
-    }
-  }
-  fileoutput << "- ==================================================" << doocore::io::endmsg;
-  fileoutput << "" << doocore::io::endmsg;
+  Print(fileoutput);
 }
 
 void Summary::StartClock() {
@@ -181,6 +166,8 @@ void Summary::CopyFiles() {
       serr << "Summary::CopyFiles(): Cannot copy " << *it << "!" << endmsg;
     }
   }
-  }
+  fs::path summary_log = dir_output / fs::path("summary.log");
+  Write(summary_log.string());
+}
 } // namespace config
 } // namespace doocore
