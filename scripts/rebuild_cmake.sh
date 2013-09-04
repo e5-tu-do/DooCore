@@ -20,5 +20,5 @@ elif [ "$1" = "profiling" ]
 then
   cmake -DCMAKE_INSTALL_PREFIX=$DOOCORESYS -DCMAKE_BUILD_TYPE=Profiling ..
 else 
-  cmake -DCMAKE_INSTALL_PREFIX=$DOOCORESYS ..
+  cmake -DCMAKE_INSTALL_PREFIX=$DOOCORESYS -DCMAKE_BUILD_TYPE=Release ..
 fi
