@@ -123,7 +123,7 @@ void Summary::Print(doocore::io::MsgStream& stream){
       stream << "--- " << log_.at(i).first << "\r\t\t\t\t" << " : " << log_.at(i).second << doocore::io::endmsg;
     }
   }
-  stream << "The following files are added to the run summary: " << endmsg;
+  stream << "The following files are added to the run summary (copied to " << output_directory_ << "): " << endmsg;
   for (std::set<boost::filesystem::path>::const_iterator it = files_.begin(), end = files_.end(); it != end; ++it) {
     stream << " " << *it << endmsg;
   }
