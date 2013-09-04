@@ -13,6 +13,7 @@
 #include "TIterator.h"
 #include "RooAbsArg.h"
 #include "RooRealVar.h"
+#include "RooAbsCollection.h"
 
 /**
  * @namespace doocore::io
@@ -291,11 +292,11 @@ inline MsgStream& operator<<(MsgStream& lhs, TStopwatch& sw) {
 }
 
 /**
- *  @brief Function to output RooArgSets directly and nicely into MsgStreams
+ *  @brief Function to output RooAbsCollection directly and nicely into MsgStreams
  *
  *  This function just prints all arguments in an RooArgSet nicely.
  */
-inline MsgStream& operator<<(MsgStream& lhs, const RooArgSet& argset) {
+inline MsgStream& operator<<(MsgStream& lhs, const RooAbsCollection& argset) {
   using namespace ROOT;
   using namespace RooFit;
   
@@ -315,6 +316,7 @@ inline MsgStream& operator<<(MsgStream& lhs, const RooArgSet& argset) {
   
   return lhs;
 }
+  
 
 /**
  *  @brief Function to output RooRealVars directly and nicely into MsgStreams
