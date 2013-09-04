@@ -14,6 +14,7 @@
 
 // from BOOST
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 
 // from DooCore
 #include "doocore/io/MsgStream.h"
@@ -106,6 +107,8 @@ void Summary::AddHLine(){
 }
 
 void Summary::Print(){
+  using namespace doocore::io;
+  
   doocore::io::scfg << "- ==================== Summary ====================" << doocore::io::endmsg;
   for(size_t i = 0; i < log_.size(); ++i)
   {
@@ -118,6 +121,10 @@ void Summary::Print(){
     else{
       doocore::io::scfg << "--- " << log_.at(i).first << "\r\t\t\t\t" << " : " << log_.at(i).second << doocore::io::endmsg;
     }
+  }
+  scfg << "The following files are added to the run summary: " << endmsg;
+  for (std::vector<boost::filesystem::path>::const_iterator it = files_.begin(), end = files_.end(); it != end; ++it) {
+    scfg << " " << *it << endmsg;
   }
   doocore::io::scfg << "- ==================================================" << doocore::io::endmsg;
   doocore::io::scfg << "" << doocore::io::endmsg;
@@ -149,6 +156,10 @@ void Summary::StartClock() {
 
 void Summary::StopClock() {
   // to be implemented
+}
+  
+void Summary::AddFile(const boost::filesystem::path& file) {
+  files_.push_back(file);
 }
 
 } // namespace config

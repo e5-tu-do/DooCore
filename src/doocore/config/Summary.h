@@ -11,6 +11,7 @@
 // from TMVA
 
 // from BOOST
+#include <boost/filesystem.hpp>
 
 // from here
 
@@ -106,9 +107,9 @@ class Summary {
    *  Add a specific file to the run summary. The file will be copied to the 
    *  summary directory upon program termination.
    *
-   *  @param parameter description
-   *  @return description of the return value
+   *  @param file file to include in run summary directory
    */
+  void AddFile(const boost::filesystem::path& file);
   
  protected:
   
@@ -123,13 +124,20 @@ class Summary {
   Summary(const Summary&);
 
   /// private destructor
-  ~Summary() {};
+  ~Summary() {
+    Print();
+  };
   
   /// internal debug mode  
   bool debug_mode_;
   
   /// internal vector to log all key,value pairs  
   std::vector< std::pair< TString,TString > > log_;
+  
+  /**
+   *  @brief List of files to add to the summary
+   */
+  std::vector<boost::filesystem::path> files_;
 
 }; // class Summary
 } // namespace config
