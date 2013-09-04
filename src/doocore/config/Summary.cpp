@@ -20,7 +20,7 @@
 
 namespace doocore {
 namespace config {
-Summary *Summary::instance_ = NULL;
+//Summary *Summary::instance_ = NULL;
 
 Summary::Summary(){
   debug_mode_ = false;
@@ -29,18 +29,20 @@ Summary::Summary(){
 Summary::Summary(const Summary&){}
 
 Summary& Summary::GetInstance() {
-  if(!instance_){
-    instance_ = new Summary();
-  }
-  return *instance_;
+//  if(!instance_){
+//    instance_ = new Summary();
+//  }
+//  return *instance_;
+  static Summary instance;
+  return instance;
 }
 
-void Summary::DestroyInstance(){
-  if(instance_){
-    delete instance_;
-  }
-  instance_ = 0;
-}
+//void Summary::DestroyInstance(){
+//  if(instance_){
+//    delete instance_;
+//  }
+//  instance_ = 0;
+//}
 
 void Summary::Add(TString description, TString argument){
   std::pair< TString,TString > tpair;

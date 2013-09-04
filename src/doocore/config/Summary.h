@@ -64,7 +64,7 @@ class Summary {
   /**
    *  @brief Destructor for Summary
    */
-  static void DestroyInstance();
+  //static void DestroyInstance();
   
   /**
    *  @brief add a key/value pair to the summary
@@ -100,11 +100,21 @@ class Summary {
   /// not yet implemented
   void StopClock();
   
+  /**
+   *  @brief Add file to run summary
+   *
+   *  Add a specific file to the run summary. The file will be copied to the 
+   *  summary directory upon program termination.
+   *
+   *  @param parameter description
+   *  @return description of the return value
+   */
+  
  protected:
   
  private:
   /// static private instance
-  static Summary *instance_;
+  // static Summary *instance_;
 
   /// private constructor
   Summary();
