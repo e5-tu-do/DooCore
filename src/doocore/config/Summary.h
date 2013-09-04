@@ -2,6 +2,7 @@
 #define DOOCORE_CONFIG_SUMMARY_H
 
 // from STL
+#include <set>
 
 // from ROOT
 #include <TString.h>
@@ -126,9 +127,18 @@ class Summary {
   /// private destructor
   ~Summary() {
     Print();
+    CopyFiles();
   };
   
-  /// internal debug mode  
+  /**
+   *  @brief Copy all previously added files to summary directory
+   *
+   *  This function is called upon destruction of Summary and will copy all 
+   *  relevant files previously added via AddFile() to the summary directory.
+   */
+  void CopyFiles();
+  
+  /// internal debug mode
   bool debug_mode_;
   
   /// internal vector to log all key,value pairs  
@@ -137,8 +147,12 @@ class Summary {
   /**
    *  @brief List of files to add to the summary
    */
-  std::vector<boost::filesystem::path> files_;
-
+  std::set<boost::filesystem::path> files_;
+  
+  /**
+   *  @brief Output directory for summary
+   */
+  std::string output_directory_;
 }; // class Summary
 } // namespace config
 } // namespace doocore

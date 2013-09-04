@@ -23,9 +23,10 @@ namespace doocore {
 namespace config {
 //Summary *Summary::instance_ = NULL;
 
-Summary::Summary(){
-  debug_mode_ = false;
-}
+Summary::Summary() :
+  debug_mode_(false),
+  output_directory_("summary")
+{}
 
 Summary::Summary(const Summary&){}
 
@@ -123,7 +124,7 @@ void Summary::Print(){
     }
   }
   scfg << "The following files are added to the run summary: " << endmsg;
-  for (std::vector<boost::filesystem::path>::const_iterator it = files_.begin(), end = files_.end(); it != end; ++it) {
+  for (std::set<boost::filesystem::path>::const_iterator it = files_.begin(), end = files_.end(); it != end; ++it) {
     scfg << " " << *it << endmsg;
   }
   doocore::io::scfg << "- ==================================================" << doocore::io::endmsg;
@@ -159,8 +160,27 @@ void Summary::StopClock() {
 }
   
 void Summary::AddFile(const boost::filesystem::path& file) {
-  files_.push_back(file);
+  files_.insert(file);
 }
 
+void Summary::CopyFiles() {
+  namespace fs = boost::filesystem;
+  using namespace doocore::io;
+  fs::path dir_output = output_directory_;
+  
+  if (!fs::exists(dir_output)) {
+    fs::create_directories(dir_output);
+  }
+  
+  for (std::set<boost::filesystem::path>::const_iterator it = files_.begin(), end = files_.end(); it != end; ++it) {
+    fs::path input  = fs::canonical(*it);
+    fs::path target = dir_output / input.filename();
+    if (fs::exists(input) && fs::is_regular_file(input)) {
+      fs::copy_file(input, target, boost::filesystem::copy_option::overwrite_if_exists);
+    } else {
+      serr << "Summary::CopyFiles(): Cannot copy " << *it << "!" << endmsg;
+    }
+  }
+  }
 } // namespace config
 } // namespace doocore

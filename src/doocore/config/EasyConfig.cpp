@@ -15,6 +15,7 @@
 
 // from DooCore
 #include "doocore/io/MsgStream.h"
+#include "doocore/config/Summary.h"
 
 namespace doocore {
 namespace config {
@@ -44,6 +45,7 @@ EasyConfig::EasyConfig(std::string filename, bool debug_mode){
 EasyConfig::~EasyConfig(){}
 
 void EasyConfig::LoadConfigFile(std::string filename){
+  doocore::config::Summary::GetInstance().AddFile(filename);
   doocore::io::sinfo << "Reading config file " << filename << "..." << doocore::io::endmsg;
   read_info(filename, ptree_);
   if (debug_mode_) DisplayPTree(ptree_);
