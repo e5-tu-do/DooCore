@@ -7,6 +7,7 @@
 #include <sstream> 
 #include <cstring>
 #include <vector>
+#include <unistd.h>
 
 #include "TStopwatch.h"
 #include "RooArgSet.h"
