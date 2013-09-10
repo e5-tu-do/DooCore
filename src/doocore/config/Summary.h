@@ -156,7 +156,7 @@ class Summary {
 
   /// private destructor
   ~Summary() {
-    CopyFiles();
+    if (log_.size() > 0 || files_.size() > 0) CopyFiles();
   };
   
   /**
