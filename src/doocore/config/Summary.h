@@ -128,6 +128,20 @@ class Summary {
    */
   void AddFile(const boost::filesystem::path& file);
   
+  /**
+   *  @brief Flush all summary information and reset
+   *
+   *  Flush all summary logs and copy files to summary. Afterwards, the logs and
+   *  file lists will be reset in order to allow a fresh new Summary. This is 
+   *  useful if summaries have to be given at certain stages of the overall 
+   *  program execution.
+   */
+  void SummarizeAndReset() {
+    CopyFiles();
+    log_.clear();
+    files_.clear();
+  }
+  
  protected:
   
  private:
