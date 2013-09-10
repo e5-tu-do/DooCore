@@ -1,5 +1,9 @@
 #include "doocore/config/EasyConfig.cpp"
 
+//#if __GNUG__
+#define BOOST_NO_CXX11_SCOPED_ENUMS
+//#endif
+
 int main(int argc, char *argv[]){
 	doocore::io::sout << "TestEasyConfig.cpp" << doocore::io::endmsg;	
 

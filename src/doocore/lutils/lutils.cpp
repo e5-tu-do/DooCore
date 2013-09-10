@@ -805,6 +805,13 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
   RooCurve * curve = (RooCurve*) pFrame->findObject(0,RooCurve::Class());
   RooHist * data = (RooHist*) pFrame->findObject(0,RooHist::Class());
 
+  if (curve == NULL || data == NULL) {
+    serr << "Error in doocore::lutils::GetPulls(RooPlot*, bool): Could not get curve or data!" << endmsg;
+    
+    TH1D pulls("pulls","Pulls",100,0,1);
+    return pulls;
+  }
+  
   std::vector<double> limits;
   std::vector<double> values;
   std::vector<double> errors;
