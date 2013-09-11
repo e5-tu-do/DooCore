@@ -900,6 +900,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
   setStyle();
   
   h_pulls = new TH1D("hGauss","hGauss;Pull [#sigma];Number of bins",10,-5,5);
+  h_pulls->SetBit(kMustCleanup);
   int num_pulls_used = 0;
   
 	for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
@@ -941,6 +942,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	
 	//Get error Band Histogram
 	h_error = new TH1D("hError","hError",500,-5,5);
+  h_error->SetBit(kMustCleanup);
 	for (unsigned i = 1; i <= h_error->GetNbinsX(); ++i) {
 		const Double_t pos = -5. + double(i)*10./500.+(10./500./2);
 		
@@ -1011,13 +1013,13 @@ void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) 
   PlotPullDistributionWithGaussian(pulls, c1, f_gauss_norm, f_gauss_fit, h_pulls, h_error, legend);
 	printPlot(&c1, pName, pDir);
   
-  gDirectory->ls();
-  
   delete f_gauss_norm;
   delete f_gauss_fit;
   delete h_pulls;
   delete h_error;
   delete legend;
+  
+  gDirectory->ls();
 }
 
 void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TLatex& label, TString pDir, bool normalize_residuals, bool plot_logy, bool plot_logx, std::string gauss_suffix) {
