@@ -325,7 +325,7 @@ void doocore::lutils::printSystemRecources(TString cmd)
 
 void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_only)
 {
-  sinfo << "doocore::lutils::printPlot(...): Printing plots for " << name << " into " << dir << endmsg;
+  //sinfo << "doocore::lutils::printPlot(...): Printing plots for " << name << " in directory " << dir << endmsg;
 
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
 
@@ -356,7 +356,7 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
   
 void doocore::lutils::printPlotOpenStack(TCanvas* c, TString name, TString dir)
 {
-  cout << "doocore::lutils::printPlot() : printing plots ..." << endl;
+  //sinfo << "doocore::lutils::printPlot() : Opening plot stack " << name << " in directory " << dir << endmsg;
   
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
   
@@ -375,7 +375,7 @@ void doocore::lutils::printPlotOpenStack(TCanvas* c, TString name, TString dir)
 
 void doocore::lutils::printPlotCloseStack(TCanvas* c, TString name, TString dir)
 {
-  cout << "doocore::lutils::printPlot() : printing plots ..." << endl;
+  //sinfo << "doocore::lutils::printPlot() : Closing plot stack " << name << " in directory " << dir << endmsg;
   
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
   
