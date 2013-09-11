@@ -325,7 +325,7 @@ void doocore::lutils::printSystemRecources(TString cmd)
 
 void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_only)
 {
-  sinfo << "doocore::lutils::printPlot(...): printing plots..." << endmsg;
+  sinfo << "doocore::lutils::printPlot(...): Printing plots for " << name << " into " << dir << endmsg;
 
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
 
@@ -367,7 +367,10 @@ void doocore::lutils::printPlotOpenStack(TCanvas* c, TString name, TString dir)
   }
     
   //  c->Print(dir+"eps/" + name + ".eps");
+  int ignore_level = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kWarning;
   c->Print(dir+"pdf/" + name + ".pdf[");
+  gErrorIgnoreLevel = ignore_level;
 }
 
 void doocore::lutils::printPlotCloseStack(TCanvas* c, TString name, TString dir)
@@ -380,7 +383,10 @@ void doocore::lutils::printPlotCloseStack(TCanvas* c, TString name, TString dir)
   //system("mkdir -p " + dir+"pdf/");
   
   //  c->Print(dir+"eps/" + name + ".eps");
+  int ignore_level = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kWarning;
   c->Print(dir+"pdf/" + name + ".pdf]");
+  gErrorIgnoreLevel = ignore_level;
 }
 
 /* 
@@ -1005,6 +1011,8 @@ void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) 
   PlotPullDistributionWithGaussian(pulls, c1, f_gauss_norm, f_gauss_fit, h_pulls, h_error, legend);
 	printPlot(&c1, pName, pDir);
   
+  gDirectory->ls();
+  
   delete f_gauss_norm;
   delete f_gauss_fit;
   delete h_pulls;
@@ -1153,6 +1161,11 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
 
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
+  
+  delete pulls4;
+  delete pulls3;
+  delete pulls2;
+  delete pulls1;
 }
 
 void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label, std::string gauss_suffix) {
