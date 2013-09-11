@@ -30,7 +30,7 @@ if(${APPLE})
 endif(${APPLE})
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   MESSAGE( STATUS "Building for Linux, switching off C++11 flags for Linux/gcc" )
-  #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 install(FILES external/FindDooCore.cmake DESTINATION cmake/Modules)
