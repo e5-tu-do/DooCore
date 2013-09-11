@@ -1018,8 +1018,10 @@ void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) 
   delete h_pulls;
   delete h_error;
   delete legend;
-  
-  gDirectory->ls();
+
+  // deleting the objects is not enough, we still have to remove them from the dictionary.
+  gDirectory->Delete("hGauss");
+  gDirectory->Delete("hError");
 }
 
 void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TLatex& label, TString pDir, bool normalize_residuals, bool plot_logy, bool plot_logx, std::string gauss_suffix) {
