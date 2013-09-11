@@ -928,7 +928,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	pad.cd(0);
 	f_gauss_norm->Draw();
 	
-	h_pulls->Fit("fFit");
+	h_pulls->Fit("fFit", "Q");
 	
 	//Get error Band Histogram
 	h_error = new TH1D("hError","hError",500,-5,5);
