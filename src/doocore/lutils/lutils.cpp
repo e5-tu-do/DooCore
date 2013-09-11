@@ -343,12 +343,15 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
     }
   }
 
+  int ignore_level = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kWarning;
   if (!pdf_only) {
     c->Print(dir+"eps/" + name + ".eps");
     c->Print(dir+"C/"   + name + ".C");
     c->Print(dir+"png/" + name + ".png");
   }
   c->Print(dir+"pdf/" + name + ".pdf");
+  gErrorIgnoreLevel = ignore_level;
 }
   
 void doocore::lutils::printPlotOpenStack(TCanvas* c, TString name, TString dir)
