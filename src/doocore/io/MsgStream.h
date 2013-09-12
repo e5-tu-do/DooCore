@@ -341,8 +341,7 @@ inline MsgStream& operator<<(MsgStream& lhs, const RooRealVar& var) {
   
   return lhs;
 }
-
-
+  
 /// MsgStream for errors. Color: Red
 extern MsgStream serr; 
 /// MsgStream for warnings. Color: Yellow
