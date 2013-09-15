@@ -382,11 +382,6 @@ void doocore::lutils::printPlotCloseStack(TCanvas* c, TString name, TString dir)
   //	system("mkdir -p " + dir+"eps/");
   //system("mkdir -p " + dir+"pdf/");
   
-  swarn << c << endmsg;
-  swarn << name << endmsg;
-  swarn << dir << endmsg;
-  c->Print();
-  
   //  c->Print(dir+"eps/" + name + ".eps");
   int ignore_level = gErrorIgnoreLevel;
 //  gErrorIgnoreLevel = kWarning;
