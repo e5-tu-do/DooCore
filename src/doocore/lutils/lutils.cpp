@@ -382,11 +382,16 @@ void doocore::lutils::printPlotCloseStack(TCanvas* c, TString name, TString dir)
   //	system("mkdir -p " + dir+"eps/");
   //system("mkdir -p " + dir+"pdf/");
   
+  swarn << c << endmsg;
+  swarn << name << endmsg;
+  swarn << dir << endmsg;
+  c->Print();
+  
   //  c->Print(dir+"eps/" + name + ".eps");
   int ignore_level = gErrorIgnoreLevel;
-  gErrorIgnoreLevel = kWarning;
+//  gErrorIgnoreLevel = kWarning;
   c->Print(dir+"pdf/" + name + ".pdf]");
-  gErrorIgnoreLevel = ignore_level;
+//  gErrorIgnoreLevel = ignore_level;
 }
 
 /* 
@@ -683,7 +688,7 @@ void doocore::lutils::addEtaPtLabels(TH2D* h)
 }
 
 void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex& label, bool plot_logx) {
-  doocore::io::swarn << "doocore::lutils::PlotPulls(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
+  doocore::io::swarn << "doocore::lutils::PlotSimple(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
   PlotSimple(pName, pFrame, label, pDir, plot_logy, plot_logx);
 }
 
@@ -900,7 +905,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
   setStyle();
   
   h_pulls = new TH1D("hGauss","hGauss;Pull [#sigma];Number of bins",10,-5,5);
-  h_pulls->SetBit(kMustCleanup);
+//  h_pulls->SetBit(kMustCleanup);
   int num_pulls_used = 0;
   
 	for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
@@ -942,7 +947,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	
 	//Get error Band Histogram
 	h_error = new TH1D("hError","hError",500,-5,5);
-  h_error->SetBit(kMustCleanup);
+//  h_error->SetBit(kMustCleanup);
 	for (unsigned i = 1; i <= h_error->GetNbinsX(); ++i) {
 		const Double_t pos = -5. + double(i)*10./500.+(10./500./2);
 		
