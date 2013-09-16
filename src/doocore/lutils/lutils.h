@@ -11,7 +11,10 @@
 #include "TString.h"
 #include "TLatex.h"
 #include "TMath.h"
-#include "TMatrixD.h" 
+#include "TMatrixD.h"
+
+// from RooFit
+#include "RooBinning.h"
 
 // from project
 #include "doocore/io/MsgStream.h"
@@ -297,7 +300,15 @@ std::pair<double,double> MedianLimitsForTuple(const RooDataSet& dataset, std::st
  *  @param var_name name of variable in dataset to evaluate
  *  @return pair of (double,double) as (min,max) to use for plotting
  */
-std::pair<double,double> MedianLimitsForTuple(TTree& tree, std::string var_name); 
+std::pair<double,double> MedianLimitsForTuple(TTree& tree, std::string var_name);
+
+/**
+ *  @brief Quantile Binning for datasets
+ *
+ *  This function calculates the bin boundaries for a given observable that divides the data set in equally 
+ *  populated bins. The number of bins can be specified.
+ */
+RooBinning GetQuantileBinning(RooDataSet* data, TString nameofquantileobservable, int nbins = 10);
 
 } // namespace lutils
 } // namespace doocore

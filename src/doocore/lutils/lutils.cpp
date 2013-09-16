@@ -1812,5 +1812,29 @@ void doocore::lutils::plotAsymmetry(TString pPlotName, TTree * pTuple, TString p
         delete hUpDif;
         delete hUpAsy;
 }
+
+RooBinning Utils::GetQuantileBinning(RooDataSet* data, TString nameofquantileobservable, int nbins){
+  std::vector<double> data_vector;
+  for (unsigned int i = 0; i < data->numEntries(); i++) {
+    data_vector.push_back(data->get(i)->getRealValue(nameofquantileobservable));
+  }
+  sort(data_vector.begin(), data_vector.end());
+  std::vector<double> probability_vector;
+  for (unsigned int i = 1; i < nbins; i++) {
+    probability_vector.push_back(1.*i/nbins);
+  }
+  std::vector<double> xbins(nbins+1,0);
+  RooRealVar* quantilerealvar = dynamic_cast<RooRealVar*>(data->get()->find(nameofquantileobservable));
+  xbins.front() = quantilerealvar->getMin();
+  xbins.back() = quantilerealvar->getMax();
   
+  TMath::Quantiles(data_vector.size(), nbins-1, &data_vector[0], &xbins[1], &probability_vector[0]);
+  double* xbinarray = new double[xbins.size()];
+  for (int i = 0; i < xbins.size(); i++) {
+    xbinarray[i] = xbins[i];
+  }
+  RooBinning Binning(nbins,xbinarray,"Binning_"+nameofquantileobservable);
+  return Binning;
+}
+
 
