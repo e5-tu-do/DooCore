@@ -2,6 +2,7 @@
 #define DOOCORE_CONFIG_SUMMARY_H
 
 // from STL
+#include <set>
 
 // from ROOT
 #include <TString.h>
@@ -11,6 +12,13 @@
 // from TMVA
 
 // from BOOST
+#ifdef __GNUG__
+#define BOOST_NO_CXX11_SCOPED_ENUMS
+#endif
+#include <boost/filesystem.hpp>
+
+// from DooCore
+#include <doocore/io/MsgStream.h>
 
 // from here
 
@@ -64,7 +72,7 @@ class Summary {
   /**
    *  @brief Destructor for Summary
    */
-  static void DestroyInstance();
+  //static void DestroyInstance();
   
   /**
    *  @brief add a key/value pair to the summary
@@ -89,7 +97,7 @@ class Summary {
   /**
    *  @brief print the summary
    */
-  void Print();
+  void Print(doocore::io::MsgStream& stream=doocore::io::scfg);
 
   /// not yet implemented (write to output file)
   void Write(std::string filename="");
@@ -100,11 +108,48 @@ class Summary {
   /// not yet implemented
   void StopClock();
   
+  /**
+   *  @brief Add file to run summary
+   *
+   *  Add a specific file to the run summary. The file will be copied to the
+   *  summary directory upon program termination.
+   *
+   *  @param file file to include in run summary directory
+   */
+  Summary& set_output_directory(std::string output_directory) {
+    output_directory_ = output_directory;
+    return *this;
+  }
+  
+  /**
+   *  @brief Add file to run summary
+   *
+   *  Add a specific file to the run summary. The file will be copied to the 
+   *  summary directory upon program termination.
+   *
+   *  @param file file to include in run summary directory
+   */
+  void AddFile(const boost::filesystem::path& file);
+  
+  /**
+   *  @brief Flush all summary information and reset
+   *
+   *  Flush all summary logs and copy files to summary. Afterwards, the logs and
+   *  file lists will be reset in order to allow a fresh new Summary. This is 
+   *  useful if summaries have to be given at certain stages of the overall 
+   *  program execution.
+   */
+  void SummarizeAndReset() {
+    CopyFiles();
+    log_.clear();
+    files_.clear();
+  }
+  
  protected:
   
  private:
   /// static private instance
-  static Summary *instance_;
+  // static Summary *instance_;
 
   /// private constructor
   Summary();
@@ -113,14 +158,33 @@ class Summary {
   Summary(const Summary&);
 
   /// private destructor
-  ~Summary() {};
+  ~Summary() {
+    if (log_.size() > 0 || files_.size() > 0) CopyFiles();
+  };
   
-  /// internal debug mode  
+  /**
+   *  @brief Copy all previously added files to summary directory
+   *
+   *  This function is called upon destruction of Summary and will copy all 
+   *  relevant files previously added via AddFile() to the summary directory.
+   */
+  void CopyFiles();
+  
+  /// internal debug mode
   bool debug_mode_;
   
   /// internal vector to log all key,value pairs  
   std::vector< std::pair< TString,TString > > log_;
-
+  
+  /**
+   *  @brief List of files to add to the summary
+   */
+  std::set<boost::filesystem::path> files_;
+  
+  /**
+   *  @brief Output directory for summary
+   */
+  std::string output_directory_;
 }; // class Summary
 } // namespace config
 } // namespace doocore

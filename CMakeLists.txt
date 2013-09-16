@@ -24,6 +24,15 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 project(DooCore)
 cmake_minimum_required(VERSION 2.6)
 
+if(${APPLE})
+  MESSAGE( STATUS "Building for Mac OS X, switching on C++11 flags for Mac OS X/clang" )
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
+endif(${APPLE})
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  MESSAGE( STATUS "Building for Linux, switching off C++11 flags for Linux/gcc" )
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
 install(FILES external/FindDooCore.cmake DESTINATION cmake/Modules)
 
 FIND_PACKAGE(Boost 1.48 COMPONENTS program_options filesystem regex thread system random REQUIRED)

@@ -5,6 +5,9 @@
 #include <string>
 
 // boost
+#ifdef __GNUG__
+#define BOOST_NO_CXX11_SCOPED_ENUMS
+#endif
 #include "boost/filesystem.hpp"
 
 // forward declarations

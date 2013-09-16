@@ -7,12 +7,14 @@
 #include <sstream> 
 #include <cstring>
 #include <vector>
+#include <unistd.h>
 
 #include "TStopwatch.h"
 #include "RooArgSet.h"
 #include "TIterator.h"
 #include "RooAbsArg.h"
 #include "RooRealVar.h"
+#include "RooAbsCollection.h"
 
 /**
  * @namespace doocore::io
@@ -291,11 +293,11 @@ inline MsgStream& operator<<(MsgStream& lhs, TStopwatch& sw) {
 }
 
 /**
- *  @brief Function to output RooArgSets directly and nicely into MsgStreams
+ *  @brief Function to output RooAbsCollection directly and nicely into MsgStreams
  *
  *  This function just prints all arguments in an RooArgSet nicely.
  */
-inline MsgStream& operator<<(MsgStream& lhs, const RooArgSet& argset) {
+inline MsgStream& operator<<(MsgStream& lhs, const RooAbsCollection& argset) {
   using namespace ROOT;
   using namespace RooFit;
   
@@ -315,6 +317,7 @@ inline MsgStream& operator<<(MsgStream& lhs, const RooArgSet& argset) {
   
   return lhs;
 }
+  
 
 /**
  *  @brief Function to output RooRealVars directly and nicely into MsgStreams
@@ -338,8 +341,7 @@ inline MsgStream& operator<<(MsgStream& lhs, const RooRealVar& var) {
   
   return lhs;
 }
-
-
+  
 /// MsgStream for errors. Color: Red
 extern MsgStream serr; 
 /// MsgStream for warnings. Color: Yellow
