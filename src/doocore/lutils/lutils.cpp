@@ -1813,7 +1813,7 @@ void doocore::lutils::plotAsymmetry(TString pPlotName, TTree * pTuple, TString p
         delete hUpAsy;
 }
 
-RooBinning Utils::GetQuantileBinning(RooDataSet* data, TString nameofquantileobservable, int nbins){
+RooBinning doocore::lutils::GetQuantileBinning(RooDataSet* data, TString nameofquantileobservable, int nbins){
   std::vector<double> data_vector;
   for (unsigned int i = 0; i < data->numEntries(); i++) {
     data_vector.push_back(data->get(i)->getRealValue(nameofquantileobservable));
