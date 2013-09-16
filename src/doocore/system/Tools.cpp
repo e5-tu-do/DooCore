@@ -9,6 +9,9 @@
 // from TMVA
 
 // from BOOST
+#ifdef __GNUG__
+#define BOOST_NO_CXX11_SCOPED_ENUMS
+#endif
 #include "boost/filesystem.hpp"
 #include "boost/regex.hpp"
 
@@ -78,20 +81,17 @@ void RemoveFile(std::string target_file){
 
 void CopyFileToDirectory(std::string source_file, std::string target_directory){
   bool debug_mode = false;
-  boost::regex expr("^(.*/)([^/]*)$");
-  boost::match_results<std::string::const_iterator> what;
-  
-  std::pair<std::string, std::string> path_and_filename = SeparatePathAndFilename(source_file);
 
-  boost::filesystem::path source(path_and_filename.first + path_and_filename.second);
-  boost::filesystem::path target(target_directory + "/" + path_and_filename.second);
+  boost::filesystem::path source(source_file);
+  boost::filesystem::path target_path(target_directory);
+  boost::filesystem::path target = target_path / source.filename();
 
   if (!(boost::filesystem::exists(target_directory))){
     doocore::io::swarn << "-warning- " << "Target directory '" + target_directory + "' does not exists! Create directory...." << doocore::io::endmsg;
     boost::filesystem::create_directories(target_directory);
   }
   boost::filesystem::copy_file(source, target, boost::filesystem::copy_option::overwrite_if_exists);
-  if (debug_mode) doocore::io::serr << "-debug- " << "copied file '" << path_and_filename.second << "' to output directory '" << target_directory << "'" << doocore::io::endmsg;
+  if (debug_mode) doocore::io::serr << "-debug- " << "copied file '" << source.filename() << "' to output directory '" << target_directory << "'" << doocore::io::endmsg;
 }
 
 void ReplaceFile(std::string source_file, std::string target_file){

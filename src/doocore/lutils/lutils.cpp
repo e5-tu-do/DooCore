@@ -325,7 +325,7 @@ void doocore::lutils::printSystemRecources(TString cmd)
 
 void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_only)
 {
-  sinfo << "doocore::lutils::printPlot(...): printing plots..." << endmsg;
+  //sinfo << "doocore::lutils::printPlot(...): Printing plots for " << name << " in directory " << dir << endmsg;
 
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
 
@@ -343,17 +343,20 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
     }
   }
 
+  int ignore_level = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kWarning;
   if (!pdf_only) {
     c->Print(dir+"eps/" + name + ".eps");
     c->Print(dir+"C/"   + name + ".C");
     c->Print(dir+"png/" + name + ".png");
   }
   c->Print(dir+"pdf/" + name + ".pdf");
+  gErrorIgnoreLevel = ignore_level;
 }
   
 void doocore::lutils::printPlotOpenStack(TCanvas* c, TString name, TString dir)
 {
-  cout << "doocore::lutils::printPlot() : printing plots ..." << endl;
+  //sinfo << "doocore::lutils::printPlot() : Opening plot stack " << name << " in directory " << dir << endmsg;
   
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
   
@@ -364,12 +367,15 @@ void doocore::lutils::printPlotOpenStack(TCanvas* c, TString name, TString dir)
   }
     
   //  c->Print(dir+"eps/" + name + ".eps");
+  int ignore_level = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kWarning;
   c->Print(dir+"pdf/" + name + ".pdf[");
+  gErrorIgnoreLevel = ignore_level;
 }
 
 void doocore::lutils::printPlotCloseStack(TCanvas* c, TString name, TString dir)
 {
-  cout << "doocore::lutils::printPlot() : printing plots ..." << endl;
+  //sinfo << "doocore::lutils::printPlot() : Closing plot stack " << name << " in directory " << dir << endmsg;
   
   if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
   
@@ -377,7 +383,10 @@ void doocore::lutils::printPlotCloseStack(TCanvas* c, TString name, TString dir)
   //system("mkdir -p " + dir+"pdf/");
   
   //  c->Print(dir+"eps/" + name + ".eps");
+  int ignore_level = gErrorIgnoreLevel;
+//  gErrorIgnoreLevel = kWarning;
   c->Print(dir+"pdf/" + name + ".pdf]");
+//  gErrorIgnoreLevel = ignore_level;
 }
 
 /* 
@@ -674,7 +683,7 @@ void doocore::lutils::addEtaPtLabels(TH2D* h)
 }
 
 void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex& label, bool plot_logx) {
-  doocore::io::swarn << "doocore::lutils::PlotPulls(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
+  doocore::io::swarn << "doocore::lutils::PlotSimple(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
   PlotSimple(pName, pFrame, label, pDir, plot_logy, plot_logx);
 }
 
@@ -805,6 +814,13 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
   RooCurve * curve = (RooCurve*) pFrame->findObject(0,RooCurve::Class());
   RooHist * data = (RooHist*) pFrame->findObject(0,RooHist::Class());
 
+  if (curve == NULL || data == NULL) {
+    serr << "Error in doocore::lutils::GetPulls(RooPlot*, bool): Could not get curve or data!" << endmsg;
+    
+    TH1D pulls("pulls","Pulls",100,0,1);
+    return pulls;
+  }
+  
   std::vector<double> limits;
   std::vector<double> values;
   std::vector<double> errors;
@@ -911,6 +927,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
   setStyle();
   
   h_pulls = new TH1D("hGauss","hGauss;Pull [#sigma];Number of bins",10,-5,5);
+//  h_pulls->SetBit(kMustCleanup);
   int num_pulls_used = 0;
   
 	for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
@@ -948,10 +965,11 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	pad.cd(0);
 	f_gauss_norm->Draw();
 	
-	h_pulls->Fit("fFit");
+	h_pulls->Fit("fFit", "Q");
 	
 	//Get error Band Histogram
 	h_error = new TH1D("hError","hError",500,-5,5);
+//  h_error->SetBit(kMustCleanup);
 	for (unsigned i = 1; i <= h_error->GetNbinsX(); ++i) {
 		const Double_t pos = -5. + double(i)*10./500.+(10./500./2);
 		
@@ -1027,6 +1045,10 @@ void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) 
   delete h_pulls;
   delete h_error;
   delete legend;
+
+  // deleting the objects is not enough, we still have to remove them from the dictionary.
+  gDirectory->Delete("hGauss");
+  gDirectory->Delete("hError");
 }
 
 void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TLatex& label, TString pDir, bool normalize_residuals, bool plot_logy, bool plot_logx, std::string gauss_suffix) {
@@ -1170,6 +1192,11 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
 
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
+  
+  delete pulls4;
+  delete pulls3;
+  delete pulls2;
+  delete pulls1;
 }
 
 void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label, std::string gauss_suffix) {
