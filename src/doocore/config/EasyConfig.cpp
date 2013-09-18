@@ -47,6 +47,7 @@ EasyConfig::~EasyConfig(){}
 void EasyConfig::LoadConfigFile(std::string filename){
   doocore::config::Summary::GetInstance().AddFile(filename);
   doocore::io::sinfo << "Reading config file " << filename << "..." << doocore::io::endmsg;
+  filename_ = filename;
   read_info(filename, ptree_);
   if (debug_mode_) DisplayPTree(ptree_);
 }

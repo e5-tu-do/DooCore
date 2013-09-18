@@ -149,6 +149,13 @@ class EasyConfig {
    */
   void set_debug_mode(bool debug_mode){debug_mode_ = debug_mode;}
  
+  /**
+   *  @brief Get filename of config file
+   *
+   *  @return the filename
+   */
+  const std::string& filename() const { return filename_; }
+  
  protected:
   
  private:
