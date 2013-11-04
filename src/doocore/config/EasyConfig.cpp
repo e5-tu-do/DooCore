@@ -100,6 +100,17 @@ std::vector<std::string> EasyConfig::getVoStrings(std::string name) const {
 //  }
   return vec;
 }
+  
+std::vector<std::pair<std::string, std::string> > EasyConfig::getVoStringPairs(std::string name) const {
+  std::vector<std::pair<std::string, std::string> > vec;
+
+  for (const boost::property_tree::ptree::value_type &t : ptree_.get_child(name)) {
+    vec.push_back(std::make_pair(t.first.data(), t.second.data()));
+  }
+  
+  return vec;
+}
+
 
 bool EasyConfig::getBool(std::string name) const {
   bool tmp = ptree_.get(name, false);

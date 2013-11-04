@@ -121,6 +121,26 @@ class EasyConfig {
    *  @return an std::vector<std::string>
    */
   std::vector<std::string> getVoStrings(std::string name) const;
+  
+  /**
+   *  @brief Get vector of string pairs from config file
+   *
+   *  For a given node, this will return all child elements as key and value
+   *  in the std::pair. Example for the node pair_elements:
+   *
+   * @code
+   * pair_elements 
+   * {
+   *   key1 "value1"
+   *   key2 "value2"
+   * }
+   * @endcode
+   * 
+   *  Here, the vector will then contain ((key1,value1), (key2, value2)).
+   *
+   *  @return an std::vector<std::pair<std::string,std::string> >
+   */
+  std::vector<std::pair<std::string, std::string> > getVoStringPairs(std::string name) const;
 
   /**
    *  @brief Get boolean from config file
