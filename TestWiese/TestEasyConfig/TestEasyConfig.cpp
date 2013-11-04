@@ -10,4 +10,7 @@ int main(int argc, char *argv[]){
 	doocore::io::sout << "Bool default value: " << cfg.getBool("Decision") << doocore::io::endmsg;
 	doocore::io::sout << "Double default value: " << cfg.getDouble("pi") << doocore::io::endmsg;
 	doocore::io::sout << "Integer default value: " << cfg.getInt("TheNumber") << doocore::io::endmsg;
+
+	doocore::io::sout << "String pair vector: " << cfg.getVoStringPairs("Keys") << doocore::io::endmsg;
+
 }

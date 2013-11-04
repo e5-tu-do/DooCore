@@ -257,17 +257,28 @@ inline MsgStream& operator<<(MsgStream& lhs, const T& arg) {
 template<typename T>
 inline MsgStream& operator<<(MsgStream& lhs, const std::vector<T>& arg) {
   if (arg.size() > 0) {
-    lhs.stream() << "(";
-    lhs.stream() << arg.front();
+    lhs << "(";
+    lhs << arg.front();
     for (typename std::vector<T>::const_iterator it = arg.begin()+1;
          it != arg.end(); ++it) {
-      lhs.stream() << ", " << *it;
+      lhs << ", " << *it;
     }
-    lhs.stream() << ")";
+    lhs << ")";
   }
   return lhs;
 }
 
+/**
+ *  @brief Print a std::pair via MsgStream
+ */
+template<typename T1, typename T2>
+inline MsgStream& operator<<(MsgStream& lhs, const std::pair<T1,T2>& arg) {
+  lhs << "(" << arg.first << ", " << arg.second << ")";
+
+  return lhs;
+}
+
+  
 /**
  *  @brief Function to output bools directly and nicely into MsgStreams
  */
