@@ -5,6 +5,7 @@
 // from DooCore
 #include "doocore/io/Progress.h"
 #include "doocore/io/MsgStream.h"
+#include "doocore/lutils/lutils.h"
 
 void func() {
   int i = 0;
@@ -31,6 +32,8 @@ int main () {
     //func();
   }
   std::chrono::high_resolution_clock::time_point time_noop_stop = std::chrono::high_resolution_clock::now();
+  
+  p.Finish();
   
   sinfo << "Time per operator++ call: " << static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(time_stop - time_start).count()-std::chrono::duration_cast<std::chrono::nanoseconds>(time_noop_stop - time_noop_start).count())/steps << " ns." << endmsg;
   sinfo << "Time per no call loop: " << static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(time_noop_stop - time_noop_start).count())/steps << " ns." << endmsg;

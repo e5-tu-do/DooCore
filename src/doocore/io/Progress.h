@@ -5,6 +5,9 @@
 #include <string>
 #include <chrono>
 
+// from DooCore
+#include "doocore/io/MsgStream.h"
+
 namespace doocore {
 namespace io {
 
@@ -14,13 +17,14 @@ namespace io {
  *  A progress output indicator. It will be initialised with a name of the #
  *  current task and the total number of steps to perform. For each step 
  *  operator++ is called on the Progress object which will update the progress
- *  indicator on demand. 
+ *  indicator on demand. Alternatively, operator+= can be called for larger
+ *  steps.
  *
  *  The operator++ function is implemented such that not each call will trigger
  *  an update of the indicator to optimise the cost per call. Nevertheless, each
  *  call of operator++ costs (on an arbitrary reference machine): 
  * 
- *  -O0: ~30 ns.
+ *  -O0: ~60 ns.
  *  -O3: ~4 ns.
  */
 
@@ -54,32 +58,44 @@ class Progress {
     return *this;
   }
   
+  void Finish() {
+    Update(true);
+    printf("\n");
+  }
+  
  protected:
   
  private:
   
-  void Update() {
-    if (tty_ && steps_since_update_ > step_position_update_tty_) {
-      //time_now_ = std::chrono::high_resolution_clock::now();
+  void Update(bool force_update=false) {
+    if (tty_ && steps_since_update_ > step_position_update_tty_ || force_update) {
       position_ += steps_since_update_;
       steps_since_update_ = 0;
       
-      //if (std::chrono::duration_cast<std::chrono::milliseconds>(time_now_ - time_last_).count() > 1) {
-      //time_last_ = time_now_;
       progress_fraction_ = static_cast<double>(position_)/num_steps_total_;
-      printf("Progress %.2f %         \xd", progress_fraction_*100.0);
+
+      time_now_ = std::chrono::high_resolution_clock::now();
+      elapsed_ = std::chrono::duration_cast<std::chrono::microseconds>(time_now_ - time_start_).count()*1e-6;
+      double remaining = static_cast<double>(elapsed_)/progress_fraction_-static_cast<double>(elapsed_);
+      printf("%s %.2f % (time elapsed / remaining / per step[ms]: %s / %s / %.2f)        \xd", MakeProgressBar(progress_fraction_).c_str(), progress_fraction_*100.0, SecondsToTimeString(elapsed_).c_str(), SecondsToTimeString(remaining).c_str(), elapsed_/position_*1000.0);
       fflush(stdout);
-      //}
-    } else if (!tty_ && steps_since_update_ > step_position_update_notty_){
+    } else if (!tty_ && steps_since_update_ > step_position_update_notty_ || force_update){
       position_ += steps_since_update_;
       steps_since_update_ = 0;
       
       progress_fraction_ = static_cast<double>(position_)/num_steps_total_;
       
-      printf("Progress %.2f %         \n", progress_fraction_*100.0);
+      time_now_ = std::chrono::high_resolution_clock::now();
+      elapsed_ = std::chrono::duration_cast<std::chrono::microseconds>(time_now_ - time_start_).count()*1e-6;
+      double remaining = static_cast<double>(elapsed_)/progress_fraction_-static_cast<double>(elapsed_);
+      printf("%s %.2f % (time elapsed / remaining / per step[ms]: %s / %s / %.2f)        \n", MakeProgressBar(progress_fraction_).c_str(), progress_fraction_*100.0, SecondsToTimeString(elapsed_).c_str(), SecondsToTimeString(remaining).c_str(), elapsed_/position_*1000.0);
       fflush(stdout);
     }
   }
+  
+  std::string SecondsToTimeString(double seconds) const;
+  
+  std::string MakeProgressBar(double fraction) const;
   
   /**
    *  @brief Name of the task to perform
@@ -124,12 +140,17 @@ class Progress {
   /**
    *  @brief Time of last update
    */
-  std::chrono::high_resolution_clock::time_point time_last_;
+  std::chrono::high_resolution_clock::time_point time_start_;
   
   /**
    *  @brief Time of now (updated regularly)
    */
   std::chrono::high_resolution_clock::time_point time_now_;
+  
+  /**
+   *  @brief Elapsed time
+   */
+  double elapsed_;
 };
 
 } // namespace io
