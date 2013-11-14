@@ -26,6 +26,21 @@ namespace io {
  * 
  *  -O0: ~60 ns.
  *  -O3: ~4 ns.
+ *  
+ *  @section p_example Usage example
+ *
+ * @code
+ * int main () {
+ *   using namespace doocore::io;
+ *   long long steps = 1000000000;
+ *   Progress p("my task", steps);
+ *
+ *   for (long long i=0; i<steps; ++i) {
+ *     ++p;
+ *   }
+ *   p.Finish();
+ * }
+ * @endcode
  */
 
 // forward declarations
@@ -44,6 +59,9 @@ class Progress {
 
   virtual ~Progress() {}
   
+  /**
+   *  @brief Increase step counter by 1
+   */
   Progress& operator++() {
     ++steps_since_update_;
     Update();
@@ -51,6 +69,9 @@ class Progress {
     return *this;
   }
   
+  /**
+   *  @brief Increase step counter by increment
+   */
   Progress& operator+=(int steps) {
     steps_since_update_ += steps;
     Update();
@@ -58,6 +79,9 @@ class Progress {
     return *this;
   }
   
+  /**
+   *  @brief Finish progress writing by printing the progress permanently
+   */
   void Finish() {
     Update(true);
     printf("\n");

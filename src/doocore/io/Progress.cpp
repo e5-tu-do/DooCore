@@ -27,6 +27,7 @@ elapsed_(0)
   if (name_task.size() > 0) {
     sinfo << "Progress: " << name_task_ << endmsg;
   }
+  Update(true);
 }
 
 std::string doocore::io::Progress::SecondsToTimeString(double seconds) const {
