@@ -361,6 +361,14 @@ inline MsgStream& operator<< <RooAbsCollection>(MsgStream& lhs, const RooAbsColl
   using namespace ROOT;
   using namespace RooFit;
   
+  bool print_newlines = false;
+  if (argset.getSize() >= 10) {
+    print_newlines = true;
+  }
+  
+  lhs << "Collection: " << argset.GetName() << " ";
+  if (print_newlines) lhs << endmsg;
+  
   if (argset.getSize() > 0) {
     //lhs.stream() << "(";
     
@@ -372,7 +380,12 @@ inline MsgStream& operator<< <RooAbsCollection>(MsgStream& lhs, const RooAbsColl
     
     while ((arg = (const RooAbsArg*)iter->Next())) {
       //lhs.stream() << "," << arg->GetName();
-      lhs << ", " << *arg;
+      if (print_newlines) {
+        lhs << endmsg;
+      } else {
+        lhs << ", ";
+      }
+      lhs << *arg;
     }
     //lhs.stream() << ")";
   }
