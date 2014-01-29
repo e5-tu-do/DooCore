@@ -8,6 +8,16 @@
  * functionality which is needed in nearly all ROOT/RooFit applications in high
  * energy physics analyses.
  *
+ * @section mp_topics What useful tools are there?
+ *
+ * Here is an overview of the current DooCore functionality:
+ *
+ * @li @link doocore::config::EasyConfig doocore::config::EasyConfig: Easy to use configuration through config files @endlink
+ * @li @link doocore::config::Summary doocore::config::Summary: Singleton class to overlook all important variables @endlink
+ * @li @link doocore::io::EasyTuple doocore::io::EasyTuple: Easy tuple loading into TTree/RooDataSet without boilerplate code @endlink
+ * @li @link doocore::io::MsgStream doocore::io::MsgStream: A class for message output using different messages and colors @endlink
+ * @li @link doocore::io::Progress doocore::io::Progress: Progress indicator class with cool features @endlink
+ *
  * @section mp_simplesetup Simple setup via global DooSoftware installation
  * 
  * On all machines with a DooSoftware installation setup of DooCore is very 
