@@ -14,15 +14,15 @@ using namespace boost::assign; // bring 'operator+=()' into scope
 
 int main() {
   using namespace doocore::io;
+  using namespace doocore::statistics::general;
   
-  std::vector<double> values, errors, weights;
+  std::vector<ValueWithError<double>> values;
   
-  values  += 1.21, 0.30;
-  errors  += 0.12, 0.04;
-  weights += 56.8149, 10.804;
+  values  += ValueWithError<double>(1.21, 0.12, 56.8149), ValueWithError<double>(0.30, 0.04, 10.804);
   
-  auto mean_error = doocore::statistics::general::WeightedAverage<double>(values.begin(), values.end(),
-                                                                          weights.begin(), errors.begin());
+  sinfo << values << endmsg;
+  
+  auto mean_error = doocore::statistics::general::WeightedAverage<double>(values.begin(), values.end());
   
   sinfo << mean_error.value << " +/- " << mean_error.error << endmsg;
 }
