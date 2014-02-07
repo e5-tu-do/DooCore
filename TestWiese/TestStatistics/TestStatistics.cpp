@@ -25,18 +25,18 @@ int main() {
   sinfo << ValueWithError<double>(122.572427568, 122.572427568) << endmsg;
   sinfo << ValueWithError<double>(3.1415927, 3.1415927) << endmsg;
 
-  sinfo << ValueWithError<double>(34000000, 340000) << endmsg;
-  sinfo << ValueWithError<double>(3400000, 34000) << endmsg;
-  sinfo << ValueWithError<double>(340000, 3400) << endmsg;
-  sinfo << ValueWithError<double>(34000, 340) << endmsg;
-  sinfo << ValueWithError<double>(3400, 34) << endmsg;
-  sinfo << ValueWithError<double>(340, 3.4) << endmsg;
-  sinfo << ValueWithError<double>(34, 0.34) << endmsg;
-  sinfo << ValueWithError<double>(3.4, 0.034) << endmsg;
-  sinfo << ValueWithError<double>(0.34, 0.0034) << endmsg;
-  sinfo << ValueWithError<double>(0.034, 0.00034) << endmsg;
-  sinfo << ValueWithError<double>(0.0034, 0.000034) << endmsg;
-  sinfo << ValueWithError<double>(0.00034, 0.0000034) << endmsg;
+  sinfo << ValueWithError<double>(35400000, 354000) << endmsg;
+  sinfo << ValueWithError<double>(3540000, 35400) << endmsg;
+  sinfo << ValueWithError<double>(354000, 3540) << endmsg;
+  sinfo << ValueWithError<double>(35400, 354) << endmsg;
+  sinfo << ValueWithError<double>(3540, 35.4) << endmsg;
+  sinfo << ValueWithError<double>(35.4, 3.54) << endmsg;
+  sinfo << ValueWithError<double>(3.54, 0.354) << endmsg;
+  sinfo << ValueWithError<double>(3.4, 0.0354) << endmsg;
+  sinfo << ValueWithError<double>(0.354, 0.00354) << endmsg;
+  sinfo << ValueWithError<double>(0.0354, 0.000354) << endmsg;
+  sinfo << ValueWithError<double>(0.00354, 0.0000354) << endmsg;
+  sinfo << ValueWithError<double>(0.000354, 0.00000354) << endmsg;
 
   sinfo << ValueWithError<double>(36000000, 360000) << endmsg;
   sinfo << ValueWithError<double>(3600000, 36000) << endmsg;

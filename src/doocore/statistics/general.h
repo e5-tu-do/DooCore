@@ -43,52 +43,65 @@ namespace statistics {
 namespace general {
   
   /**
-   *  @struct doocore::statistics::general::ValueWithError
+   *  @class doocore::statistics::general::ValueWithError
    *  @brief Simple value with error compound type (and optional weight)
    */
   template<typename T>
-  struct ValueWithError {
+  class ValueWithError {
+   public:
     ValueWithError(T val, T err) : value(val), error(err), weight(1.0) {}
     ValueWithError(T val, T err, T wgt) : value(val), error(err), weight(wgt) {}
     
-    std::string FormatString() const {
-      std::fesetround(FE_TONEAREST);
-      int mantissa_err   = std::nearbyint(error*10.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))));
-      double exp_err     = std::log10(error);
-      double abs_exp_err = std::abs(exp_err);
-      
-      // additional digits if mantissa of error <= 3.5
-      int add_digits     = 0;
-      if (mantissa_err <= 35) add_digits++;
-      
-      std::string format;
-      std::stringstream output;
-      
-      // depending on exponent use scientific notation or not
-      if (abs_exp_err < 5) {
-        if (exp_err < 1.0) {
-          std::fesetround(FE_DOWNWARD);
-          format = "%." + std::to_string(static_cast<int>(std::abs(std::nearbyint(exp_err))+add_digits)) + "f";
-        } else {
-          format = "%.0f";
-        }
-        output << boost::format(format) % value << " +/- " << boost::format(format) % error;
-      } else {
-        format = "%." + std::to_string(add_digits) + "f";
-        double exp_new_err      = std::floor(exp_err);
-        double mantissa_new_err = error/std::pow(10.0,exp_new_err);
-        double mantissa_new_val = value/std::pow(10.0,exp_new_err);
-        
-        output << boost::format(format) % mantissa_new_val << "e" << exp_new_err << " +/- " << boost::format(format) % mantissa_new_err << "e" << exp_new_err;
-      }
-      
-      return output.str();
-    }
+    /**
+     *  @brief Format value +/- error with PDG rounding
+     *
+     *  Based on the PDG rounding rules, the value and error will be formatted 
+     *  as strings.
+     *
+     *  @return value +/- error as string
+     */
+    std::string FormatString() const;
     
     T value;
     T error;
     T weight;
   };
+  
+  template<typename T>
+  std::string doocore::statistics::general::ValueWithError<T>::FormatString() const {
+    std::fesetround(FE_TONEAREST);
+    int mantissa_err   = std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))));
+    T exp_err     = std::log10(error);
+    T abs_exp_err = std::abs(exp_err);
+    
+    // additional digits if mantissa of error <= 3.54
+    int add_digits     = 0;
+    if (mantissa_err <= 354) add_digits++;
+    
+    std::string format;
+    std::stringstream output;
+    
+    // depending on exponent use scientific notation or not
+    if (abs_exp_err < 5) {
+      if (exp_err < 1.0) {
+        std::fesetround(FE_DOWNWARD);
+        format = "%." + std::to_string(static_cast<int>(std::abs(std::nearbyint(exp_err))+add_digits)) + "f";
+      } else {
+        format = "%.0f";
+      }
+      output << boost::format(format) % value << " +/- " << boost::format(format) % error;
+    } else {
+      format = "%." + std::to_string(add_digits) + "f";
+      T exp_new_err      = std::floor(exp_err);
+      T mantissa_new_err = error/std::pow(10.0,exp_new_err);
+      T mantissa_new_val = value/std::pow(10.0,exp_new_err);
+      
+      output << boost::format(format) % mantissa_new_val << "e" << exp_new_err << " +/- " << boost::format(format) % mantissa_new_err << "e" << exp_new_err;
+    }
+    
+    return output.str();
+  }
+
   
   /**
    *  @brief Function to output doocore::statistics::general::ValueWithError directly and nicely into MsgStreams
