@@ -65,6 +65,18 @@ namespace config {
  *   number "13.37"
  *   count "42"
  *   decision "false"
+ *   myvector 
+ *   {
+ *     one
+ *     two
+ *     three
+ *   }
+ *   mypairvector
+ *   {
+ *     one "un"
+ *     two "deux"
+ *     three "trois"
+ *   }
  * }
  * @endcode
  * 
@@ -162,6 +174,14 @@ class EasyConfig {
    *  @return a double value
    */
   double getDouble(std::string name) const;
+  
+  /**
+   *  @brief Templated function to get any type from config file
+   *
+   *  @return value or default_value
+   */
+  template<typename Type>
+  Type Get(const std::string& name, Type default_value=Type()) const;
  
   /**
    * @brief Set debug mode
@@ -205,6 +225,13 @@ class EasyConfig {
   boost::property_tree::ptree ptree_;
 
 }; // class EasyConfig
+  
+template<typename Type>
+Type EasyConfig::Get(const std::string& name, Type default_value) const {
+  Type tmp = ptree_.get(name, default_value);
+  return tmp;
+}
+
 } // namespace config
 } // namespace doocore
 
