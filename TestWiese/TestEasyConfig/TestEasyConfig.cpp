@@ -1,16 +1,22 @@
 #include "doocore/config/EasyConfig.cpp"
 
-int main(int argc, char *argv[]){
-	doocore::io::sout << "TestEasyConfig.cpp" << doocore::io::endmsg;	
+#include <string>
 
+int main(int argc, char *argv[]){
 	doocore::config::EasyConfig cfg(argc, argv);
 
-	doocore::io::sinfo << "Testing default values" << doocore::io::endmsg;
-	doocore::io::sout << "String default value: " << cfg.getString("Florida") << doocore::io::endmsg;
-	doocore::io::sout << "Bool default value: " << cfg.getBool("Decision") << doocore::io::endmsg;
-	doocore::io::sout << "Double default value: " << cfg.getDouble("pi") << doocore::io::endmsg;
-	doocore::io::sout << "Integer default value: " << cfg.getInt("TheNumber") << doocore::io::endmsg;
+	doocore::io::sinfo << "Testing Config" << doocore::io::endmsg;
+	doocore::io::sout << "Florida: " << cfg.getString("Florida") << doocore::io::endmsg;
+	doocore::io::sout << "Decision: " << cfg.getBool("Decision") << doocore::io::endmsg;
+	doocore::io::sout << "pi: " << cfg.getDouble("pi") << doocore::io::endmsg;
+  
+  doocore::io::sout << "pi (templating): " << cfg.Get<double>("pi", 3.14) << doocore::io::endmsg;
+  
+	doocore::io::sout << "TheNumber: " << cfg.getInt("TheNumber") << doocore::io::endmsg;
 
-	doocore::io::sout << "String pair vector: " << cfg.getVoStringPairs("Keys") << doocore::io::endmsg;
+	doocore::io::sout << "Keys: " << cfg.getVoStringPairs("Keys") << doocore::io::endmsg;
+  
+  doocore::io::sout << "doubles: " << cfg.GetVector<double>("doubles") << doocore::io::endmsg;
+  doocore::io::sout << "keyvals: " << cfg.GetVectorPairs<std::string,bool>("keyvals") << doocore::io::endmsg;
 
 }

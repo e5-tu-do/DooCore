@@ -4,6 +4,7 @@
 // from STL
 #include <string>
 #include <vector>
+#include <sstream>
 
 // from ROOT
 
@@ -65,6 +66,18 @@ namespace config {
  *   number "13.37"
  *   count "42"
  *   decision "false"
+ *   myvector 
+ *   {
+ *     one
+ *     two
+ *     three
+ *   }
+ *   mypairvector
+ *   {
+ *     one "un"
+ *     two "deux"
+ *     three "trois"
+ *   }
  * }
  * @endcode
  * 
@@ -162,6 +175,32 @@ class EasyConfig {
    *  @return a double value
    */
   double getDouble(std::string name) const;
+  
+  /**
+   *  @brief Templated function to get any type from config file
+   *
+   *  @return value or default_value
+   */
+  template<typename Type>
+  Type Get(const std::string& name, Type default_value=Type()) const;
+  
+  /**
+   *  @brief Templated function to get vector for key of any type from config file
+   *
+   *  @return vector for given key
+   */
+  template<typename Type>
+  std::vector<Type> GetVector(const std::string& name) const;
+  
+  /**
+   *  @brief Templated function to get vector of key value pairs for key of any types from config file
+   *
+   *  @warning As no property_tree translator can be used for the keys, take caution in case you want to use non-string objects as keys.
+   *
+   *  @return vector for given key
+   */
+  template<typename KeyType, typename ValueType>
+  std::vector<std::pair<KeyType,ValueType>> GetVectorPairs(const std::string& name) const;
  
   /**
    * @brief Set debug mode
@@ -187,7 +226,7 @@ class EasyConfig {
   /**
    *  @brief display property tree
    */
-  void DisplayPTree(const boost::property_tree::ptree& tree, const int depth = 0);
+  void DisplayPTree(const boost::property_tree::ptree& tree, const int depth = 0) const;
 
   /**
    *  @brief debug mode
@@ -205,6 +244,39 @@ class EasyConfig {
   boost::property_tree::ptree ptree_;
 
 }; // class EasyConfig
+  
+template<typename Type>
+Type EasyConfig::Get(const std::string& name, Type default_value) const {
+  Type tmp = ptree_.get<Type>(name, default_value);
+  return tmp;
+}
+  
+template<typename Type>
+std::vector<Type> EasyConfig::GetVector(const std::string& name) const {
+  std::vector<Type> v;
+  for (auto t : ptree_.get_child(name)) {
+    std::istringstream ss(t.first.data());
+    Type el;
+    ss >> el;
+    v.push_back(el);
+  }
+  return v;
+}
+  
+template<typename KeyType, typename ValueType>
+std::vector<std::pair<KeyType,ValueType>> EasyConfig::GetVectorPairs(const std::string& name) const {
+  std::vector<std::pair<KeyType,ValueType>> v;
+  for (auto t : ptree_.get_child(name)) {
+    std::istringstream ss_key(t.first.data());
+    KeyType el_key;
+    ss_key >> el_key;
+    
+    const boost::property_tree::ptree& sec = t.second;
+    v.push_back(std::make_pair(el_key,sec.get_value<ValueType>()));
+  }
+  return v;
+}
+
 } // namespace config
 } // namespace doocore
 
