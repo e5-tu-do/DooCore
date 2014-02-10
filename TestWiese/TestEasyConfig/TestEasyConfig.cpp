@@ -1,5 +1,7 @@
 #include "doocore/config/EasyConfig.cpp"
 
+#include <string>
+
 int main(int argc, char *argv[]){
 	doocore::config::EasyConfig cfg(argc, argv);
 
@@ -13,5 +15,8 @@ int main(int argc, char *argv[]){
 	doocore::io::sout << "TheNumber: " << cfg.getInt("TheNumber") << doocore::io::endmsg;
 
 	doocore::io::sout << "Keys: " << cfg.getVoStringPairs("Keys") << doocore::io::endmsg;
+  
+  doocore::io::sout << "doubles: " << cfg.GetVector<double>("doubles") << doocore::io::endmsg;
+  doocore::io::sout << "keyvals: " << cfg.GetVectorPairs<std::string,bool>("keyvals") << doocore::io::endmsg;
 
 }
