@@ -82,23 +82,25 @@ std::string EasyConfig::getString(std::string name) const {
 }
 
 std::vector<std::string> EasyConfig::getVoStrings(std::string name) const {
-  std::set<std::string> set;
-  std::vector<std::string> vec;
-
-  BOOST_FOREACH(const boost::property_tree::ptree::value_type &t, ptree_.get_child(name))
-  vec.push_back(t.first.data());
-
-  return vec;
+//  std::set<std::string> set;
+//  std::vector<std::string> vec;
+//
+//  BOOST_FOREACH(const boost::property_tree::ptree::value_type &t, ptree_.get_child(name))
+//  vec.push_back(t.first.data());
+//
+//  return vec;
+  return GetVector<std::string>(name);
 }
   
 std::vector<std::pair<std::string, std::string> > EasyConfig::getVoStringPairs(std::string name) const {
-  std::vector<std::pair<std::string, std::string> > vec;
-
-  for (const boost::property_tree::ptree::value_type &t : ptree_.get_child(name)) {
-    vec.push_back(std::make_pair(t.first.data(), t.second.data()));
-  }
-  
-  return vec;
+//  std::vector<std::pair<std::string, std::string> > vec;
+//
+//  for (const boost::property_tree::ptree::value_type &t : ptree_.get_child(name)) {
+//    vec.push_back(std::make_pair(t.first.data(), t.second.data()));
+//  }
+//  
+//  return vec;
+  return GetVectorPairs<std::string,std::string>(name);
 }
 
 
