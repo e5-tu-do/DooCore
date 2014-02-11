@@ -19,6 +19,7 @@ int main(int argc, char *argv[]){
   doocore::io::sout << "doubles: " << cfg.GetVector<double>("doubles") << doocore::io::endmsg;
   doocore::io::sout << "keyvals: " << cfg.GetVectorPairs<std::string,bool>("keyvals") << doocore::io::endmsg;
 
+  doocore::io::sout << "real key exists: " << cfg.KeyExists("keyvals") << doocore::io::endmsg;
   doocore::io::sout << "absurd key exists: " << cfg.KeyExists("YoMamaKey") << doocore::io::endmsg;
 
 }
