@@ -187,6 +187,8 @@ class EasyConfig {
   /**
    *  @brief Templated function to get vector for key of any type from config file
    *
+   *  @warning As no property_tree translator can be used for the keys, take caution in case you want to use non-string objects as keys.
+   *
    *  @return vector for given key
    */
   template<typename Type>
