@@ -153,7 +153,7 @@ class EasyConfig {
    *
    *  @return an std::vector<std::pair<std::string,std::string> >
    */
-  std::vector<std::pair<std::string, std::string> > getVoStringPairs(std::string name) const;
+  std::vector<std::pair<std::string, std::string>> getVoStringPairs(std::string name) const;
 
   /**
    *  @brief Get boolean from config file
@@ -204,6 +204,15 @@ class EasyConfig {
   template<typename KeyType, typename ValueType>
   std::vector<std::pair<KeyType,ValueType>> GetVectorPairs(const std::string& name) const;
  
+  /**
+   *  @brief Check if key exists
+   *
+   *  @return whether key exists (true) or not (false)
+   */
+  bool KeyExists(const std::string& name) const {
+    return (ptree_.find(name) != ptree_.not_found());
+  }
+  
   /**
    * @brief Set debug mode
    *
