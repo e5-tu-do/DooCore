@@ -16,6 +16,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 // from here
+#include "doocore/io/MsgStream.h"
 
 // forward declarations
 
@@ -153,7 +154,7 @@ class EasyConfig {
    *
    *  @return an std::vector<std::pair<std::string,std::string> >
    */
-  std::vector<std::pair<std::string, std::string> > getVoStringPairs(std::string name) const;
+  std::vector<std::pair<std::string, std::string>> getVoStringPairs(std::string name) const;
 
   /**
    *  @brief Get boolean from config file
@@ -187,6 +188,8 @@ class EasyConfig {
   /**
    *  @brief Templated function to get vector for key of any type from config file
    *
+   *  @warning As no property_tree translator can be used for the keys, take caution in case you want to use non-string objects as keys.
+   *
    *  @return vector for given key
    */
   template<typename Type>
@@ -202,6 +205,20 @@ class EasyConfig {
   template<typename KeyType, typename ValueType>
   std::vector<std::pair<KeyType,ValueType>> GetVectorPairs(const std::string& name) const;
  
+  /**
+   *  @brief Check if key exists
+   *
+   *  @return whether key exists (true) or not (false)
+   */
+  bool KeyExists(const std::string& name) const {
+    //doocore::io::sinfo << "looking for " << name << ptree_.find(name)->first.data() << doocore::io::endmsg;
+    boost::optional<const boost::property_tree::ptree&> child = ptree_.get_child_optional(name);
+    return !(!child);
+    
+//    return (ptree_.find(name) != ptree_.not_found());
+//    return (ptree_.count(name) > 0);
+  }
+  
   /**
    * @brief Set debug mode
    *
