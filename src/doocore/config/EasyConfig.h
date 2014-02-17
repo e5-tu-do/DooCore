@@ -16,6 +16,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 // from here
+#include "doocore/io/MsgStream.h"
 
 // forward declarations
 
@@ -210,7 +211,12 @@ class EasyConfig {
    *  @return whether key exists (true) or not (false)
    */
   bool KeyExists(const std::string& name) const {
-    return (ptree_.find(name) != ptree_.not_found());
+    //doocore::io::sinfo << "looking for " << name << ptree_.find(name)->first.data() << doocore::io::endmsg;
+    boost::optional<const boost::property_tree::ptree&> child = ptree_.get_child_optional(name);
+    return !(!child);
+    
+//    return (ptree_.find(name) != ptree_.not_found());
+//    return (ptree_.count(name) > 0);
   }
   
   /**
