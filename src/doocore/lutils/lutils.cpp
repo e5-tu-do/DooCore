@@ -896,7 +896,7 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
   return pulls;
 }
 
-void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend) {
+void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend, double chi2_reduced) {
   setStyle();
   
   h_pulls = new TH1D("hGauss","hGauss;Pull [#sigma];Number of bins",10,-5,5);
@@ -983,7 +983,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
   legend = new TLegend(0.2,0.65,0.48,0.93);
   legend->SetTextFont(kLHCbFont);
 	legend->SetTextSize(0.04);
-	legend->SetHeader(Form("Run test: #it{p} = %.2f",RunTest(pulls)));
+	legend->SetHeader(Form("Run test: #it{p} = %.2f, #chi^{2}/ndf = %.2f",RunTest(pulls), chi2_reduced));
 	legend->AddEntry(h_error,Form("#splitline{Gaussian fit}{#scale[0.7]{#Delta#it{N}=%.0f#pm%.0f, #Delta#mu=%.2f#pm%.2f, #Delta#sigma=%.2f#pm%.2f}}",nVal, nErr, mVal, mErr, sVal, sErr),"lf");
 	legend->AddEntry(f_gauss_norm,"Normal distribution","l");
 	legend->AddEntry(h_pulls,"Pull distribution","f");
@@ -1001,7 +1001,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	gPad->RedrawAxis();
 }
 
-void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) {
+void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir, double chi2_reduced) {
 	TCanvas c1("c_Utils","c_Utils",900,900);
   
   TF1* f_gauss_norm = NULL;
@@ -1010,7 +1010,7 @@ void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir) 
   TH1* h_error = NULL;
   TLegend* legend = NULL;
   
-  PlotPullDistributionWithGaussian(pulls, c1, f_gauss_norm, f_gauss_fit, h_pulls, h_error, legend);
+  PlotPullDistributionWithGaussian(pulls, c1, f_gauss_norm, f_gauss_fit, h_pulls, h_error, legend, chi2_reduced);
 	printPlot(&c1, pName, pDir);
   
   delete f_gauss_norm;
@@ -1039,8 +1039,10 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRea
   PlotPulls(pName, pFrame, label, pDir, plot_logy, plot_logx, greyscale, gauss_suffix);
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, std::string gauss_suffix) {
+void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, std::string gauss_suffix, unsigned int num_degrees_freedom) {
   gStyle->SetTitle(0);
+  
+  double chi2_reduced = pFrame->chiSquare(num_degrees_freedom);
   
   TCanvas c1("c_Utils","c_Utils",900,900);
 
@@ -1161,7 +1163,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-	PlotGauss(pName+gauss_suffix, pulls, pDir);
+	PlotGauss(pName+gauss_suffix, pulls, pDir, chi2_reduced);
 
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
