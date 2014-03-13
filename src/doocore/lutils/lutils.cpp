@@ -1042,6 +1042,8 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRea
 void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, std::string gauss_suffix) {
   gStyle->SetTitle(0);
   
+  sdebug << "Reduced chi^2: " << pFrame->chiSquare() << endmsg;
+  
   TCanvas c1("c_Utils","c_Utils",900,900);
 
   double top_label_size   = 0;
