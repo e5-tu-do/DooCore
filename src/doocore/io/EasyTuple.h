@@ -208,7 +208,7 @@ class EasyTuple {
    *  @param cut optional cut to reduce dataset
    *  @return the converted dataset
    */
-  RooDataSet& ConvertToDataSet(const std::string& cut);
+  //RooDataSet& ConvertToDataSet(const std::string& cut);
   
   /**
    *  @brief Get RooDataSet based on opened TTree and supplied argset and optional RooCmdArgs
@@ -265,7 +265,7 @@ class EasyTuple {
    *  @param cut optional cut to reduce dataset
    *  @return the converted dataset
    */
-  RooDataSet& ConvertToDataSet(const RooArgSet& argset, const std::string& cut);
+  //RooDataSet& ConvertToDataSet(const RooArgSet& argset, const std::string& cut);
   
   /**
    *  @brief Access variable in dataset
