@@ -35,8 +35,10 @@ class MySampleGenerator {
 
 class MyCalculator {
  public:
-  double Calculate(double input) const {
-    return input*2;
+  double Calculate(const RooArgSet* values) const {
+    using namespace doocore::io;
+//    sdebug << values->getRealValue("p1") << " - " << values->getRealValue("p2") << endmsg;
+    return values->getRealValue("p1") + values->getRealValue("p2");
   }
 };
 
@@ -52,21 +54,18 @@ int main() {
   
   TMatrixDSym cov(2);
   
-  cov(0,0) = 1;
-  cov(0,1) = 1;
-  cov(1,1) = 1;
+  cov(0,0) = 1.0;
+  cov(0,1) = cov(1,0) = 0.9;
+  cov(1,1) = 1.0;
   
   MultiVarGaussianSampleGenerator mvggen(args, cov);
   
-  for (int i=0; i<100; ++i) {
-    sdebug << mvggen.Generate() << endmsg;
-  }
-  
   MyCalculator mycalc;
   MySampleGenerator mygen;
-  ErrorEstimator<MyCalculator, MySampleGenerator> est(mycalc, mygen);
+  ErrorEstimator<MyCalculator, MultiVarGaussianSampleGenerator> est(mycalc, mvggen);
   
-  est.Sample(10000);
+  ValueWithError<double> mcval = est.Sample(10000);
+  sinfo << mcval << " - " << mcval.value << " +/- " << mcval.error << endmsg;
   
   std::vector<ValueWithError<double>> values;
   

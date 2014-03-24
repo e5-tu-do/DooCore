@@ -59,25 +59,20 @@ class ErrorEstimator {
    */
   ErrorEstimator(Calculator& calculator, SampleGenerator& sample_generator) : calculator_(calculator), sample_generator_(sample_generator) {}
   
-  /**
-   *  @brief Destructor for ErrorEstimator
-   *
-   *  Detailed description.
-   *
-   */
   ~ErrorEstimator() {}
   
   /**
    *  @brief Sample value calculation for n events
    *
    *  @param num_samples number of calculations to perform
+   *  @return mean value and sqrt(sample variance) as ValueWithError<double>
    */
-  void Sample(unsigned int num_samples) {
+  doocore::statistics::general::ValueWithError<double> Sample(unsigned int num_samples) {
     for (int i=0; i<num_samples; ++i) {
       DrawSingleValue();
     }
     
-    doocore::io::sdebug << doocore::statistics::general::ArithmeticMean<double>(generated_values_.begin(), generated_values_.end()) << doocore::io::endmsg;
+    return doocore::statistics::general::ArithmeticMean<double>(generated_values_.begin(), generated_values_.end());
   }
   
  protected:
@@ -118,11 +113,14 @@ class MultiVarGaussianSampleGenerator {
 public:
   MultiVarGaussianSampleGenerator(const RooArgList& values_expected, const TMatrixDSym& covariance);
   
+  ~MultiVarGaussianSampleGenerator();
+  
   const RooArgSet* Generate();
 private:
   RooMultiVarGaussian* mvg_;
   
   RooArgSet* values_expected_;
+  RooArgList* values_mu_;
   
   /**
    *  @brief Number of generated events so far
