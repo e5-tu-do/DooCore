@@ -45,6 +45,16 @@ namespace general {
   /**
    *  @class doocore::statistics::general::ValueWithError
    *  @brief Simple value with error compound type (and optional weight)
+   *
+   *  @section Usage
+   *
+   *  @code
+   *  // value with error: 0.22883328 +/- 0.0052244
+   *  doocore::statistics::general::ValueWithError<double> parameter(0.22883328,0.0052244);
+   *  std::string labeltext("Parameter p = " + parameter.FormatString());
+   *  doocore::io::sinfo << "My parameter is " << parameter << doocore::io::endmsg;
+   *  @endcode
+   *
    */
   template<typename T>
   class ValueWithError {
