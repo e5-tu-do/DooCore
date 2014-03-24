@@ -7,14 +7,66 @@
 #include <boost/assign/std/vector.hpp> // for 'operator+=()'
 using namespace boost::assign; // bring 'operator+=()' into scope
 
+// from ROOT
+#include "TRandom3.h"
+#include "TMatrixDSym.h"
+
+// from RooFit
+#include "RooArgList.h"
+#include "RooRealVar.h"
+
 // from DooCore
 #include "doocore/statistics/general.h"
+#include "doocore/statistics/montecarlo/ErrorEstimator.h"
 #include "doocore/io/MsgStream.h"
 #include "doocore/lutils/lutils.h"
+
+class MySampleGenerator {
+ public:
+  MySampleGenerator() : rand_() {}
+  
+  double Generate() {
+    return rand_.Gaus(1, 0.5);
+  }
+  
+ private:
+  TRandom3 rand_;
+};
+
+class MyCalculator {
+ public:
+  double Calculate(double input) const {
+    return input*2;
+  }
+};
+
 
 int main() {
   using namespace doocore::io;
   using namespace doocore::statistics::general;
+  using namespace doocore::statistics::montecarlo;
+  
+  RooRealVar p1("p1", "p1", 1.0, -100.0, 100.0);
+  RooRealVar p2("p2", "p2", 1.0, -100.0, 100.0);
+  RooArgList args(p1, p2);
+  
+  TMatrixDSym cov(2);
+  
+  cov(0,0) = 1;
+  cov(0,1) = 1;
+  cov(1,1) = 1;
+  
+  MultiVarGaussianSampleGenerator mvggen(args, cov);
+  
+  for (int i=0; i<100; ++i) {
+    sdebug << mvggen.Generate() << endmsg;
+  }
+  
+  MyCalculator mycalc;
+  MySampleGenerator mygen;
+  ErrorEstimator<MyCalculator, MySampleGenerator> est(mycalc, mygen);
+  
+  est.Sample(10000);
   
   std::vector<ValueWithError<double>> values;
   
@@ -68,4 +120,7 @@ int main() {
   
   sinfo << mean_error << endmsg;
   //sinfo << mean_error.value << " +/- " << mean_error.error << endmsg;
+  
+  
+  
 }
