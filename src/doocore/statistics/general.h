@@ -220,6 +220,7 @@ namespace general {
     unsigned int n = 0;
     
     while (first != last) {
+//      doocore::io::sdebug << "x = " << *first << doocore::io::endmsg;
       sum         += (*first) - x_e;
       sum_error   += std::pow(((*first) - x_e),2);
       ++first;
@@ -227,7 +228,7 @@ namespace general {
     }
     
     return ValueWithError<T>(x_e + sum/static_cast<double>(n),
-                             (sum_error - (sum*sum)/static_cast<double>(n))/static_cast<double>(n-1));
+                             std::sqrt((sum_error - (sum*sum)/static_cast<double>(n))/static_cast<double>(n-1)));
   }
 
 

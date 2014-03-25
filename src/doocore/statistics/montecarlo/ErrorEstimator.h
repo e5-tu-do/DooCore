@@ -9,6 +9,7 @@
 
 // from DooCore
 #include "doocore/io/MsgStream.h"
+#include "doocore/io/Progress.h"
 #include "doocore/statistics/general.h"
 
 // forward declarations
@@ -72,9 +73,12 @@ class ErrorEstimator {
    *  @return mean value and sqrt(sample variance) as ValueWithError<double>
    */
   doocore::statistics::general::ValueWithError<double> Sample(unsigned int num_samples) {
+    doocore::io::Progress p("Sampling distribution", num_samples);
     for (int i=0; i<num_samples; ++i) {
       DrawSingleValue();
+      ++p;
     }
+    p.Finish();
     
     return doocore::statistics::general::ArithmeticMean<double>(generated_values_.begin(), generated_values_.end());
   }
