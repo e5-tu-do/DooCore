@@ -35,11 +35,15 @@ class RooDataSet;
  *  generated parameter set), this class will get an error estimate for the 
  *  calculator's taget value.
  *
- *  @section Required interfaces
+ *  @section sec_interfaces Required interfaces
  *
  *  SampleGenerator::Generate() must be defined as well as 
  *  Calculator::Calculate(inputs) where inputs is the return value of 
  *  SampleGenerator::Generate().
+ *
+ *  @section sec_example Usage example
+ *
+ *  For a usage example see TestStatistics.cpp.
  *
  *  @author Florian Kruse
  */
