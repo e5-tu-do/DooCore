@@ -18,7 +18,7 @@
 
 doocore::statistics::montecarlo::MultiVarGaussianSampleGenerator::MultiVarGaussianSampleGenerator(const RooArgList& values_expected, const TMatrixDSym& covariance)
 : mvg_(NULL),
-values_expected_(new RooArgSet(values_expected)),
+values_expected_(new RooArgSet()),
 values_mu_(new RooArgList()),
 num_generated_(0),
 pos_dataset_(0),
@@ -32,9 +32,12 @@ dataset_(NULL) {
   while ((arg = dynamic_cast<RooAbsArg*>(it->Next()))) {
     RooRealVar* var = dynamic_cast<RooRealVar*>(arg);
     if (var != NULL) {
+      RooRealVar* var_copy = new RooRealVar(*var, var->GetName());
+      values_expected_->addOwned(*var_copy);
+
       std::string name_copy(std::string(var->GetName())+"_mu");
-      RooRealVar* var_copy = new RooRealVar(*var, name_copy.c_str());
-      values_mu_->addOwned(*var_copy);
+      RooRealVar* var_copy_mu = new RooRealVar(*var, name_copy.c_str());
+      values_mu_->addOwned(*var_copy_mu);
     }
   }
   delete it;
@@ -64,7 +67,8 @@ const RooArgSet* doocore::statistics::montecarlo::MultiVarGaussianSampleGenerato
       delete dataset_;
     }
     
-    
+//    values_expected_->Print();
+//    values_mu_->Print();
     dataset_ = mvg_->generate(*values_expected_, num_generate);
   }
   
