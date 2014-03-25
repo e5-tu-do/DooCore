@@ -200,6 +200,36 @@ namespace general {
     
     return ValueWithError<T>(sum/sum_weights,TMath::Sqrt(sum_error)/sum_weights);
   }
+  
+  /**
+   *  @brief Calculate arithmetic mean based on values
+   *
+   *  Based on given iterators of values, the arithmetic mean and the 
+   *  sqrt(sample variance) are computed.
+   *
+   *  @param parameter description
+   *  @param first iterator for values to start with
+   *  @param last iterator for values to end with
+   *  @return arithmetic mean and sqrt(sample variance) as ValueWithError
+   */
+  template <typename T, typename ValueIterator>
+  inline ValueWithError<T> ArithmeticMean(ValueIterator first, ValueIterator last) {
+    T x_e          = *first;
+    T sum          = 0.0;
+    T sum_error    = 0.0;
+    unsigned int n = 0;
+    
+    while (first != last) {
+      sum         += (*first) - x_e;
+      sum_error   += std::pow(((*first) - x_e),2);
+      ++first;
+      ++n;
+    }
+    
+    return ValueWithError<T>(x_e + sum/static_cast<double>(n),
+                             (sum_error - (sum*sum)/static_cast<double>(n))/static_cast<double>(n-1));
+  }
+
 
 } // namespace general
 } // namespace statistics
