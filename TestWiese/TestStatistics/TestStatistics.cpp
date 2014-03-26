@@ -38,7 +38,7 @@ class MyCalculator {
   double Calculate(const RooArgSet* values) const {
     using namespace doocore::io;
 //    sdebug << values->getRealValue("p1") << " - " << values->getRealValue("p2") << endmsg;
-    return values->getRealValue("p1") + values->getRealValue("p2");
+    return values->getRealValue("p1");// + values->getRealValue("p2");
   }
 };
 
@@ -48,15 +48,15 @@ int main() {
   using namespace doocore::statistics::general;
   using namespace doocore::statistics::montecarlo;
   
-  RooRealVar p1("p1", "p1", 1.0, -100.0, 100.0);
-  RooRealVar p2("p2", "p2", 1.0, -100.0, 100.0);
+  RooRealVar p1("p1", "p1", 10.0, -100.0, 100.0);
+  RooRealVar p2("p2", "p2", 10.0, -100.0, 100.0);
   RooArgList args(p1, p2);
   
   TMatrixDSym cov(2);
   
-  cov(0,0) = 1.0;
-  cov(0,1) = cov(1,0) = 0.9;
-  cov(1,1) = 1.0;
+  cov(0,0) = 0.25;
+  cov(0,1) = cov(1,0) = 0.0;
+  cov(1,1) = 0.25;
   
   MultiVarGaussianSampleGenerator mvggen(args, cov);
   

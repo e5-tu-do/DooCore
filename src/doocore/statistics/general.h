@@ -79,34 +79,38 @@ namespace general {
   
   template<typename T>
   std::string doocore::statistics::general::ValueWithError<T>::FormatString() const {
-    std::fesetround(FE_TONEAREST);
-    int mantissa_err   = std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))));
-    T exp_err     = std::log10(error);
-    T abs_exp_err = std::abs(exp_err);
-    
-    // additional digits if mantissa of error <= 3.54
-    int add_digits     = 0;
-    if (mantissa_err <= 354) add_digits++;
-    
-    std::string format;
     std::stringstream output;
-    
-    // depending on exponent use scientific notation or not
-    if (abs_exp_err < 5) {
-      if (exp_err < 1.0) {
-        std::fesetround(FE_DOWNWARD);
-        format = "%." + std::to_string(static_cast<int>(std::abs(std::nearbyint(exp_err))+add_digits)) + "f";
-      } else {
-        format = "%.0f";
-      }
-      output << boost::format(format) % value << " +/- " << boost::format(format) % error;
+    if (error == 0.0) {
+      output << value << " +/- " << error;
     } else {
-      format = "%." + std::to_string(add_digits) + "f";
-      T exp_new_err      = std::floor(exp_err);
-      T mantissa_new_err = error/std::pow(10.0,exp_new_err);
-      T mantissa_new_val = value/std::pow(10.0,exp_new_err);
+      std::fesetround(FE_TONEAREST);
+      int mantissa_err   = std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))));
+      T exp_err     = std::log10(error);
+      T abs_exp_err = std::abs(exp_err);
       
-      output << boost::format(format) % mantissa_new_val << "e" << exp_new_err << " +/- " << boost::format(format) % mantissa_new_err << "e" << exp_new_err;
+      // additional digits if mantissa of error <= 3.54
+      int add_digits     = 0;
+      if (mantissa_err <= 354) add_digits++;
+      
+      std::string format;
+      
+      // depending on exponent use scientific notation or not
+      if (abs_exp_err < 5) {
+        if (exp_err < 1.0) {
+          std::fesetround(FE_DOWNWARD);
+          format = "%." + std::to_string(static_cast<int>(std::abs(std::nearbyint(exp_err))+add_digits)) + "f";
+        } else {
+          format = "%.0f";
+        }
+        output << boost::format(format) % value << " +/- " << boost::format(format) % error;
+      } else {
+        format = "%." + std::to_string(add_digits) + "f";
+        T exp_new_err      = std::floor(exp_err);
+        T mantissa_new_err = error/std::pow(10.0,exp_new_err);
+        T mantissa_new_val = value/std::pow(10.0,exp_new_err);
+        
+        output << boost::format(format) % mantissa_new_val << "e" << exp_new_err << " +/- " << boost::format(format) % mantissa_new_err << "e" << exp_new_err;
+      }
     }
     
     return output.str();
@@ -220,6 +224,7 @@ namespace general {
     unsigned int n = 0;
     
     while (first != last) {
+//      doocore::io::sdebug << "x = " << *first << doocore::io::endmsg;
       sum         += (*first) - x_e;
       sum_error   += std::pow(((*first) - x_e),2);
       ++first;
@@ -227,7 +232,7 @@ namespace general {
     }
     
     return ValueWithError<T>(x_e + sum/static_cast<double>(n),
-                             (sum_error - (sum*sum)/static_cast<double>(n))/static_cast<double>(n-1));
+                             std::sqrt((sum_error - (sum*sum)/static_cast<double>(n))/static_cast<double>(n-1)));
   }
 
 

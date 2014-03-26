@@ -9,6 +9,7 @@
 
 // from DooCore
 #include "doocore/io/MsgStream.h"
+#include "doocore/io/Progress.h"
 #include "doocore/statistics/general.h"
 
 // forward declarations
@@ -35,11 +36,15 @@ class RooDataSet;
  *  generated parameter set), this class will get an error estimate for the 
  *  calculator's taget value.
  *
- *  @section Required interfaces
+ *  @section sec_interfaces Required interfaces
  *
  *  SampleGenerator::Generate() must be defined as well as 
  *  Calculator::Calculate(inputs) where inputs is the return value of 
  *  SampleGenerator::Generate().
+ *
+ *  @section sec_example Usage example
+ *
+ *  For a usage example see TestStatistics.cpp.
  *
  *  @author Florian Kruse
  */
@@ -68,9 +73,12 @@ class ErrorEstimator {
    *  @return mean value and sqrt(sample variance) as ValueWithError<double>
    */
   doocore::statistics::general::ValueWithError<double> Sample(unsigned int num_samples) {
+    doocore::io::Progress p("Sampling distribution for ErrorEstimator", num_samples);
     for (int i=0; i<num_samples; ++i) {
       DrawSingleValue();
+      ++p;
     }
+    p.Finish();
     
     return doocore::statistics::general::ArithmeticMean<double>(generated_values_.begin(), generated_values_.end());
   }
