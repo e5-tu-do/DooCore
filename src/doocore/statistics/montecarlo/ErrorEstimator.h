@@ -46,6 +46,19 @@ class RooDataSet;
  *
  *  For a usage example see TestStatistics.cpp.
  *
+ *  @section sec_samplesize Sample size guideline
+ *
+ *  The number of required samples is depending on the required precision in the
+ *  error estimate. According to Blobel (eBook p. 92) the standard deviation of
+ *  the error estimate can be approximated as
+ *
+ *  @code
+ *  sigma(error) = error/sqrt(2*(n-1))
+ *  @endcode
+ *
+ *  This means, to get a relative error precision of error/sigma(error) = 10 the
+ *  number of samples would be 49.
+ *
  *  @author Florian Kruse
  */
 namespace doocore {
