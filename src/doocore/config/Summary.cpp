@@ -14,7 +14,7 @@
 
 // from BOOST
 #ifdef __GNUG__
-#define BOOST_NO_SCOPED_ENUMS
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #endif
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
