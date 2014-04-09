@@ -62,7 +62,7 @@ private:
   mutable boost::mutex the_mutex;
   boost::condition_variable the_condition_variable;
   boost::condition_variable the_condition_variable_popped;
-  int max_size_;
+  unsigned int max_size_;
 public:
   concurrent_queue(int max_size=-1) : max_size_(max_size) {}
   
