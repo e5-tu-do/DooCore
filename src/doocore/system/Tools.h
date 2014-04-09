@@ -76,7 +76,7 @@ void ReplaceFile(std::string source_file, std::string target_file);
  */
 void CreateDirectory(std::string target_directory);
 
-}; // namespace tools
+} // namespace tools
 } // namespace system
 } // namespace doocore
 

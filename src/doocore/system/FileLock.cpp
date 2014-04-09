@@ -135,5 +135,5 @@ namespace system {
     }
     return num_lockfiles;
   }
-};
-};
+}
+}
