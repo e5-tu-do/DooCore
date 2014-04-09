@@ -196,7 +196,7 @@ void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "", double chi2_
  */
 void PlotPulls(TString pName, RooPlot * pFrame, TLatex& label,
                TString pDir = "", bool plot_logy = false,
-               bool plot_logx = false, bool greyscale = true,
+               bool plot_logx = false,
                std::string gauss_suffix="_Gauss", unsigned int num_fit_params=0);
 
 /**
@@ -204,33 +204,12 @@ void PlotPulls(TString pName, RooPlot * pFrame, TLatex& label,
  */
 void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "",
                bool plot_logy = false, bool plot_logx = false,
-               bool greyscale = true, TLegend * label = NULL,
+               TLegend * label = NULL,
                std::string gauss_suffix="_Gauss");
-  
-/**
- *  @brief (DEPRECATED:) Plot RooPlot frame with pull distribution
- *
- *  Just a compatibility wrapper for the other PlotPull functions.
- */
-void PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex& label, std::string gauss_suffix="_Gauss");
-  
-/**
- *  @brief (DEPRECATED:) Plot RooPlot frame with pull distribution
- *
- *  Just a compatibility wrapper for the other PlotPull functions.
- */
-void PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex& label, std::string gauss_suffix="_Gauss");
-  
-void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, TLatex& label, TString pDir = "", bool normalize_residuals = true, bool plot_logy = false, bool plot_logx = false);
+ 
+void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, TLatex& label, TString pDir = "", bool normalize_residuals = true, bool plot_logy = false, bool plot_logx = false);
 
-void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool normalize_residuals, bool plot_logy, TLegend * label = NULL, bool plot_logx = false);
-  
-/**
- *  @brief (DEPRECATED:) Plot RooPlot frame with old residuals distribution
- *
- *  Just a compatibility wrapper for the other PlotResiduals functions.
- */
-void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, TString pDir, bool normalize_residuals, bool plot_logy, TLatex& label, bool plot_logx = false);
+void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, TString pDir, bool normalize_residuals, bool plot_logy, TLegend * label = NULL, bool plot_logx = false);
   
 ///Do an Asymmetry Plot for a given NTuple the name of the time variable and a variable name that is used for a cut (+/-1) to separate two mixing states
 void plotAsymmetry(TString pPlotName, TTree * pTuple, TString pVarTime, TString pVarMix, int pBins = 20, double pRngMax = 0.01, double pRngMin = 0.00, TString pTimeUnit = "ns");

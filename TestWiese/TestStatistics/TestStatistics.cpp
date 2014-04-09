@@ -64,7 +64,7 @@ int main() {
   MySampleGenerator mygen;
   ErrorEstimator<MyCalculator, MultiVarGaussianSampleGenerator> est(mycalc, mvggen);
   
-  ValueWithError<double> mcval = est.Sample(10000);
+  ValueWithError<double> mcval(est.Sample(10000));
   sinfo << mcval << " - " << mcval.value << " +/- " << mcval.error << endmsg;
   
   std::vector<ValueWithError<double>> values;

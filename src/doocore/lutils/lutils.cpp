@@ -1024,17 +1024,7 @@ void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir, 
   gDirectory->Delete("hError");
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex& label, std::string gauss_suffix) {
-  doocore::io::swarn << "doocore::lutils::PlotPulls(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
-  PlotPulls(pName, pFrame, label, pDir, plot_logy, plot_logx, greyscale, gauss_suffix);
-}
-
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex& label, std::string gauss_suffix) {
-  doocore::io::swarn << "doocore::lutils::PlotPulls(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
-  PlotPulls(pName, pFrame, label, pDir, plot_logy, plot_logx, greyscale, gauss_suffix);
-}
-
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, std::string gauss_suffix, unsigned int num_fit_params) {
+void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx, std::string gauss_suffix, unsigned int num_fit_params) {
   gStyle->SetTitle(0);
   
   double chi2_reduced = pFrame->chiSquare(num_fit_params);
@@ -1171,9 +1161,9 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   delete pulls1;
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label, std::string gauss_suffix) {
+void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, TLegend * label, std::string gauss_suffix) {
   gStyle->SetTitle(0);
-  
+    
   TCanvas c1("c_Utils","c_Utils",900,900);
 
   double top_label_size   = 0;
@@ -1301,7 +1291,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
 }
 
   
-void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, TLatex& label, TString pDir, bool normalize, bool plot_logy, bool plot_logx) {
+void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, TLatex& label, TString pDir, bool normalize, bool plot_logy, bool plot_logx) {
 	setStyle();
   gStyle->SetTitle(0);
   
@@ -1384,10 +1374,10 @@ void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAb
   delete residFrame;
 }
 
-void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF,
-                          TString pDir, bool normalize, bool plot_logy,
-                          TLegend * label, bool plot_logx
-                          ) {
+void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,
+                                    TString pDir, bool normalize, bool plot_logy,
+                                    TLegend * label, bool plot_logx
+                                    ) {
 	setStyle();
   gStyle->SetTitle(0);
   
@@ -1473,10 +1463,6 @@ void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAb
   delete residFrame;
 }
 
-void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, TString pDir, bool normalize_residuals, bool plot_logy, TLatex& label, bool plot_logx) {
-  doocore::io::swarn << "doocore::lutils::PlotPulls(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
-  PlotResiduals(pName, pFrame, pVar, pPDF, label, pDir, normalize_residuals, plot_logy, plot_logx);
-}
 
 std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet& dataset, std::string var_name) {
   bool debug = false;
