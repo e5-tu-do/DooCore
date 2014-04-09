@@ -92,8 +92,12 @@ class Progress {
  private:
   
   void Update(bool force_update=false) {
-    if (tty_ && steps_since_update_ > step_position_update_tty_ || force_update) {
+    if ((tty_ && steps_since_update_ > step_position_update_tty_) || force_update) {
       position_ += steps_since_update_;
+      if (position_>num_steps_total_) {
+        position_ = num_steps_total_;
+      }
+      
       steps_since_update_ = 0;
       
       progress_fraction_ = static_cast<double>(position_)/num_steps_total_;
@@ -103,8 +107,11 @@ class Progress {
       double remaining = static_cast<double>(elapsed_)/progress_fraction_-static_cast<double>(elapsed_);
       printf("%s %.2f % (time elapsed / remaining / per step[ms]: %s / %s / %.2f)        \xd", MakeProgressBar(progress_fraction_).c_str(), progress_fraction_*100.0, SecondsToTimeString(elapsed_).c_str(), SecondsToTimeString(remaining).c_str(), elapsed_/position_*1000.0);
       fflush(stdout);
-    } else if (!tty_ && steps_since_update_ > step_position_update_notty_ || force_update){
+    } else if ((!tty_ && steps_since_update_ > step_position_update_notty_) || force_update){
       position_ += steps_since_update_;
+      if (position_>num_steps_total_) {
+        position_ = num_steps_total_;
+      }
       steps_since_update_ = 0;
       
       progress_fraction_ = static_cast<double>(position_)/num_steps_total_;
