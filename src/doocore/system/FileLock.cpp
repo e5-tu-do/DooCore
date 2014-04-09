@@ -7,7 +7,7 @@
 #include <fstream>
 
 // boost
-#ifdef __GNUG__
+#if defined(__GNUG__) && !defined(__clang__)
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #endif
 #include "boost/filesystem.hpp"
