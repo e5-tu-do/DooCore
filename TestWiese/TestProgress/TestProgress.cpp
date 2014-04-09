@@ -15,7 +15,7 @@ void func() {
 
 int main () {
   using namespace doocore::io;
-  long long steps = 1000000000;
+  long long steps = 1000000;
   
   Progress p("my task", steps);
   
