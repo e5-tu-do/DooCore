@@ -157,7 +157,7 @@ double RunTest(const TH1 & hist);
 ///Returns a residual HISTOGRAM and no fucking RooHist TGraph for the given RooPlot
 TH1D 		GetPulls(RooPlot * pFrame, bool normalize = true);
 ///Prepare canvas with two pads for pull and residual plots, returns numbers for text formatting
-void PreparePadForPulls(TCanvas * c1, RooPlot * pFrame, bool plot_logx, bool plot_logy,
+void PreparePadForPulls(TCanvas * c1, bool plot_logx, bool plot_logy,
 												double & top_label_size, double & top_title_offset, double & title2label_size_ratio,
 												double & bottom_label_size, double & bottom_title_offset);
 
@@ -207,16 +207,6 @@ void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "",
                bool greyscale = true, TLegend * label = NULL,
                std::string gauss_suffix="_Gauss");
   
-/**
- *  @brief (DEPRECATED:) Plot RooPlot frame with pull distribution
- *
- *  Just a compatibility wrapper for the other PlotPull functions.
- */  
-void PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,
-               RooAbsPdf * pPDF, TLatex& label, TString pDir = "",
-               bool normalize_residuals = true, bool plot_logy = false,
-               bool plot_logx = false, std::string gauss_suffix="_Gauss");
-
 /**
  *  @brief (DEPRECATED:) Plot RooPlot frame with pull distribution
  *

@@ -383,7 +383,7 @@ void doocore::lutils::printPlotCloseStack(TCanvas* c, TString name, TString dir)
   //system("mkdir -p " + dir+"pdf/");
   
   //  c->Print(dir+"eps/" + name + ".eps");
-  int ignore_level = gErrorIgnoreLevel;
+//  int ignore_level = gErrorIgnoreLevel;
 //  gErrorIgnoreLevel = kWarning;
   c->Print(dir+"pdf/" + name + ".pdf]");
 //  gErrorIgnoreLevel = ignore_level;
@@ -701,11 +701,11 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label,
   
   // derived definitions
   double pad_ysplit     = (1.0-2.*pad_border)*pad_relysplit;
-  double bottom_label_size = top_label_size*(1.-pad_relysplit)/pad_relysplit;
-  double bottom_title_offset = top_title_offset/(1.-pad_relysplit)*pad_relysplit;
-  
-  double plot_min = pFrame->GetXaxis()->GetXmin();
-  double plot_max = pFrame->GetXaxis()->GetXmax();
+//  double bottom_label_size = top_label_size*(1.-pad_relysplit)/pad_relysplit;
+//  double bottom_title_offset = top_title_offset/(1.-pad_relysplit)*pad_relysplit;
+//  
+//  double plot_min = pFrame->GetXaxis()->GetXmin();
+//  double plot_max = pFrame->GetXaxis()->GetXmax();
   
   TCanvas c1("c1","c1",900,630);
   TPad* pad = (TPad*)c1.cd();
@@ -736,7 +736,7 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label,
 
 double doocore::lutils::RunTest(const TH1 & hist) {
 	int runs = 0;
-	int entries = hist.GetNbinsX();
+	unsigned int entries = hist.GetNbinsX();
 	int nplus = 0;
 	int nminus = 0;
 	int sign = 1;
@@ -771,7 +771,7 @@ double doocore::lutils::RunTest(const TH1 & hist) {
 	return (TMath::Erf((runs-expect)/sqrt(variance))+1.)/2.;
 }
 
-void doocore::lutils::PreparePadForPulls(TCanvas * c1, RooPlot * pFrame, bool plot_logx, bool plot_logy, double & top_label_size, double & top_title_offset, double & title2label_size_ratio, double & bottom_label_size, double & bottom_title_offset) {
+void doocore::lutils::PreparePadForPulls(TCanvas * c1, bool plot_logx, bool plot_logy, double & top_label_size, double & top_title_offset, double & title2label_size_ratio, double & bottom_label_size, double & bottom_title_offset) {
   // some global definitions
   double pad_border       = 0.02;
   double pad_relysplit    = 0.3;
@@ -834,7 +834,7 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
 
   limits.push_back(x-data->GetErrorXlow(1));
 
-  for (unsigned int i = 0; i < data->GetN(); ++i) {
+  for (int i = 0; i < data->GetN(); ++i) {
     
     data->GetPoint(i,x,y);
     c = curve->Eval(x);
@@ -903,7 +903,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 //  h_pulls->SetBit(kMustCleanup);
   int num_pulls_used = 0;
   
-	for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
+	for (int i = 1; i <= pulls.GetNbinsX(); ++i) {
     // only count pulls different from zero (due to numerics != 0.0 won't work here)
     if (TMath::Abs(pulls.GetBinContent(i)) > 1e-4) {
 //      sdebug << "doocore::lutils::PlotPullDistributionWithGaussian(...): p = " << pulls.GetBinContent(i) << endmsg;
@@ -943,7 +943,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	//Get error Band Histogram
 	h_error = new TH1D("hError","hError",500,-5,5);
 //  h_error->SetBit(kMustCleanup);
-	for (unsigned i = 1; i <= h_error->GetNbinsX(); ++i) {
+	for (int i = 1; i <= h_error->GetNbinsX(); ++i) {
 		const Double_t pos = -5. + double(i)*10./500.+(10./500./2);
 		
 		Double_t dev0 = f_gauss_fit->GradientPar(0, &pos, 0.01);
@@ -1024,11 +1024,6 @@ void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir, 
   gDirectory->Delete("hError");
 }
 
-void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TLatex& label, TString pDir, bool normalize_residuals, bool plot_logy, bool plot_logx, std::string gauss_suffix) {
-  doocore::io::swarn << "doocore::lutils::PlotPulls(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
-  PlotPulls(pName, pFrame, label, pDir, plot_logy, plot_logx, true);
-}
-
 void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex& label, std::string gauss_suffix) {
   doocore::io::swarn << "doocore::lutils::PlotPulls(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
   PlotPulls(pName, pFrame, label, pDir, plot_logy, plot_logx, greyscale, gauss_suffix);
@@ -1058,7 +1053,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   double plot_min = pFrame->GetXaxis()->GetXmin();
   double plot_max = pFrame->GetXaxis()->GetXmax();
 
-  PreparePadForPulls(&c1, pFrame, plot_logx, plot_logy, top_label_size, top_title_offset, title2label_size_ratio, bottom_label_size, bottom_title_offset);  
+  PreparePadForPulls(&c1, plot_logx, plot_logy, top_label_size, top_title_offset, title2label_size_ratio, bottom_label_size, bottom_title_offset);
   
   TH1D pulls = GetPulls(pFrame,true);
   
@@ -1078,7 +1073,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   pulls3->SetLineWidth(2);
   pulls4->SetLineWidth(2);
   
-  for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
+  for (int i = 1; i <= pulls.GetNbinsX(); ++i) {
     pulls1->SetBinContent(i,0);
     pulls2->SetBinContent(i,0);
     pulls3->SetBinContent(i,0);
@@ -1191,7 +1186,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   double plot_min = pFrame->GetXaxis()->GetXmin();
   double plot_max = pFrame->GetXaxis()->GetXmax();
 
-  PreparePadForPulls(&c1, pFrame, plot_logx, plot_logy, top_label_size, top_title_offset, title2label_size_ratio, bottom_label_size, bottom_title_offset);  
+  PreparePadForPulls(&c1, plot_logx, plot_logy, top_label_size, top_title_offset, title2label_size_ratio, bottom_label_size, bottom_title_offset);
   
   TH1D pulls = GetPulls(pFrame,true);
   
@@ -1211,7 +1206,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   pulls3->SetLineWidth(2);
   pulls4->SetLineWidth(2);
   
-  for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
+  for (int i = 1; i <= pulls.GetNbinsX(); ++i) {
     pulls1->SetBinContent(i,0);
     pulls2->SetBinContent(i,0);
     pulls3->SetBinContent(i,0);
