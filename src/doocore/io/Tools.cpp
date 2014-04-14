@@ -11,9 +11,9 @@
 // from TMVA
 
 // from BOOST
-#if defined(__GNUG__) && !defined(__clang__) 
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#endif
+//#if defined(__GNUG__) && !defined(__clang__)
+//#define BOOST_NO_CXX11_SCOPED_ENUMS
+//#endif
 #include "boost/filesystem.hpp"
 #include "boost/regex.hpp"
 #include "boost/lexical_cast.hpp"
