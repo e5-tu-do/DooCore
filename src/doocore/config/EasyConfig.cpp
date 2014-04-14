@@ -38,7 +38,6 @@ EasyConfig::EasyConfig(int argc, char *argv[]){
 }
 
 EasyConfig::EasyConfig(std::string filename, bool debug_mode){
-  if (debug_mode_)  doocore::io::sdebug << "Constructor config file " << filename_ << "..." << doocore::io::endmsg;
   debug_mode_ = debug_mode;
   LoadConfigFile(filename);
 }
