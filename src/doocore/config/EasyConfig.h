@@ -230,7 +230,10 @@ class EasyConfig {
    *
    *  @return the filename
    */
-  const std::string& filename() const { return filename_; }
+  const std::string& filename() const {
+    using namespace doocore::io;
+    return filename_; 
+  }
   
  protected:
   

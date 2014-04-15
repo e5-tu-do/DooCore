@@ -42,11 +42,13 @@ EasyConfig::EasyConfig(std::string filename, bool debug_mode){
   LoadConfigFile(filename);
 }
 
-EasyConfig::~EasyConfig(){}
+EasyConfig::~EasyConfig(){
+  using namespace doocore::io;
+}
 
 void EasyConfig::LoadConfigFile(std::string filename){
   doocore::config::Summary::GetInstance().AddFile(filename);
-  if (debug_mode_) doocore::io::sinfo << "Reading config file " << filename << "..." << doocore::io::endmsg;
+  if (debug_mode_) doocore::io::sdebug << "Reading config file " << filename << "..." << doocore::io::endmsg;
   filename_ = filename;
   read_info(filename, ptree_);
   if (debug_mode_) DisplayPTree(ptree_);
