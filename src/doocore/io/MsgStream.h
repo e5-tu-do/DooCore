@@ -242,7 +242,7 @@ protected:
 inline MsgStream& endmsg(MsgStream& s) {
   return s.doOutput();
 }
-
+  
 /// \brief Stream operator for MsgStream streams and additional objects.
 /// To be used with other objects like in STL iostreams.
 template<typename T>
@@ -250,6 +250,7 @@ inline MsgStream& operator<<(MsgStream& lhs, const T& arg) {
   lhs.stream() << arg;
   return lhs;
 }
+
   
 /**
  *  @brief Print a vector via MsgStream
@@ -257,17 +258,28 @@ inline MsgStream& operator<<(MsgStream& lhs, const T& arg) {
 template<typename T>
 inline MsgStream& operator<<(MsgStream& lhs, const std::vector<T>& arg) {
   if (arg.size() > 0) {
-    lhs.stream() << "(";
-    lhs.stream() << arg.front();
+    lhs << "(";
+    lhs << arg.front();
     for (typename std::vector<T>::const_iterator it = arg.begin()+1;
          it != arg.end(); ++it) {
-      lhs.stream() << ", " << *it;
+      lhs << ", " << *it;
     }
-    lhs.stream() << ")";
+    lhs << ")";
   }
   return lhs;
 }
 
+/**
+ *  @brief Print a std::pair via MsgStream
+ */
+template<typename T1, typename T2>
+inline MsgStream& operator<<(MsgStream& lhs, const std::pair<T1,T2>& arg) {
+  lhs << "(" << arg.first << ", " << arg.second << ")";
+
+  return lhs;
+}
+
+  
 /**
  *  @brief Function to output bools directly and nicely into MsgStreams
  */
@@ -293,54 +305,114 @@ inline MsgStream& operator<<(MsgStream& lhs, TStopwatch& sw) {
 }
 
 /**
- *  @brief Function to output RooAbsCollection directly and nicely into MsgStreams
+ *  @brief Function to output RooAbsArgs directly and nicely into MsgStreams
  *
- *  This function just prints all arguments in an RooArgSet nicely.
+ *  This function just prints all RooAbsArgs (including value, error and range if applicable).
  */
-inline MsgStream& operator<<(MsgStream& lhs, const RooAbsCollection& argset) {
+template<>
+inline MsgStream& operator<< <RooAbsArg>(MsgStream& lhs, const RooAbsArg& arg) {
   using namespace ROOT;
   using namespace RooFit;
   
+  const RooRealVar* var_ptr = dynamic_cast<const RooRealVar*>(&arg);
+  std::string name = arg.GetName();
+  std::string title = arg.GetTitle();
+  
+  if (var_ptr != nullptr) {
+    const RooRealVar& var = *var_ptr;
+
+    lhs.stream() << name;
+    if (name != title) { lhs.stream() << " (" << title << ")"; }
+    lhs.stream() << " = " << var.getVal();
+    if (var.hasAsymError()) {
+      lhs.stream() << " (" << var.getAsymErrorLo() << " +" << var.getAsymErrorHi() << ") (+- " <<  var.getError() << ")";
+    } else {
+      lhs.stream() << " +- " << var.getError();
+    }
+    if (var.isConstant()) lhs.stream() << " C";
+    if (var.hasMin() || var.hasMax()) {
+      lhs.stream() << " L(" << var.getMin() << " - " << var.getMax() << ")";
+    }
+  } else {
+    lhs.stream() << name;
+    if (name != title) { lhs.stream() << " (" << title << ")"; }
+  }
+  
+  return lhs;
+}
+  
+/**
+ *  @brief Function to output RooRealVar directly and nicely into MsgStreams
+ *
+ *  This function just prints all RooRealVar (including value, error and range if applicable).
+ */
+template<>
+inline MsgStream& operator<< <RooRealVar>(MsgStream& lhs, const RooRealVar& arg) {
+  return operator<<(lhs, dynamic_cast<const RooAbsArg&>(arg));
+}
+  
+/**
+ *  @brief Function to output RooAbsCollection directly and nicely into MsgStreams
+ *
+ *  This function just prints all arguments in a RooAbsCollection nicely.
+ */
+template<>
+inline MsgStream& operator<< <RooAbsCollection>(MsgStream& lhs, const RooAbsCollection& argset) {
+  using namespace ROOT;
+  using namespace RooFit;
+  
+  bool print_newlines = false;
+  if (argset.getSize() >= 10) {
+    print_newlines = true;
+  }
+  
+  lhs << "Collection: " << argset.GetName() << " ";
+  if (print_newlines) lhs << endmsg;
+  
   if (argset.getSize() > 0) {
-    lhs.stream() << "(";
+    //lhs.stream() << "(";
     
     // happy fun time using TIterator, yay!
     TIterator* iter = argset.createIterator();
-    RooAbsArg* arg  = (RooAbsArg*)iter->Next();
-    lhs.stream() << arg->GetName();
+    const RooAbsArg* arg  = (RooAbsArg*)iter->Next();
+    //lhs.stream() << arg->GetName();
+    lhs << *arg;
     
-    while ((arg = (RooAbsArg*)iter->Next())) {
-      lhs.stream() << "," << arg->GetName();
+    while ((arg = (const RooAbsArg*)iter->Next())) {
+      //lhs.stream() << "," << arg->GetName();
+      if (print_newlines) {
+        lhs << endmsg;
+      } else {
+        lhs << ", ";
+      }
+      lhs << *arg;
     }
-    lhs.stream() << ")";
+    //lhs.stream() << ")";
   }
   
   return lhs;
 }
   
+/**
+ *  @brief Function to output RooArgSet directly and nicely into MsgStreams
+ *
+ *  This function just prints all arguments in a RooArgSet nicely.
+ */
+template<>
+inline MsgStream& operator<< <RooArgSet>(MsgStream& lhs, const RooArgSet& argset) {
+  return operator<<(lhs, dynamic_cast<const RooAbsCollection&>(argset));
+}
 
 /**
- *  @brief Function to output RooRealVars directly and nicely into MsgStreams
+ *  @brief Function to output RooArgList directly and nicely into MsgStreams
  *
- *  This function just prints all RooRealVar including error and range.
+ *  This function just prints all arguments in a RooArgList nicely.
  */
-inline MsgStream& operator<<(MsgStream& lhs, const RooRealVar& var) {
-  using namespace ROOT;
-  using namespace RooFit;
-  
-  lhs.stream() << var.GetName() << " (" << var.GetTitle() << ") = " << var.getVal();
-  if (var.hasAsymError()) {
-    lhs.stream() << " (" << var.getAsymErrorLo() << " +" << var.getAsymErrorHi() << ") (+- " <<  var.getError() << ")";
-  } else {
-    lhs.stream() << " +- " << var.getError();
-  }
-  if (var.isConstant()) lhs.stream() << " C";
-  if (var.hasMin() || var.hasMax()) {
-    lhs.stream() << " L(" << var.getMin() << " - " << var.getMax() << ")";
-  }
-  
-  return lhs;
+template<>
+inline MsgStream& operator<< <RooArgList>(MsgStream& lhs, const RooArgList& argset) {
+  return operator<<(lhs, dynamic_cast<const RooAbsCollection&>(argset));
 }
+
   
 /// MsgStream for errors. Color: Red
 extern MsgStream serr; 

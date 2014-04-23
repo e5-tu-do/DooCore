@@ -2,3 +2,6 @@ add_subdirectory(TestEasyConfig)
 add_subdirectory(TestEasyTuple)
 add_subdirectory(ReplaceScientificNotationInFiles)
 add_subdirectory(TestKinematic)
+add_subdirectory(TestProgress)
+add_subdirectory(TestStatistics)
+

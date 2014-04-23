@@ -65,7 +65,7 @@ private:
   mutable boost::mutex the_mutex;
   boost::condition_variable the_condition_variable;
   boost::condition_variable the_condition_variable_popped;
-  int max_size_;
+  unsigned int max_size_;
 public:
   concurrent_queue(int max_size=-1) : max_size_(max_size) {}
   
@@ -162,7 +162,7 @@ TH1D 		GetPulls(RooPlot * pFrame, bool normalize = true);
 //Same as above but for checking compatibility of two histograms
 TH1D    GetPulls(TH1D* h1, TH1D* h2); 
 ///Prepare canvas with two pads for pull and residual plots, returns numbers for text formatting
-void PreparePadForPulls(TCanvas * c1, RooPlot * pFrame, bool plot_logx, bool plot_logy,
+void PreparePadForPulls(TCanvas * c1, bool plot_logx, bool plot_logy,
 												double & top_label_size, double & top_title_offset, double & title2label_size_ratio,
 												double & bottom_label_size, double & bottom_title_offset);
 
@@ -182,13 +182,13 @@ void PreparePadForPulls(TCanvas * c1, RooPlot * pFrame, bool plot_logx, bool plo
  *  @param h_error error band of Gaussian fit (will be created)
  *  @param legend legend with information (will be created)
  */
-void PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend);
+void PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend, double chi2_reduced, double chi2_pvalue);
 
   
 /**
  *  Plot a distribution histogram of the pulls overlaid with a Gaussian
  */
-void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
+void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "", double chi2_reduced = 0.0, double chi2_pvalue = 0.0);
 
 /**
  *  @brief Plot a RooPlot frame with pulls underneath
@@ -201,54 +201,20 @@ void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
  */
 void PlotPulls(TString pName, RooPlot * pFrame, TLatex& label,
                TString pDir = "", bool plot_logy = false,
-               bool plot_logx = false, bool greyscale = true,
-               std::string gauss_suffix="_Gauss");
+               bool plot_logx = false,
+               std::string gauss_suffix="_Gauss", unsigned int num_fit_params=0);
 
 /**
  *  Overloaded version for compatibility with Legends (no idea how to solve this nicely Tobi 2013-04-17)
  */
 void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "",
                bool plot_logy = false, bool plot_logx = false,
-               bool greyscale = true, TLegend * label = NULL,
+               TLegend * label = NULL,
                std::string gauss_suffix="_Gauss");
-  
-/**
- *  @brief (DEPRECATED:) Plot RooPlot frame with pull distribution
- *
- *  Just a compatibility wrapper for the other PlotPull functions.
- */  
-void PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar,
-               RooAbsPdf * pPDF, TLatex& label, TString pDir = "",
-               bool normalize_residuals = true, bool plot_logy = false,
-               bool plot_logx = false, std::string gauss_suffix="_Gauss");
+ 
+void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, TLatex& label, TString pDir = "", bool normalize_residuals = true, bool plot_logy = false, bool plot_logx = false);
 
-/**
- *  @brief (DEPRECATED:) Plot RooPlot frame with pull distribution
- *
- *  Just a compatibility wrapper for the other PlotPull functions.
- */
-void PlotPulls(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex& label, std::string gauss_suffix="_Gauss");
-  
-/**
- *  @brief (DEPRECATED:) Plot RooPlot frame with pull distribution
- *
- *  Just a compatibility wrapper for the other PlotPull functions.
- */
-void PlotPulls(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLatex& label, std::string gauss_suffix="_Gauss");
-
-//Plot Pulldistribution for two histograms
-void PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label, std::string gauss_suffix="_Gauss");
-
-void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, TLatex& label, TString pDir = "", bool normalize_residuals = true, bool plot_logy = false, bool plot_logx = false);
-
-void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, RooAbsPdf * pPDF, TString pDir, bool normalize_residuals, bool plot_logy, TLegend * label = NULL, bool plot_logx = false);
-  
-/**
- *  @brief (DEPRECATED:) Plot RooPlot frame with old residuals distribution
- *
- *  Just a compatibility wrapper for the other PlotResiduals functions.
- */
-void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, RooAbsPdf * pPDF, TString pDir, bool normalize_residuals, bool plot_logy, TLatex& label, bool plot_logx = false);
+void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, TString pDir, bool normalize_residuals, bool plot_logy, TLegend * label = NULL, bool plot_logx = false);
   
 ///Do an Asymmetry Plot for a given NTuple the name of the time variable and a variable name that is used for a cut (+/-1) to separate two mixing states
 void plotAsymmetry(TString pPlotName, TTree * pTuple, TString pVarTime, TString pVarMix, int pBins = 20, double pRngMax = 0.01, double pRngMin = 0.00, TString pTimeUnit = "ns");
