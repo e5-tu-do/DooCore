@@ -274,7 +274,7 @@ std::pair<double,double> MedianLimitsForTuple(TTree& tree, std::string var_name)
  *  This function calculates the bin boundaries for a given observable that divides the data set in equally 
  *  populated bins. The number of bins can be specified.
  */
-RooBinning GetQuantileBinning(RooDataSet* data, TString nameofquantileobservable, int nbins = 10);
+RooBinning GetQuantileBinning(RooDataSet* data, std::string var_name, int nbins = 10);
 
 } // namespace lutils
 } // namespace doocore

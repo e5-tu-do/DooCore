@@ -1290,144 +1290,6 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   pFrame->SetXTitle(temp_xtitle);
 }
 
-void doocore::lutils::PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label, std::string gauss_suffix) {
-  gStyle->SetTitle(0);
-  
-  TCanvas c1("c_Utils","c_Utils",900,900);
-
-  double top_label_size   = 0;
-  double top_title_offset = 0;
-  double title2label_size_ratio = 0;
-
-  double bottom_label_size = 0;
-  double bottom_title_offset = 0;
-
-  double plot_min = h1->GetXaxis()->GetXmin();
-  double plot_max = h1->GetXaxis()->GetXmax();
-
-  //Used function is actually independent of plotdummy - change PreparePadForPulls() signature later
-  RooPlot* plotdummy = NULL;
-  PreparePadForPulls(&c1, plotdummy, plot_logx, plot_logy, top_label_size, top_title_offset, title2label_size_ratio, bottom_label_size, bottom_title_offset);  
-  
-  TH1D pulls = GetPulls(h1,h2);
-  
-  TH1D * pulls1 = (TH1D*) pulls.Clone("pulls1");
-  TH1D * pulls2 = (TH1D*) pulls.Clone("pulls2");
-  TH1D * pulls3 = (TH1D*) pulls.Clone("pulls3");
-  TH1D * pulls4 = (TH1D*) pulls.Clone("pulls4");
-  
-  //Additional pull histograms for color coding only used if normalize = true
-  pulls1->SetFillColor(18);
-  pulls2->SetFillColor(16);
-  pulls3->SetFillColor(14);
-  pulls4->SetFillColor(12);
-  
-  pulls1->SetLineWidth(2);
-  pulls2->SetLineWidth(2);
-  pulls3->SetLineWidth(2);
-  pulls4->SetLineWidth(2);
-  
-  for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
-    pulls1->SetBinContent(i,0);
-    pulls2->SetBinContent(i,0);
-    pulls3->SetBinContent(i,0);
-    pulls4->SetBinContent(i,0);
-    
-    if (TMath::Abs(pulls.GetBinContent(i)) < 1) {
-      pulls1->SetBinContent(i,pulls.GetBinContent(i));
-    }
-    else if (TMath::Abs(pulls.GetBinContent(i)) < 2) {
-      pulls2->SetBinContent(i,pulls.GetBinContent(i));
-    }
-    else if (TMath::Abs(pulls.GetBinContent(i)) < 3) {
-      pulls3->SetBinContent(i,pulls.GetBinContent(i));
-    }
-    else {
-      pulls4->SetBinContent(i,pulls.GetBinContent(i));
-    }
-  }
-  //end of histogram creation
-
-  c1.cd(1);
-
-  //SavePlotXTitle
-  TString temp_xtitle =  h1->GetXaxis()->GetTitle();
-
-  h1->SetLabelSize(0.0,"x");
-  h1->SetLabelSize(top_label_size,"y");
-  h1->SetXTitle("");
-  h1->SetTitleSize(top_label_size*title2label_size_ratio,"y");
-  h1->GetYaxis()->SetTitleOffset(top_title_offset);
-
-  double max = h1->GetMaximum() > h2->GetMaximum() ? h1->GetMaximum() : h2->GetMaximum();
-  h1->SetMaximum(1.3*max);
-    
-  //pFrame->Draw();
-  h1->SetLineColor(2);
-  h2->SetLineColor(4);
-
-  h1->Draw("E");
-  h2->Draw("E SAME");
-
-  // lower frame with residuals plot
-  c1.cd(2);
-  
-  pulls.SetXTitle(temp_xtitle);
-  pulls.GetXaxis()->SetLimits(plot_min,plot_max);
-  
-  TLine zero_line(plot_min, 0, plot_max, 0);
-  
-  //some boxes for new residual plots:
-  TBox lower_box(plot_min, -1., plot_max, -2.);
-  TBox upper_box(plot_min, +1., plot_max, +2.);
-  
-  upper_box.SetFillColor(11);
-  upper_box.SetFillStyle(1001);
-  upper_box.SetLineWidth(0);
-  lower_box.SetFillColor(11);
-  lower_box.SetFillStyle(1001);
-  lower_box.SetLineWidth(0);
-  
-  //Style for pull histogram
-  pulls.SetLineWidth(2);
-  pulls.SetAxisRange(-5.8,5.8,"Y");
-  pulls.SetTitle("");
-  pulls.SetYTitle("Pull");
-  
-  pulls.SetLabelSize(bottom_label_size, "xy");
-  pulls.SetTitleSize(bottom_label_size*title2label_size_ratio, "xy");
-  pulls.GetYaxis()->SetTitleOffset(bottom_title_offset);  
-  pulls.GetYaxis()->SetNdivisions(5,5,0);
-
-  //Draw pull
-  pulls.Draw();
-  zero_line.Draw();
-  //Draw color coded pull graphs
-  upper_box.Draw();
-  lower_box.Draw();
-  pulls1->Draw("same");
-  pulls2->Draw("same");
-  pulls3->Draw("same");
-  pulls4->Draw("same");
-  
-  gPad->RedrawAxis(); 
-
-  //Draw label, possibly better on c1.cd(1) Tobi 2013-04-16
-  c1.cd(0);
-	if (label) {
-  	label->SetTextSize(0.05);
-  	label->Draw();
-	}
-  
-  printPlot(&c1, pName, pDir);
-
-	//produce a plot with distribution of pulls
-	PlotGauss(pName+gauss_suffix, pulls, pDir);
-
-  // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
-  h1->SetXTitle(temp_xtitle);
-}
-
   
 void doocore::lutils::PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, TLatex& label, TString pDir, bool normalize, bool plot_logy, bool plot_logx) {
 	setStyle();
@@ -1798,27 +1660,27 @@ void doocore::lutils::plotAsymmetry(TString pPlotName, TTree * pTuple, TString p
         delete hUpAsy;
 }
 
-RooBinning doocore::lutils::GetQuantileBinning(RooDataSet* data, TString nameofquantileobservable, int nbins){
+RooBinning doocore::lutils::GetQuantileBinning(RooDataSet* data, std::string var_name, int nbins){
   std::vector<double> data_vector;
-  for (unsigned int i = 0; i < data->numEntries(); i++) {
-    data_vector.push_back(data->get(i)->getRealValue(nameofquantileobservable));
+  for (signed int i = 0; i < data->numEntries(); i++) {
+    data_vector.push_back(data->get(i)->getRealValue(TString(var_name)));
   }
   sort(data_vector.begin(), data_vector.end());
   std::vector<double> probability_vector;
-  for (unsigned int i = 1; i < nbins; i++) {
+  for (signed int i = 1; i < nbins; i++) {
     probability_vector.push_back(1.*i/nbins);
   }
   std::vector<double> xbins(nbins+1,0);
-  RooRealVar* quantilerealvar = dynamic_cast<RooRealVar*>(data->get()->find(nameofquantileobservable));
+  RooRealVar* quantilerealvar = dynamic_cast<RooRealVar*>(data->get()->find(TString(var_name)));
   xbins.front() = quantilerealvar->getMin();
   xbins.back() = quantilerealvar->getMax();
   
   TMath::Quantiles(data_vector.size(), nbins-1, &data_vector[0], &xbins[1], &probability_vector[0]);
   double* xbinarray = new double[xbins.size()];
-  for (int i = 0; i < xbins.size(); i++) {
+  for (unsigned int i = 0; i < xbins.size(); i++) {
     xbinarray[i] = xbins[i];
   }
-  RooBinning Binning(nbins,xbinarray,"Binning_"+nameofquantileobservable);
+  RooBinning Binning(nbins,xbinarray,TString("Binning_"+var_name));
   return Binning;
 }
 
