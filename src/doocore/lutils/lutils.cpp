@@ -1274,9 +1274,10 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   
   gPad->RedrawAxis(); 
 
-  //Draw label, possibly better on c1.cd(1) Tobi 2013-04-16
-  c1.cd(0);
+  //Draw TLegend(label)
+  c1.cd(1);
 	if (label) {
+	label->SetFillColor(kWhite);
   	label->SetTextSize(0.05);
   	label->Draw();
 	}
