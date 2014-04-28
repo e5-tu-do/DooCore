@@ -11,7 +11,10 @@
 #include "TString.h"
 #include "TLatex.h"
 #include "TMath.h"
-#include "TMatrixD.h" 
+#include "TMatrixD.h"
+
+// from RooFit
+#include "RooBinning.h"
 
 // from project
 #include "doocore/io/MsgStream.h"
@@ -156,6 +159,8 @@ void PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, T
 double RunTest(const TH1 & hist);
 ///Returns a residual HISTOGRAM and no fucking RooHist TGraph for the given RooPlot
 TH1D 		GetPulls(RooPlot * pFrame, bool normalize = true);
+//Same as above but for checking compatibility of two histograms
+TH1D    GetPulls(TH1D* h1, TH1D* h2); 
 ///Prepare canvas with two pads for pull and residual plots, returns numbers for text formatting
 void PreparePadForPulls(TCanvas * c1, bool plot_logx, bool plot_logy,
 												double & top_label_size, double & top_title_offset, double & title2label_size_ratio,
@@ -261,7 +266,15 @@ std::pair<double,double> MedianLimitsForTuple(const RooDataSet& dataset, std::st
  *  @param var_name name of variable in dataset to evaluate
  *  @return pair of (double,double) as (min,max) to use for plotting
  */
-std::pair<double,double> MedianLimitsForTuple(TTree& tree, std::string var_name); 
+std::pair<double,double> MedianLimitsForTuple(TTree& tree, std::string var_name);
+
+/**
+ *  @brief Quantile Binning for datasets
+ *
+ *  This function calculates the bin boundaries for a given observable that divides the data set in equally 
+ *  populated bins. The number of bins can be specified.
+ */
+RooBinning GetQuantileBinning(RooDataSet* data, std::string var_name, int nbins = 10);
 
 } // namespace lutils
 } // namespace doocore

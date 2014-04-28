@@ -1274,9 +1274,10 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   
   gPad->RedrawAxis(); 
 
-  //Draw label, possibly better on c1.cd(1) Tobi 2013-04-16
-  c1.cd(0);
+  //Draw TLegend(label)
+  c1.cd(1);
 	if (label) {
+	label->SetFillColor(kWhite);
   	label->SetTextSize(0.05);
   	label->Draw();
 	}
@@ -1659,5 +1660,29 @@ void doocore::lutils::plotAsymmetry(TString pPlotName, TTree * pTuple, TString p
         delete hUpDif;
         delete hUpAsy;
 }
+
+RooBinning doocore::lutils::GetQuantileBinning(RooDataSet* data, std::string var_name, int nbins){
+  std::vector<double> data_vector;
+  for (signed int i = 0; i < data->numEntries(); i++) {
+    data_vector.push_back(data->get(i)->getRealValue(TString(var_name)));
+  }
+  sort(data_vector.begin(), data_vector.end());
+  std::vector<double> probability_vector;
+  for (signed int i = 1; i < nbins; i++) {
+    probability_vector.push_back(1.*i/nbins);
+  }
+  std::vector<double> xbins(nbins+1,0);
+  RooRealVar* quantilerealvar = dynamic_cast<RooRealVar*>(data->get()->find(TString(var_name)));
+  xbins.front() = quantilerealvar->getMin();
+  xbins.back() = quantilerealvar->getMax();
   
+  TMath::Quantiles(data_vector.size(), nbins-1, &data_vector[0], &xbins[1], &probability_vector[0]);
+  double* xbinarray = new double[xbins.size()];
+  for (unsigned int i = 0; i < xbins.size(); i++) {
+    xbinarray[i] = xbins[i];
+  }
+  RooBinning Binning(nbins,xbinarray,TString("Binning_"+var_name));
+  return Binning;
+}
+
 
