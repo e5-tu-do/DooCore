@@ -87,7 +87,7 @@ class ErrorEstimator {
    */
   doocore::statistics::general::ValueWithError<double> Sample(unsigned int num_samples) {
     doocore::io::Progress p("Sampling distribution for ErrorEstimator", num_samples);
-    for (int i=0; i<num_samples; ++i) {
+    for (unsigned int i=0; i<num_samples; ++i) {
       DrawSingleValue();
       ++p;
     }

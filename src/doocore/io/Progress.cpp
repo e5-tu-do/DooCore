@@ -51,7 +51,7 @@ std::string doocore::io::Progress::MakeProgressBar(double fraction) const {
   progress_bar[steps*3] = '|';
   progress_bar[cols-1]  = '|';
   
-  for (int i=1; i<1+cols_filled; ++i) {
+  for (unsigned int i=1; i<1+cols_filled; ++i) {
     progress_bar[i] = '=';
   }
   
