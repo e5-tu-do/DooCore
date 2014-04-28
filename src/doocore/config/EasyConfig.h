@@ -235,6 +235,11 @@ class EasyConfig {
     return filename_; 
   }
   
+  /**
+   *  @brief Print the property tree
+   */
+  void Print() const { DisplayPTree(ptree_); }
+  
  protected:
   
  private:
@@ -248,6 +253,13 @@ class EasyConfig {
    */
   void DisplayPTree(const boost::property_tree::ptree& tree, const int depth = 0) const;
 
+  /**
+   *  @brief Iterate property tree and check for load_config statements
+   *
+   *  @param tree tree to check for load_config
+   */
+  void LoadExternalConfigs(boost::property_tree::ptree& tree);
+  
   /**
    *  @brief debug mode
    */
