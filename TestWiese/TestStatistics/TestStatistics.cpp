@@ -48,6 +48,8 @@ int main() {
   using namespace doocore::statistics::general;
   using namespace doocore::statistics::montecarlo;
   
+  swarn << "Starting TestStatistics.cpp" << endmsg;
+  
   RooRealVar p1("p1", "p1", 10.0, -100.0, 100.0);
   RooRealVar p2("p2", "p2", 10.0, -100.0, 100.0);
   RooArgList args(p1, p2);
@@ -64,14 +66,18 @@ int main() {
   MySampleGenerator mygen;
   ErrorEstimator<MyCalculator, MultiVarGaussianSampleGenerator> est(mycalc, mvggen);
   
-  ValueWithError<double> mcval = est.Sample(10000);
+  ValueWithError<double> mcval(est.Sample(10000));
+  swarn << "Test of ErrorEstimator:" << endmsg;
   sinfo << mcval << " - " << mcval.value << " +/- " << mcval.error << endmsg;
   
   std::vector<ValueWithError<double>> values;
   
   values  += ValueWithError<double>(1.21, 0.12, 56.8149), ValueWithError<double>(0.30, 0.04, 10.804);
   
+  swarn << "Test of std::vector<ValueWithError<double>> printout:" << endmsg;
   sinfo << values << endmsg;
+
+  swarn << "Test of printout for different values and correct usage of auto-precision:" << endmsg;
   sinfo << ValueWithError<double>(0.335646548e-6, 0.335646548e-6) << endmsg;
   sinfo << ValueWithError<double>(122.572427568, 122.572427568) << endmsg;
   sinfo << ValueWithError<double>(3.1415927, 3.1415927) << endmsg;
@@ -115,11 +121,26 @@ int main() {
   sinfo << ValueWithError<double>(0.000010, 0.000010) << endmsg;
   sinfo << ValueWithError<double>(0.0000010, 0.0000010) << endmsg;
   
+
+  swarn << "Test of WeightedAverage:" << endmsg;
   auto mean_error = doocore::statistics::general::WeightedAverage<double>(values.begin(), values.end());
-  
   sinfo << mean_error << endmsg;
   //sinfo << mean_error.value << " +/- " << mean_error.error << endmsg;
   
-  
-  
+  swarn << "Test of PearsonCorrelation:" << endmsg;
+  std::vector<double> x_full;
+  std::vector<double> y_full;
+  x_full += 1, 2, 3, 4, 5, 6, 7, 8, 9;
+  y_full += 2, 4, 6, 8, 10, 12, 14, 16, 18;
+  sinfo << "Full correlation (1): " << PearsonCorrelation(x_full, y_full) << endmsg;
+  std::vector<double> x_full_anti;
+  std::vector<double> y_full_anti;
+  x_full_anti += 1, 2, 3, 4, 5, 6, 7, 8, 9;
+  y_full_anti += 9, 8, 7, 6, 5, 4, 3, 2, 1;
+  sinfo << "Full anti-correlation (-1): " << PearsonCorrelation(x_full_anti, y_full_anti) << endmsg;
+  std::vector<double> x_rdm;
+  std::vector<double> y_rdm;
+  x_rdm += 1.3, 8, 9.2, 1.2, 8.8, 1.9, 4.3;
+  y_rdm += 9.4, 8.8, 1.2, 0.2, 9.4, 8.4, 10.3;
+  sinfo << "No correlation (~0): " << PearsonCorrelation(x_rdm, y_rdm) << endmsg;
 }

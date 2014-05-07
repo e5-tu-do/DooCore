@@ -18,6 +18,9 @@
 // from DooCore
 #include "doocore/io/MsgStream.h"
 
+// from GSL
+#include "gsl/gsl_statistics.h"
+
 // forward decalarations
 
 /**
@@ -233,6 +236,21 @@ namespace general {
     
     return ValueWithError<T>(x_e + sum/static_cast<double>(n),
                              std::sqrt((sum_error - (sum*sum)/static_cast<double>(n))/static_cast<double>(n-1)));
+  }
+
+  /**
+   *  @brief Calculate Pearson product-moment correlation coefficient
+   *
+   *  Based on given iterators of values, the arithmetic mean and the 
+   *  sqrt(sample variance) are computed.
+   *
+   *  @param parameter description
+   *  @param first iterator for values to start with
+   *  @param last iterator for values to end with
+   *  @return arithmetic mean and sqrt(sample variance) as ValueWithError
+   */
+  inline double PearsonCorrelation(const std::vector<double>& x, const std::vector<double>& y, const size_t stride=1) {
+    return gsl_stats_correlation( &x[0], stride, &y[0], stride, x.size());
   }
 
 
