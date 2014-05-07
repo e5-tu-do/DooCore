@@ -6,6 +6,9 @@
 # to Debug prior to calling PROJECT()
 #
 
+project(DooCore)
+cmake_minimum_required(VERSION 2.6)
+
 set(CMAKE_CXX_FLAGS_DBG "-O0 -ggdb -pg" CACHE STRING "Debug options." FORCE)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3" CACHE STRING "Debug options." FORCE)
 SET(CMAKE_CXX_FLAGS_PROFILING "-O3 -pg" CACHE STRING "Debug options." FORCE)
@@ -19,8 +22,8 @@ set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 
 # Project Definition
-project(DooCore)
-cmake_minimum_required(VERSION 2.6)
+#project(DooCore)
+#cmake_minimum_required(VERSION 2.6)
 
 if(${APPLE})
   MESSAGE( STATUS "Building for Mac OS X, switching on C++11 flags for Mac OS X/clang" )
@@ -34,10 +37,12 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 install(FILES external/FindDooCore.cmake DESTINATION cmake/Modules)
 
 FIND_PACKAGE(Boost 1.48 COMPONENTS program_options filesystem regex thread system random REQUIRED)
+set(Boost_LIBRARY_DIRS "$ENV{BOOST_ROOT}/lib")
+
 find_package(ROOT REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIR})
+link_directories(${Boost_LIBRARY_DIRS})
 
 include_directories(${ROOT_INCLUDE_DIR})
 
