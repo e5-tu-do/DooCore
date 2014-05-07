@@ -79,6 +79,8 @@ namespace config {
  *     two "deux"
  *     three "trois"
  *   }
+ *
+ *   load_config "external_file_to_parse.cfg"
  * }
  * @endcode
  * 
