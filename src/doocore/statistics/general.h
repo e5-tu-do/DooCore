@@ -241,13 +241,14 @@ namespace general {
   /**
    *  @brief Calculate Pearson product-moment correlation coefficient
    *
-   *  Based on given iterators of values, the arithmetic mean and the 
-   *  sqrt(sample variance) are computed.
+   *  Based on two std::vector<double>'s, the Pearson product-moment 
+   *  correlation coefficient is calculated
    *
    *  @param parameter description
-   *  @param first iterator for values to start with
-   *  @param last iterator for values to end with
-   *  @return arithmetic mean and sqrt(sample variance) as ValueWithError
+   *  @param x vector of first set of values
+   *  @param y vector of second set of values
+   *  @param stride stride/step-width (default value: 1)
+   *  @return Pearson product-moment correlation coefficient as double
    */
   inline double PearsonCorrelation(const std::vector<double>& x, const std::vector<double>& y, const size_t stride=1) {
     return gsl_stats_correlation( &x[0], stride, &y[0], stride, x.size());
