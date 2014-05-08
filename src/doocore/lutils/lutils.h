@@ -177,13 +177,13 @@ void PreparePadForPulls(TCanvas * c1, RooPlot * pFrame, bool plot_logx, bool plo
  *  @param h_error error band of Gaussian fit (will be created)
  *  @param legend legend with information (will be created)
  */
-void PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend);
+void PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend, double chi2_reduced, double chi2_pvalue);
 
   
 /**
  *  Plot a distribution histogram of the pulls overlaid with a Gaussian
  */
-void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
+void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "", double chi2_reduced = 0.0, double chi2_pvalue = 0.0);
 
 /**
  *  @brief Plot a RooPlot frame with pulls underneath
@@ -197,7 +197,7 @@ void PlotGauss(TString pName, const TH1 & pulls, TString pDir = "");
 void PlotPulls(TString pName, RooPlot * pFrame, TLatex& label,
                TString pDir = "", bool plot_logy = false,
                bool plot_logx = false, bool greyscale = true,
-               std::string gauss_suffix="_Gauss");
+               std::string gauss_suffix="_Gauss", unsigned int num_fit_params=0);
 
 /**
  *  Overloaded version for compatibility with Legends (no idea how to solve this nicely Tobi 2013-04-17)
