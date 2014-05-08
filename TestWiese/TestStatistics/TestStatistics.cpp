@@ -142,5 +142,5 @@ int main() {
   std::vector<double> y_rdm;
   x_rdm += 1.3, 8, 9.2, 1.2, 8.8, 1.9, 4.3;
   y_rdm += 9.4, 8.8, 1.2, 0.2, 9.4, 8.4, 10.3;
-  sinfo << "No correlation (~0): " << PearsonCorrelation(x_rdm, y_rdm) << endmsg;
+  sinfo << "No correlation (0.00449236908671472): " << PearsonCorrelation(x_rdm, y_rdm) << endmsg;
 }
