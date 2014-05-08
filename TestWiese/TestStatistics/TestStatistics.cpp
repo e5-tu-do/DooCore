@@ -21,6 +21,10 @@ using namespace boost::assign; // bring 'operator+=()' into scope
 #include "doocore/io/MsgStream.h"
 #include "doocore/lutils/lutils.h"
 
+// from GSL
+#include "gsl/gsl_randist.h"
+#include "gsl/gsl_rng.h"
+
 class MySampleGenerator {
  public:
   MySampleGenerator() : rand_() {}
@@ -127,20 +131,54 @@ int main() {
   sinfo << mean_error << endmsg;
   //sinfo << mean_error.value << " +/- " << mean_error.error << endmsg;
   
-  swarn << "Test of PearsonCorrelation:" << endmsg;
+  swarn << "Test of PearsonCorrelation (incl. permutation test and bootstrap test):" << endmsg;
   std::vector<double> x_full;
   std::vector<double> y_full;
   x_full += 1, 2, 3, 4, 5, 6, 7, 8, 9;
   y_full += 2, 4, 6, 8, 10, 12, 14, 16, 18;
   sinfo << "Full correlation (1): " << PearsonCorrelation(x_full, y_full) << endmsg;
+  sinfo << "Permutation Test: p = " << PermutationTest(x_full, y_full) << endmsg;
+  std::pair<double, double> xy_full_corr_conv = BootstrapTest(x_full, y_full);
+  sinfo << "Bootstrap Test: LOW: " << xy_full_corr_conv.first << ", HIGH: " << xy_full_corr_conv.second << endmsg;
+  sinfo << "" << endmsg;
+
   std::vector<double> x_full_anti;
   std::vector<double> y_full_anti;
   x_full_anti += 1, 2, 3, 4, 5, 6, 7, 8, 9;
   y_full_anti += 9, 8, 7, 6, 5, 4, 3, 2, 1;
   sinfo << "Full anti-correlation (-1): " << PearsonCorrelation(x_full_anti, y_full_anti) << endmsg;
+  sinfo << "Permutation Test: p = " << PermutationTest(x_full_anti, y_full_anti) << endmsg;
+  std::pair<double, double> xy_full_anti_corr_conv = BootstrapTest(x_full_anti, y_full_anti);
+  sinfo << "Bootstrap Test: LOW: " << xy_full_anti_corr_conv.first << ", HIGH: " << xy_full_anti_corr_conv.second << endmsg;
+  sinfo << "" << endmsg;
+
   std::vector<double> x_rdm;
   std::vector<double> y_rdm;
   x_rdm += 1.3, 8, 9.2, 1.2, 8.8, 1.9, 4.3;
   y_rdm += 9.4, 8.8, 1.2, 0.2, 9.4, 8.4, 10.3;
+
+  // std::generate(x_rdm.begin(), x_rdm.end(), std::default_random_engine(1));
+  // std::generate(y_rdm.begin(), y_rdm.end(), std::default_random_engine(10000));
   sinfo << "No correlation (0.00449236908671472): " << PearsonCorrelation(x_rdm, y_rdm) << endmsg;
+  sinfo << "Permutation Test: p = " << PermutationTest(x_rdm, y_rdm) << endmsg;
+  std::pair<double, double> xy_rdm_corr_conv = BootstrapTest(x_rdm, y_rdm);
+  sinfo << "Bootstrap Test: LOW: " << xy_rdm_corr_conv.first << " , HIGH:" << xy_rdm_corr_conv.second << endmsg;
+  sinfo << "" << endmsg;
+
+  std::vector<double> x_rdm_wc;
+  std::vector<double> y_rdm_wc;
+
+  gsl_rng * r = gsl_rng_alloc (gsl_rng_taus);
+  double a;
+  double b;
+  for (int i = 0; i < 500; i++){
+    gsl_ran_bivariate_gaussian(r, 0.5, 0.5, 0.1, &a, &b);
+    x_rdm_wc.push_back(a);
+    y_rdm_wc.push_back(b);  
+  }
+
+  sinfo << "rho = 0.1: " << PearsonCorrelation(x_rdm_wc, y_rdm_wc) << endmsg;
+  sinfo << "Permutation Test: p = " << PermutationTest(x_rdm_wc, y_rdm_wc) << endmsg;
+  std::pair<double, double> xy_rdm_wc_corr_conv = BootstrapTest(x_rdm_wc, y_rdm_wc);
+  sinfo << "Bootstrap Test: LOW: " << xy_rdm_wc_corr_conv.first << " , HIGH:" << xy_rdm_wc_corr_conv.second << endmsg;
 }
