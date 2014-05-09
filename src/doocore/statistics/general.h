@@ -209,6 +209,29 @@ namespace general {
     
     return ValueWithError<T>(sum/sum_weights,TMath::Sqrt(sum_error)/sum_weights);
   }
+
+  /**
+   *  @brief Calculate weighted average based on values and weights
+   *
+   *  Based on a provided dataset including weights the weighted average is computed. 
+   *
+   *  @param x vector of values
+   *  @param w vector of weights
+   *  @return weighted average as double
+   */
+  inline double WeightedAverage(const std::vector<double>&x, const std::vector<double>& w){
+    if (x.size() != w.size()){
+      doocore::io::serr << "WeightedAverage: Different size of vectors!" << doocore::io::endmsg;
+      abort();
+    }
+    double numerator = 0;
+    double denominator = 0;
+    for (unsigned long i = 0; i < x.size(); i++){
+      numerator += x.at(i) * w.at(i);
+      denominator += w.at(i);
+    }
+    return numerator / denominator;
+  }
   
   /**
    *  @brief Calculate arithmetic mean based on values
@@ -241,6 +264,50 @@ namespace general {
   }
 
   /**
+   *  @brief Calculate weighted covariance based on provides values and weights
+   *
+   *  Based on two given vectors of values and a vector of weights the 
+   *  weighted covariance is calculated.
+   *
+   *  @param parameter description
+   *  @param x vector of first set of values
+   *  @param y vector of second set of values
+   *  @param w vector of weight values
+   *  @return weighted covariance as double
+   */
+  inline double WeightedCovariance(const std::vector<double>&x, const std::vector<double>& y, const std::vector<double>&w){
+    if ((x.size() != y.size()) || (x.size() != w.size())){
+      doocore::io::serr << "WeightedCovariance: Different size of vectors!" << doocore::io::endmsg;
+      abort();
+    }
+
+    // using reimplementation to prevent unnecessary loops
+    // double numerator = 0;
+    // double denominator = 0;
+    // double w_avg_x = WeightedAverage(x, w);
+    // double w_avg_y = WeightedAverage(y, w);
+    // for (unsigned long i = 0; i < x.size(); i++){
+    //   numerator += w.at(i) * (x.at(i) - w_avg_x) * (y.at(i) - w_avg_y);
+    //   denominator += w.at(i);
+    // }
+    // return numerator / denominator;
+
+    double xy_sum(0), x_sum(0), y_sum(0), w_sum(0);
+    for (unsigned long i = 0; i < x.size(); i++){
+      xy_sum += w.at(i) * x.at(i) * y.at(i);
+      x_sum += w.at(i) * x.at(i);
+      y_sum += w.at(i) * y.at(i);
+      w_sum += w.at(i);
+    }
+
+    xy_sum /= w_sum;
+    x_sum /= w_sum;
+    y_sum /= w_sum;
+
+    return xy_sum - x_sum * y_sum;
+  }
+
+  /**
    *  @brief Calculate Pearson product-moment correlation coefficient
    *
    *  Based on two std::vector<double>'s, the Pearson product-moment 
@@ -254,6 +321,49 @@ namespace general {
    */
   inline double PearsonCorrelation(const std::vector<double>& x, const std::vector<double>& y, const size_t stride=1) {
     return gsl_stats_correlation( &x[0], stride, &y[0], stride, x.size());
+  }
+
+  /**
+   *  @brief Calculate weighted Pearson product-moment correlation coefficient
+   *
+   *  Based on two std::vector<double>'s for the values and one additional vector 
+   *  for the associated weights, the Pearson product-moment correlation 
+   *  coefficient is calculated
+   *
+   *  @param parameter description
+   *  @param x vector of first set of values
+   *  @param y vector of second set of values
+   *  @param w vector of weight values
+   *  @return weighted Pearson product-moment correlation coefficient as double
+   */
+  inline double WeightedPearsonCorrelation(const std::vector<double>& x, const std::vector<double>& y, const std::vector<double>& w){
+    if ((x.size() != y.size()) || (x.size() != w.size())){
+      doocore::io::serr << "WeightedPearsonCorrelation: Different size of vectors!" << doocore::io::endmsg;
+      abort();
+    }
+    
+    // using re-implementation to prevend unnecessary loops
+    // double numerator = WeightedCovariance(x, y, w);
+    // double denominator = sqrt(WeightedCovariance(x, x, w) * WeightedCovariance(y, y, w));
+    // return numerator / denominator;
+
+    double xy_sum(0), x_sum(0), x2_sum(0), y2_sum(0), y_sum(0), w_sum(0);
+    for (unsigned long i = 0; i < x.size(); i++){
+      xy_sum += w.at(i) * x.at(i) * y.at(i);
+      x_sum += w.at(i) * x.at(i);
+      y_sum += w.at(i) * y.at(i);
+      x2_sum += w.at(i) * x.at(i) * x.at(i);
+      y2_sum += w.at(i) * y.at(i) * y.at(i);
+      w_sum += w.at(i);
+    }
+
+    xy_sum /= w_sum;
+    x_sum /= w_sum;
+    y_sum /= w_sum;
+    x2_sum /= w_sum;
+    y2_sum /= w_sum;
+
+    return (xy_sum-x_sum*y_sum)/(sqrt(x2_sum-(x_sum*x_sum))*sqrt(y2_sum-(y_sum*y_sum)));
   }
 
   /**
@@ -316,8 +426,6 @@ namespace general {
       doocore::io::serr << "BootstrapTest: Different size of vectors!" << doocore::io::endmsg;
       abort();
     }
-    double rho = PearsonCorrelation(x, y, 1); // Pearson correlation coeff for original data
-
     std::vector<double> x_prime;
     std::vector<double> y_prime;
 
@@ -332,8 +440,6 @@ namespace general {
       // resampling vectors
       x_prime.clear();
       y_prime.clear();
-      unsigned long x_rndm_idx;
-      unsigned long y_rndm_idx;
 
       for (unsigned long i = 0; i < vx_size; i++ ){
         unsigned long idx = uniform_int(mersenne_generator);

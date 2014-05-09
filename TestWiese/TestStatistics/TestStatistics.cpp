@@ -53,6 +53,7 @@ int main() {
   using namespace doocore::statistics::montecarlo;
   
   swarn << "Starting TestStatistics.cpp" << endmsg;
+  swarn << "" << endmsg;
   
   RooRealVar p1("p1", "p1", 10.0, -100.0, 100.0);
   RooRealVar p2("p2", "p2", 10.0, -100.0, 100.0);
@@ -76,10 +77,17 @@ int main() {
   
   std::vector<ValueWithError<double>> values;
   
-  values  += ValueWithError<double>(1.21, 0.12, 56.8149), ValueWithError<double>(0.30, 0.04, 10.804);
+  values  += 
+  ValueWithError<double>(1.2, 0.034, 0.2),
+  ValueWithError<double>(2.6, 0.12, 1.3),
+  ValueWithError<double>(4.9, 0.94, 0.9),
+  ValueWithError<double>(7.2, 1.45, 1.2),
+  ValueWithError<double>(10.3, 0.87, 1.4);
+  swarn << "" << endmsg;
   
   swarn << "Test of std::vector<ValueWithError<double>> printout:" << endmsg;
   sinfo << values << endmsg;
+  swarn << "" << endmsg;
 
   swarn << "Test of printout for different values and correct usage of auto-precision:" << endmsg;
   sinfo << ValueWithError<double>(0.335646548e-6, 0.335646548e-6) << endmsg;
@@ -124,13 +132,27 @@ int main() {
   sinfo << ValueWithError<double>(0.00010, 0.00010) << endmsg;
   sinfo << ValueWithError<double>(0.000010, 0.000010) << endmsg;
   sinfo << ValueWithError<double>(0.0000010, 0.0000010) << endmsg;
-  
+  swarn << "" << endmsg;
 
   swarn << "Test of WeightedAverage:" << endmsg;
   auto mean_error = doocore::statistics::general::WeightedAverage<double>(values.begin(), values.end());
   sinfo << mean_error << endmsg;
-  //sinfo << mean_error.value << " +/- " << mean_error.error << endmsg;
+  // sdebug << mean_error.value << " +/- " << mean_error.error << endmsg;
+  std::vector<double> x_wavg;
+  std::vector<double> w_wavg_neg;
+  std::vector<double> w_wavg_pos;
+  x_wavg += 1.2, 2.6, 4.9, 7.2, 10.3;
+  w_wavg_neg += -6.3, 2.8, 1.4, -3.7, 10.8;
+  w_wavg_pos += 0.2, 1.3, 0.9, 1.2, 1.4;
+  sinfo << WeightedAverage(x_wavg, w_wavg_pos) << endmsg;
+  swarn << "" << endmsg;
   
+  swarn << "Test of WeightedCovariance:" << endmsg;
+  std::vector<double> y_wavg;
+  y_wavg += 3.4, 1.9, 6.8, 5.8, 11.4;
+  sinfo << WeightedCovariance(x_wavg, y_wavg, w_wavg_neg) << endmsg;
+  swarn << "" << endmsg;
+
   swarn << "Test of PearsonCorrelation (incl. permutation test and bootstrap test):" << endmsg;
   std::vector<double> x_full;
   std::vector<double> y_full;
@@ -154,8 +176,8 @@ int main() {
 
   std::vector<double> x_rdm;
   std::vector<double> y_rdm;
-  x_rdm += 1.3, 8, 9.2, 1.2, 8.8, 1.9, 4.3;
-  y_rdm += 9.4, 8.8, 1.2, 0.2, 9.4, 8.4, 10.3;
+  x_rdm += 1.3, 8, 9.2, 1.2, 8.8;//, 1.9, 4.3;
+  y_rdm += 9.4, 8.8, 1.2, 0.2, 9.4;//, 8.4, 10.3;
 
   // std::generate(x_rdm.begin(), x_rdm.end(), std::default_random_engine(1));
   // std::generate(y_rdm.begin(), y_rdm.end(), std::default_random_engine(10000));
@@ -181,4 +203,8 @@ int main() {
   sinfo << "Permutation Test: p = " << PermutationTest(x_rdm_wc, y_rdm_wc) << endmsg;
   std::pair<double, double> xy_rdm_wc_corr_conv = BootstrapTest(x_rdm_wc, y_rdm_wc);
   sinfo << "Bootstrap Test: LOW: " << xy_rdm_wc_corr_conv.first << " , HIGH:" << xy_rdm_wc_corr_conv.second << endmsg;
+  sinfo << "" << endmsg;
+
+  swarn << "Test of WeightedPearsonCorrelation:" << endmsg;
+  sinfo << WeightedPearsonCorrelation(x_rdm, y_rdm, w_wavg_pos) << endmsg;
 }
