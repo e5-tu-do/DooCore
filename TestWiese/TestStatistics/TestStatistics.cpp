@@ -150,7 +150,7 @@ int main() {
   swarn << "Test of WeightedCovariance:" << endmsg;
   std::vector<double> y_wavg;
   y_wavg += 3.4, 1.9, 6.8, 5.8, 11.4;
-  sinfo << WeightedCovariance(x_wavg, y_wavg, w_wavg_neg) << endmsg;
+  sinfo << Covariance(x_wavg, y_wavg, w_wavg_pos) << endmsg;
   swarn << "" << endmsg;
 
   swarn << "Test of PearsonCorrelation (incl. permutation test and bootstrap test):" << endmsg;
@@ -176,12 +176,15 @@ int main() {
 
   std::vector<double> x_rdm;
   std::vector<double> y_rdm;
-  x_rdm += 1.3, 8, 9.2, 1.2, 8.8;//, 1.9, 4.3;
-  y_rdm += 9.4, 8.8, 1.2, 0.2, 9.4;//, 8.4, 10.3;
+  std::vector<double> w_rdm;
+  x_rdm += 1.3, 8, 9.2, 1.2, 8.8, 1.9, 4.3, 3.4;
+  y_rdm += 9.4, 8.8, 1.2, 0.2, 9.4, 8.4, 10.3, 7.2;
+  // w_rdm += 0.1, 0.2, 0.3, 0.4, 0.9, 0.8, 0.7, 0.6;
+  w_rdm += 1, 1, 1, 1, 1, 1, 1, 1;
 
   // std::generate(x_rdm.begin(), x_rdm.end(), std::default_random_engine(1));
   // std::generate(y_rdm.begin(), y_rdm.end(), std::default_random_engine(10000));
-  sinfo << "No correlation (0.00449236908671472): " << PearsonCorrelation(x_rdm, y_rdm) << endmsg;
+  sinfo << "No correlation: " << PearsonCorrelation(x_rdm, y_rdm) << endmsg;
   sinfo << "Permutation Test: p = " << PermutationTest(x_rdm, y_rdm) << endmsg;
   std::pair<double, double> xy_rdm_corr_conv = BootstrapTest(x_rdm, y_rdm);
   sinfo << "Bootstrap Test: LOW: " << xy_rdm_corr_conv.first << " , HIGH:" << xy_rdm_corr_conv.second << endmsg;
@@ -189,6 +192,7 @@ int main() {
 
   std::vector<double> x_rdm_wc;
   std::vector<double> y_rdm_wc;
+  // std::vector<double> w_rdm_wc(500, 1);
 
   gsl_rng * r = gsl_rng_alloc (gsl_rng_taus);
   double a;
@@ -205,6 +209,10 @@ int main() {
   sinfo << "Bootstrap Test: LOW: " << xy_rdm_wc_corr_conv.first << " , HIGH:" << xy_rdm_wc_corr_conv.second << endmsg;
   sinfo << "" << endmsg;
 
-  swarn << "Test of WeightedPearsonCorrelation:" << endmsg;
-  sinfo << WeightedPearsonCorrelation(x_rdm, y_rdm, w_wavg_pos) << endmsg;
+  swarn << "Test of weighted PearsonCorrelation (incl. bootstrap test):" << endmsg;
+  sinfo << PearsonCorrelation(x_rdm, y_rdm, w_rdm) << endmsg;
+  sinfo << BootstrapTest(x_rdm, y_rdm, w_rdm) << endmsg;
+
+  // sinfo << PearsonCorrelation(x_rdm_wc, y_rdm_wc, w_rdm_wc) << endmsg;
+  // sinfo << BootstrapTest(x_rdm_wc, y_rdm_wc, w_rdm_wc) << endmsg;
 }
