@@ -31,7 +31,7 @@
  * This namespace contains all DooCore functionality that does statistics
  * calculations.
  *
- * @author Florian Kruse
+ * @author Florian Kruse, Christophe Cauet
  */
 
 /**
@@ -39,7 +39,7 @@
  * @brief DooCore general statistics functionality namespace
  *
  * This namespace contains all DooCore functionality that does general 
- * statistics calculations that is not part os a more specialised namespace.
+ * statistics calculations that is not part of a more specialised namespace.
  */
 
 namespace doocore {
@@ -215,8 +215,8 @@ namespace general {
    *
    *  Based on a provided dataset including weights the weighted average is computed. 
    *
-   *  @param x vector of values
-   *  @param w vector of weights
+   *  @param x vector of first set of values
+   *  @param y vector of second set of values
    *  @return weighted average as double
    */
   inline double WeightedAverage(const std::vector<double>&x, const std::vector<double>& w){
@@ -275,13 +275,13 @@ namespace general {
    *  @param w vector of weight values
    *  @return weighted covariance as double
    */
-  inline double WeightedCovariance(const std::vector<double>&x, const std::vector<double>& y, const std::vector<double>&w){
+  inline double Covariance(const std::vector<double>&x, const std::vector<double>& y, const std::vector<double>&w){
     if ((x.size() != y.size()) || (x.size() != w.size())){
-      doocore::io::serr << "WeightedCovariance: Different size of vectors!" << doocore::io::endmsg;
+      doocore::io::serr << "Covariance: Different size of vectors!" << doocore::io::endmsg;
       abort();
     }
 
-    // using reimplementation to prevent unnecessary loops
+    // using re-implementation to prevent unnecessary loops
     // double numerator = 0;
     // double denominator = 0;
     // double w_avg_x = WeightedAverage(x, w);
@@ -319,7 +319,8 @@ namespace general {
    *  @param stride stride/step-width (default value: 1)
    *  @return Pearson product-moment correlation coefficient as double
    */
-  inline double PearsonCorrelation(const std::vector<double>& x, const std::vector<double>& y, const size_t stride=1) {
+  inline double PearsonCorrelation(const std::vector<double>& x, const std::vector<double>& y) {
+    int stride = 1;
     return gsl_stats_correlation( &x[0], stride, &y[0], stride, x.size());
   }
 
@@ -336,15 +337,15 @@ namespace general {
    *  @param w vector of weight values
    *  @return weighted Pearson product-moment correlation coefficient as double
    */
-  inline double WeightedPearsonCorrelation(const std::vector<double>& x, const std::vector<double>& y, const std::vector<double>& w){
+  inline double PearsonCorrelation(const std::vector<double>& x, const std::vector<double>& y, const std::vector<double>& w){
     if ((x.size() != y.size()) || (x.size() != w.size())){
-      doocore::io::serr << "WeightedPearsonCorrelation: Different size of vectors!" << doocore::io::endmsg;
+      doocore::io::serr << "PearsonCorrelation: Different size of vectors!" << doocore::io::endmsg;
       abort();
     }
     
     // using re-implementation to prevend unnecessary loops
-    // double numerator = WeightedCovariance(x, y, w);
-    // double denominator = sqrt(WeightedCovariance(x, x, w) * WeightedCovariance(y, y, w));
+    // double numerator = Covariance(x, y, w);
+    // double denominator = sqrt(Covariance(x, x, w) * Covariance(y, y, w));
     // return numerator / denominator;
 
     double xy_sum(0), x_sum(0), x2_sum(0), y2_sum(0), y_sum(0), w_sum(0);
@@ -387,7 +388,7 @@ namespace general {
       doocore::io::serr << "PermutationTest: Different size of vectors!" << doocore::io::endmsg;
       abort();
     }
-    double rho = PearsonCorrelation(x, y, 1); // Pearson correlation coeff for original data
+    double rho = PearsonCorrelation(x, y); // Pearson correlation coeff for original data
 
     // copy y to y_prime to shuffle
     std::vector<double> y_prime = y;
@@ -397,7 +398,7 @@ namespace general {
     unsigned long n_larger = 0; // number of correlations larger than rho
     for (unsigned long i = 0; i < n_permutations; ++i){
       std::shuffle(std::begin(y_prime), std::end(y_prime), mersenne_generator);
-      double r = PearsonCorrelation(x, y_prime, 1);
+      double r = PearsonCorrelation(x, y_prime);
       if (((rho > 0) && (r > rho)) || ((rho < 0) && (r < rho))){
         n_larger++;
       }
@@ -446,14 +447,65 @@ namespace general {
         x_prime.push_back(x.at(idx));
         y_prime.push_back(y.at(idx));
       }
-      r.push_back(PearsonCorrelation(x_prime, y_prime, 1));
+      r.push_back(PearsonCorrelation(x_prime, y_prime));
     }
     std::sort(r.begin(), r.end());
     double quantile_lo = gsl_stats_quantile_from_sorted_data(&r[0], 1, n_permutations, 0.025);
     double quantile_hi = gsl_stats_quantile_from_sorted_data(&r[0], 1, n_permutations, 0.975);
 
-    // doocore::io::sdebug << "BootstrapTest: lo = " << quantile_lo << doocore::io::endmsg;
-    // doocore::io::sdebug << "BootstrapTest: hi = " << quantile_hi << doocore::io::endmsg;
+    return std::make_pair(quantile_lo, quantile_hi);
+  }
+
+  /**
+   *  @brief Bootstrap test for weighted data
+   *
+   *  Based on two std::vector<double>'s for the values and one additional vector 
+   *  for the associated weights, a 95% CL for the underlying sample 
+   *  distribution is calculated
+   *
+   *  see: http://en.wikipedia.org/wiki/Bootstrapping_(statistics)
+   *  
+   *  @param parameter description
+   *  @param x vector of first set of values
+   *  @param y vector of second set of values
+   *  @param w vector of weight values
+   *  @param n_permutations number of permutations (default value: 1000)
+   *  @return low (2.5%) and high (97.5%) quantile values as std::pair<double, double> 
+   */
+  inline std::pair<double, double> BootstrapTest(const std::vector<double>& x, const std::vector<double>& y, const std::vector<double>& w, const unsigned long n_permutations=1000){
+    if ((x.size() != y.size()) || (x.size() != w.size())){
+      doocore::io::serr << "BootstrapTest: Different size of vectors!" << doocore::io::endmsg;
+      abort();
+    }
+    std::vector<double> x_prime;
+    std::vector<double> y_prime;
+    std::vector<double> w_prime;
+
+    unsigned long vx_size = x.size();
+
+    std::random_device random_device;
+    std::mt19937 mersenne_generator(random_device());
+    std::uniform_int_distribution<> uniform_int(0, vx_size-1);
+
+    std::vector<double> r;
+    for (unsigned long i = 0; i < n_permutations; ++i){
+      // resampling vectors
+      x_prime.clear();
+      y_prime.clear();
+      w_prime.clear();
+
+      for (unsigned long i = 0; i < vx_size; i++ ){
+        unsigned long idx = uniform_int(mersenne_generator);
+        x_prime.push_back(x.at(idx));
+        y_prime.push_back(y.at(idx));
+        w_prime.push_back(w.at(idx));
+      }
+      r.push_back(PearsonCorrelation(x_prime, y_prime, w_prime));
+    }
+    std::sort(r.begin(), r.end());
+    double quantile_lo = gsl_stats_quantile_from_sorted_data(&r[0], 1, n_permutations, 0.025);
+    double quantile_hi = gsl_stats_quantile_from_sorted_data(&r[0], 1, n_permutations, 0.975);
+
     return std::make_pair(quantile_lo, quantile_hi);
   }
 
