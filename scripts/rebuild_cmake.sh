@@ -16,7 +16,7 @@ then
   rm -rf bin/ cfg/ CMake* cmake_install.cmake Makefile lib/ main/ src/
 fi
 
-echo "Building CMake build system for installation to $DOOFITSYS."
+echo "Building CMake build system for installation to $DOOCORESYS."
 if [ "$1" = "debug" ]
 then
   $CMAKE_EXECUTABLE -DCMAKE_INSTALL_PREFIX=$DOOCORESYS -DCMAKE_BUILD_TYPE=Dbg $CMAKE_BASE_DIR
