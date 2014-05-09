@@ -12,13 +12,14 @@
 // from TMVA
 
 // from BOOST
-#ifdef __GNUG__
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#endif
+//#if defined(__GNUG__) && !defined(__clang__)
+//#define BOOST_NO_CXX11_SCOPED_ENUMS
+//#endif
 #include <boost/filesystem.hpp>
 
 // from DooCore
 #include <doocore/io/MsgStream.h>
+#include "doocore/statistics/general.h"
 
 // from here
 
@@ -70,11 +71,6 @@ class Summary {
   static Summary& GetInstance();
   
   /**
-   *  @brief Destructor for Summary
-   */
-  //static void DestroyInstance();
-  
-  /**
    *  @brief add a key/value pair to the summary
    */
   void Add(TString description, TString argument);
@@ -83,6 +79,17 @@ class Summary {
   void Add(TString description, std::string argument);
   void Add(TString description, double argument);
   void Add(TString description, int argument);
+  
+  /**
+   *  @brief Add a value with error to the Summary
+   */
+  template<typename T>
+  void Add(TString description, doocore::statistics::general::ValueWithError<T> argument) {
+    std::pair<TString, TString> tpair;
+    tpair.first  = description;
+    tpair.second = argument.FormatString();
+    log_.push_back(tpair);
+  }
   
   /**
    *  @brief add a section to the summary

@@ -11,9 +11,9 @@
 // from TMVA
 
 // from BOOST
-#ifdef __GNUG__
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#endif
+//#if defined(__GNUG__) && !defined(__clang__)
+//#define BOOST_NO_CXX11_SCOPED_ENUMS
+//#endif
 #include "boost/filesystem.hpp"
 #include "boost/regex.hpp"
 #include "boost/lexical_cast.hpp"
@@ -62,7 +62,7 @@ void ReplaceScientificNotationInFile(std::string filename, bool debug_mode){
         std::string coefficient( what[1].first, what[1].second );
         std::string sign( what[2].first, what[2].second );
         std::string exponent( what[3].first, what[3].second );
-        int coefficient_int(boost::lexical_cast<int>(coefficient));
+        //int coefficient_int(boost::lexical_cast<int>(coefficient));
         int exponent_int(boost::lexical_cast<int>(exponent));
 
         for (int i = 0; i < exponent_int; ++i){zeros+="0";}

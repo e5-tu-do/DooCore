@@ -200,6 +200,7 @@ namespace general {
     T sum_weights = 0.0;
     T sum_error   = 0.0;
     while (first != last) {
+//      doocore::io::sdebug << "x = " << (*first).value << ", e = " << (*first).error << ", w = " << (*first).weight << doocore::io::endmsg;
       sum         += (*first).weight * (*first).value;
       sum_weights += (*first).weight;
       sum_error   += (*first).weight*(*first).weight*(*first).error*(*first).error;

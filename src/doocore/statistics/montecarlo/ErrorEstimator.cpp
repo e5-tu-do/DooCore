@@ -59,7 +59,7 @@ const RooArgSet* doocore::statistics::montecarlo::MultiVarGaussianSampleGenerato
   
   const RooArgSet* values;
   pos_dataset_++;
-  if (dataset_ == NULL || pos_dataset_ >= dataset_->numEntries()) {
+  if (dataset_ == NULL || pos_dataset_ >= static_cast<unsigned int>(dataset_->numEntries())) {
     pos_dataset_ = 0;
     int num_generate = std::max(100, 2*static_cast<int>(num_generated_));
     num_generated_ += num_generate;
