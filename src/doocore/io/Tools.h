@@ -35,7 +35,7 @@ namespace tools {
  */
 void ReplaceScientificNotationInFile(std::string filename, bool debug_mode=false);
 
-}; // namespace tools
+} // namespace tools
 } // namespace io
 } // namespace doocore
 
