@@ -215,4 +215,44 @@ int main() {
 
   // sinfo << PearsonCorrelation(x_rdm_wc, y_rdm_wc, w_rdm_wc) << endmsg;
   // sinfo << BootstrapTest(x_rdm_wc, y_rdm_wc, w_rdm_wc) << endmsg;
+
+  swarn << "Correlation between 'Divorce rate in Maine' and 'Per capita consuption of margarine (US)':" << endmsg;
+  std::vector<double> divorce_rate_in_maine;
+  divorce_rate_in_maine += 5.0, 4.7, 4.6, 4.4, 4.3, 4.1, 4.2, 4.2, 4.2, 4.1;
+  std::vector<double> margarine_consuption;
+  margarine_consuption += 8.2, 7.0, 6.5, 5.3, 5.2, 4.0, 4.6, 4.5, 4.2, 3.7;
+  sinfo << "rho = " << PearsonCorrelation(divorce_rate_in_maine, margarine_consuption) << endmsg;
+  sinfo << "p = " << PermutationTest(divorce_rate_in_maine, margarine_consuption) << endmsg;
+  sinfo << "95% CL: " << BootstrapTest(divorce_rate_in_maine, margarine_consuption) << endmsg;
+  sinfo << "" << endmsg;
+
+  swarn << "Correlation between 'Number of people who drowned by falling into a swimming-pool' and 'Number of films Nicolas Cage appeared in':" << endmsg;
+  std::vector<double> drowned_in_swimming_pool;
+  drowned_in_swimming_pool += 109, 102, 102, 98, 85, 95, 96, 98, 123, 94, 102;
+  std::vector<double> number_of_films_w_nicolas_cage;
+  number_of_films_w_nicolas_cage += 2, 2, 2, 3, 1, 1, 2, 3, 4, 1, 4;
+  sinfo << "rho = " << PearsonCorrelation(drowned_in_swimming_pool, number_of_films_w_nicolas_cage) << endmsg;
+  sinfo << "p = " << PermutationTest(drowned_in_swimming_pool, number_of_films_w_nicolas_cage) << endmsg;
+  sinfo << "95% CL: " << BootstrapTest(drowned_in_swimming_pool, number_of_films_w_nicolas_cage) << endmsg;
+  sinfo << "" << endmsg;
+
+  swarn << "Correlation between 'Honey producing bee colonies (US)' and 'Juveline arrests for possession of marijuana':" << endmsg;
+  std::vector<double> honey_bees;
+  honey_bees += 3.220, 3.211, 3.045, 2.875, 2.783, 2.655, 2.581, 2.631, 2.637, 2.652, 2.622, 2.550, 2.574, 2.599, 2.554, 2.409, 2.394, 2.443, 2.342, 2.498;
+  std::vector<double> marijuana_arrests;
+  marijuana_arrests += 20.940, 16.490, 25.004, 37.915, 61.003, 82.015, 87.712, 94.046, 91.467, 89.523, 95.962, 97.088, 85.769, 87.909, 87.717, 88.909, 95.120, 97.671, 93.042, 90.927;
+  sinfo << "rho = " << PearsonCorrelation(honey_bees, marijuana_arrests) << endmsg;
+  sinfo << "p = " << PermutationTest(honey_bees, marijuana_arrests) << endmsg;
+  sinfo << "95% CL: " << BootstrapTest(honey_bees, marijuana_arrests) << endmsg;
+  sinfo << "" << endmsg;
+
+  swarn << "Correlation between 'Sunlight in Arkansas' and 'Female Editors on Harvard Law Review':" << endmsg;
+  std::vector<double> sunlight_in_arkansas;
+  sunlight_in_arkansas += 17243.83, 17327.61, 16681.82, 17031.89, 16475.66;
+  std::vector<double> female_editors_harvard_law_review;
+  female_editors_harvard_law_review += 9, 14, 19, 12, 19;
+  sinfo << "rho = " << PearsonCorrelation(sunlight_in_arkansas, female_editors_harvard_law_review) << endmsg;
+  sinfo << "p = " << PermutationTest(sunlight_in_arkansas, female_editors_harvard_law_review) << endmsg;
+  sinfo << "95% CL: " << BootstrapTest(sunlight_in_arkansas, female_editors_harvard_law_review) << endmsg;
+  sinfo << "" << endmsg;
 }
