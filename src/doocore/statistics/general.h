@@ -7,6 +7,7 @@
 #include <cfenv>
 #include <string>
 #include <chrono>
+#include <random>
 
 // from Boost
 #include <boost/format.hpp>
