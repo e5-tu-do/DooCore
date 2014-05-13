@@ -144,7 +144,7 @@ int main() {
   x_wavg += 1.2, 2.6, 4.9, 7.2, 10.3;
   w_wavg_neg += -6.3, 2.8, 1.4, -3.7, 10.8;
   w_wavg_pos += 0.2, 1.3, 0.9, 1.2, 1.4;
-  sinfo << WeightedAverage(x_wavg, w_wavg_pos) << endmsg;
+  sinfo << WeightedAverage<double>(x_wavg.begin(), x_wavg.end(), w_wavg_pos.begin()) << endmsg;
   swarn << "" << endmsg;
   
   swarn << "Test of WeightedCovariance:" << endmsg;
