@@ -26,7 +26,9 @@ TEST(TestDoocoreStatisticsGeneral_WeightedAverage, CorrectOutputCheck){
     std::vector<double_t> errors{0.2, 0.3, 0.4};
     
     doocore::statistics::general::ValueWithError<double_t> testWeightedAverage = doocore::statistics::general::WeightedAverage<double_t>(values.begin(), values.end(), weights.begin(), errors.begin());
-    
+    doocore::statistics::general::ValueWithError<double_t> testArithmeticMean = doocore::statistics::general::ArithmeticMean<double_t>(values.begin(), values.end());
+
     EXPECT_EQ("1.60 +/- 0.16", testWeightedAverage.FormatString());
+    EXPECT_EQ("2.0 +/- 1.0", testArithmeticMean.FormatString());
 
 }
