@@ -1,7 +1,7 @@
 include(ExternalProject)
 
-set(TARGETS dcConfig dcIO dcLUtils dcPhysics dcStatistics dcSystem)
-set(GTEST_TARGET test_doocore)
+set(TARGET dcConfig)
+set(GTEST_TARGET ${TARGET}_test)
 file(GLOB_RECURSE TESTS_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
 
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/ThirdParty)
@@ -34,7 +34,7 @@ endif()
 add_executable(${GTEST_TARGET} EXCLUDE_FROM_ALL ${TESTS_FILES})
 target_link_libraries(
     ${GTEST_TARGET}
-    ${TARGETS}
+    ${TARGET}
     ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${Suffix}
     ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${Suffix}
     ${ALL_LIBRARIES}
