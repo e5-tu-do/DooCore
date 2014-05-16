@@ -90,14 +90,24 @@ namespace general {
     } else {
       std::fesetround(FE_TONEAREST);
       int mantissa_err   = std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))));
-      T exp_err     = std::log10(error);
-      T abs_exp_err = std::abs(exp_err);
+      
+//      using namespace doocore::io;
+//      sdebug << "std::log10(error) = " << std::log10(error) << endmsg;
+//      sdebug << "std::floor(std::log10(error)) = " << std::floor(std::log10(error)) << endmsg;
+//      sdebug << "std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) = " << std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) << endmsg;
+//      sdebug << "error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) = " << error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) << endmsg;
+//      sdebug << "std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error))))) = " << std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error))))) << endmsg;
       
       // additional digits if mantissa of error <= 3.54
       int add_digits     = 0;
       if (mantissa_err <= 354) add_digits++;
       
+      T exp_err     = std::log10(error);
+      T abs_exp_err = std::abs(exp_err);
+      
       std::string format;
+      
+//      sdebug << "std::abs(std::log10(error)) = " << abs_exp_err << endmsg;
       
       // depending on exponent use scientific notation or not
       if (abs_exp_err < 5) {
@@ -107,6 +117,9 @@ namespace general {
         } else {
           format = "%.0f";
         }
+        
+//        sdebug << "format = " << format << endmsg;
+        std::fesetround(FE_TONEAREST);
         output << boost::format(format) % value << " +/- " << boost::format(format) % error;
       } else {
         format = "%." + std::to_string(add_digits) + "f";

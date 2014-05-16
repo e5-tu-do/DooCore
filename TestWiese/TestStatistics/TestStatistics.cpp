@@ -6,6 +6,7 @@
 // from Boost
 #include <boost/assign/std/vector.hpp> // for 'operator+=()'
 using namespace boost::assign; // bring 'operator+=()' into scope
+#include <boost/format.hpp>
 
 // from ROOT
 #include "TRandom3.h"
@@ -54,6 +55,11 @@ int main() {
   
   swarn << "Starting TestStatistics.cpp" << endmsg;
   swarn << "" << endmsg;
+  
+  ValueWithError<double> test_num(0.99,0.109);
+  sinfo << "My parameter is " << test_num << doocore::io::endmsg;
+
+  sinfo << boost::format("%.2f") % 0.109 << endmsg;
   
   RooRealVar p1("p1", "p1", 10.0, -100.0, 100.0);
   RooRealVar p2("p2", "p2", 10.0, -100.0, 100.0);
