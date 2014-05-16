@@ -55,8 +55,7 @@ int main() {
   swarn << "Starting TestStatistics.cpp" << endmsg;
   swarn << "" << endmsg;
   
-  ValueWithError<double_t> test_num(0.99,0.109);
-  test_num.FormatString();
+  ValueWithError<double> test_num(0.99,0.109);
   sinfo << "My parameter is " << test_num << doocore::io::endmsg;
   
   RooRealVar p1("p1", "p1", 10.0, -100.0, 100.0);

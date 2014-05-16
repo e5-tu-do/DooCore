@@ -90,6 +90,14 @@ namespace general {
     } else {
       std::fesetround(FE_TONEAREST);
       int mantissa_err   = std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))));
+      
+      using namespace doocore::io;
+      sdebug << "std::log10(error) = " << std::log10(error) << endmsg;
+      sdebug << "std::floor(std::log10(error)) = " << std::floor(std::log10(error)) << endmsg;
+      sdebug << "std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) = " << std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) << endmsg;
+      sdebug << "error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) = " << error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) << endmsg;
+      sdebug << "std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error))))) = " << std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error))))) << endmsg;
+      
       T exp_err     = std::log10(error);
       T abs_exp_err = std::abs(exp_err);
       
