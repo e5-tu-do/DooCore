@@ -7,6 +7,7 @@
 #include <cfenv>
 #include <string>
 #include <chrono>
+#include <random>
 
 // from Boost
 #include <boost/format.hpp>
@@ -89,14 +90,24 @@ namespace general {
     } else {
       std::fesetround(FE_TONEAREST);
       int mantissa_err   = std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))));
-      T exp_err     = std::log10(error);
-      T abs_exp_err = std::abs(exp_err);
+      
+//      using namespace doocore::io;
+//      sdebug << "std::log10(error) = " << std::log10(error) << endmsg;
+//      sdebug << "std::floor(std::log10(error)) = " << std::floor(std::log10(error)) << endmsg;
+//      sdebug << "std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) = " << std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) << endmsg;
+//      sdebug << "error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) = " << error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) << endmsg;
+//      sdebug << "std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error))))) = " << std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error))))) << endmsg;
       
       // additional digits if mantissa of error <= 3.54
       int add_digits     = 0;
       if (mantissa_err <= 354) add_digits++;
       
+      T exp_err     = std::log10(error);
+      T abs_exp_err = std::abs(exp_err);
+      
       std::string format;
+      
+//      sdebug << "std::abs(std::log10(error)) = " << abs_exp_err << endmsg;
       
       // depending on exponent use scientific notation or not
       if (abs_exp_err < 5) {
@@ -106,6 +117,9 @@ namespace general {
         } else {
           format = "%.0f";
         }
+        
+//        sdebug << "format = " << format << endmsg;
+        std::fesetround(FE_TONEAREST);
         output << boost::format(format) % value << " +/- " << boost::format(format) % error;
       } else {
         format = "%." + std::to_string(add_digits) + "f";
@@ -209,30 +223,35 @@ namespace general {
     
     return ValueWithError<T>(sum/sum_weights,TMath::Sqrt(sum_error)/sum_weights);
   }
-
+  
   /**
    *  @brief Calculate weighted average based on values and weights
    *
-   *  Based on a provided dataset including weights the weighted average is computed. 
+   *  Based on given iterators of values and weights, the weighted 
+   *  average is computed. For the values first and last iterators
+   *  are used for the range to calcutate upon. For weights it is 
+   *  assumed that the same range is valid.
    *
-   *  @param x vector of first set of values
-   *  @param y vector of second set of values
-   *  @return weighted average as double
+   *  @param first iterator for values to start with
+   *  @param last iterator for values to end with
+   *  @param first_weight iterator for weights to start with
+   *  @return weighted average as T
    */
-  inline double WeightedAverage(const std::vector<double>&x, const std::vector<double>& w){
-    if (x.size() != w.size()){
-      doocore::io::serr << "WeightedAverage: Different size of vectors!" << doocore::io::endmsg;
-      abort();
+  template <typename T, typename ValueIterator, typename WeightIterator>
+  inline T WeightedAverage(ValueIterator first, ValueIterator last,
+                                    WeightIterator first_weight) {
+    T sum         = 0.0;
+    T sum_weights = 0.0;
+    while (first != last) {
+      sum         += (*first_weight) * (*first);
+      sum_weights += (*first_weight);
+      ++first_weight;
+      ++first;
     }
-    double numerator = 0;
-    double denominator = 0;
-    for (unsigned long i = 0; i < x.size(); i++){
-      numerator += x.at(i) * w.at(i);
-      denominator += w.at(i);
-    }
-    return numerator / denominator;
+    
+    return sum/sum_weights;
   }
-  
+
   /**
    *  @brief Calculate arithmetic mean based on values
    *

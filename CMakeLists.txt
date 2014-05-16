@@ -40,6 +40,7 @@ FIND_PACKAGE(Boost 1.48 COMPONENTS program_options filesystem regex thread syste
 set(Boost_LIBRARY_DIRS "$ENV{BOOST_ROOT}/lib")
 
 find_package(ROOT REQUIRED)
+FIND_PACKAGE(GSL REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
