@@ -36,7 +36,7 @@ doocore::io::EasyTuple::EasyTuple(const std::string& file_name, const std::strin
   dataset_(NULL),
   tree_name_(tree_name),
   num_maximum_events_(-1),
-  cut_variable_range_(kCutExclusive)
+  cut_variable_range_(kCutInclusive)
 {
   file_ = new TFile(file_name.c_str());
   argset_ = new RooArgSet(argset);
@@ -78,7 +78,7 @@ tree_(tree),
 argset_(NULL),
 dataset_(NULL),
 num_maximum_events_(-1),
-cut_variable_range_(kCutExclusive)
+cut_variable_range_(kCutInclusive)
 {
   argset_ = new RooArgSet(argset);
   
