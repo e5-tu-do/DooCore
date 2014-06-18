@@ -42,31 +42,68 @@ EasyConfig::EasyConfig(std::string filename, bool debug_mode){
   LoadConfigFile(filename);
 }
 
-EasyConfig::~EasyConfig(){}
+EasyConfig::~EasyConfig(){
+  using namespace doocore::io;
+}
 
 void EasyConfig::LoadConfigFile(std::string filename){
   doocore::config::Summary::GetInstance().AddFile(filename);
-  if (debug_mode_) doocore::io::sinfo << "Reading config file " << filename << "..." << doocore::io::endmsg;
+  if (debug_mode_) doocore::io::sdebug << "Reading config file " << filename << "..." << doocore::io::endmsg;
   filename_ = filename;
   read_info(filename, ptree_);
+  
+  LoadExternalConfigs(ptree_);
+  
   if (debug_mode_) DisplayPTree(ptree_);
 }
 
+void EasyConfig::LoadExternalConfigs(boost::property_tree::ptree& tree) {
+  using namespace doocore::io;
+  using namespace boost::property_tree;
+  for (auto element : tree) {
+//    boost::property_tree::ptree& sub_tree = element.second;
+//boost::property_tree::ptree& sub_tree = tree.get_child(element.first);
+    boost::optional<boost::property_tree::ptree&> sub_tree_optional = tree.get_child_optional(element.first);
+    if (sub_tree_optional && (*sub_tree_optional).size() > 0) {
+      boost::property_tree::ptree& sub_tree = *sub_tree_optional;
+      LoadExternalConfigs(sub_tree);
+    } else {
+      if (element.first == "load_config") {
+        std::string filename_config = element.second.data();
+        
+        if (filename_config.size() > 0) {
+          boost::property_tree::ptree new_ptree;
+          read_info(filename_config, new_ptree);
+          //DisplayPTree(new_ptree);
+          
+          for (auto element_ext : new_ptree) {
+            tree.add_child(element_ext.first, element_ext.second);
+          }
+        }
+      }
+    }
+  }
+}
+  
 void EasyConfig::DisplayPTree(const boost::property_tree::ptree& tree, const int depth) const {
- BOOST_FOREACH( boost::property_tree::ptree::value_type const&v, tree.get_child("") ) {  
-  boost::property_tree::ptree subtree = v.second;  
-  std::string nodestr = tree.get<std::string>(v.first);  
-  
-  // print current node  
-  doocore::io::sinfo << std::string("").assign(depth*2,' ') << "- ";  
-  doocore::io::sinfo << v.first;  
-  if ( nodestr.length() > 0 )   
-    doocore::io::sinfo << " = \"" << tree.get<std::string>(v.first) << "\"";  
-  doocore::io::sinfo << doocore::io::endmsg;  
-  
-  // recursive go down the hierarchy  
-  DisplayPTree(subtree, depth+1);  
- }
+  using namespace doocore::io;
+  for (auto element : tree) {
+    boost::property_tree::ptree& subtree = element.second;
+    std::string nodestr = element.second.data();
+    
+    // print current node
+    doocore::io::sinfo << std::string("").assign(depth*2,' ') << "- ";
+    doocore::io::sinfo << element.first;
+    if (nodestr.length() > 0) {
+      doocore::io::sinfo << " = \"" << element.second.data() << "\"";
+    }
+    doocore::io::sinfo << doocore::io::endmsg;
+    
+    if (subtree.size() > 0) {
+      // recursive go down the hierarchy
+      DisplayPTree(subtree, depth+1);
+    }
+  }
 }
 
 boost::property_tree::ptree EasyConfig::getPTree(){

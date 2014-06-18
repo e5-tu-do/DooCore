@@ -25,4 +25,6 @@ int main(int argc, char *argv[]){
   doocore::io::sout << "real key exists: " << cfg.KeyExists("doubles") << doocore::io::endmsg;
   doocore::io::sout << "absurd key exists: " << cfg.KeyExists("YoMamaKey") << doocore::io::endmsg;
 
+  
+  cfg.Print();
 }
