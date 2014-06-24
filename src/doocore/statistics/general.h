@@ -204,6 +204,19 @@ namespace general {
    *  average and its error are computed. The first and last iterators are used 
    *  for the range to calcutate upon. 
    *
+   *  Reference for calculation of error:
+   *  http://de.wikipedia.org/w/index.php?title=Arithmetisches_Mittel&oldid=131359158
+   *  (Sorry, cannot find any better source anymore. Hard to find a general
+   *  formula with weight_i != 1/error_i^2)
+   *
+   *  In the special case of chosing weight_i = 1/error_i^2, the error 
+   *  simplifies to
+   *
+   *  error_mean = 1/sqrt(sum(1/error_i^2)) (which is often quoted in literature)
+   *
+   *  So in case you want this default behaviour, simply make sure that weights
+   *  are defined accordingly.
+   *
    *  @param first iterator for values to start with
    *  @param last iterator for values to end with
    *  @return weighted average and its error as ValueWithError
@@ -222,6 +235,51 @@ namespace general {
     }
     
     return ValueWithError<T>(sum/sum_weights,TMath::Sqrt(sum_error)/sum_weights);
+  }
+
+  /**
+   *  @brief Calculate weighted average and its error from sample variance based on values with and weights
+   *
+   *  Based on given iterators of value/weight compunds, the weighted
+   *  average and its error are computed. The first and last iterators are used 
+   *  for the range to calcutate upon. 
+   *
+   *  Errors for each ValueWithError are ignored. Instead, the error for the 
+   *  computed average is derived from the weighted sample variance as
+   *
+   *  error = sqrt(sample_variance)/sqrt(sum(w_i))
+   *
+   *  where sample_variance is:
+   *
+   *  sample_variance = sum(w_i*(x_i - <x>)^2)/sum(w_i)
+   *
+   *  This error is an estimator for the error of the average if the individual
+   *  values follow a Gaussian distribution with the width sample_variance.
+   *
+   *  @param first iterator for values to start with
+   *  @param last iterator for values to end with
+   *  @return weighted average and its error as ValueWithError
+   */
+  template <typename T, typename ValueWithErrorIterator>
+  inline ValueWithError<T> WeightedAverageWithSampleVariance(ValueWithErrorIterator first, ValueWithErrorIterator last) {
+    T sum         = 0.0;
+    T sum_weights = 0.0;
+    T sum_error   = 0.0;
+    ValueWithErrorIterator start = first;
+    while (first != last) {
+//      doocore::io::sdebug << "x = " << (*first).value << ", e = " << (*first).error << ", w = " << (*first).weight << doocore::io::endmsg;
+      sum         += (*first).weight * (*first).value;
+      sum_weights += (*first).weight;
+      ++first;
+    }
+    first = start;
+    sum /= sum_weights;
+    while (first != last) {
+      sum_error   += (*first).weight * std::pow((*first).value-sum, 2);
+      ++first;
+    }
+    
+    return ValueWithError<T>(sum,TMath::Sqrt(sum_error)/sum_weights);
   }
   
   /**
