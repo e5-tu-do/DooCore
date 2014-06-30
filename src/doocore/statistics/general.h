@@ -86,8 +86,14 @@ namespace general {
       full_precision_printout_ = full_precision_printout;
     }
     
+    const std::string& str_value() const { return str_value_; }
+    const std::string& str_error() const { return str_error_; }
+    
    private:
     bool full_precision_printout_;
+    
+    mutable std::string str_value_;
+    mutable std::string str_error_;
   };
   
   template<typename T>
@@ -95,10 +101,27 @@ namespace general {
     std::stringstream output;
     
     if (full_precision_printout_) {
-      output << std::setprecision(12) << value << " +/- " << error;
+      std::stringstream sstr_value;
+      sstr_value << std::setprecision(10) << value;
+      str_value_ = sstr_value.str();
+      
+      std::stringstream sstr_error;
+      sstr_error << std::setprecision(10) << error;
+      str_error_ = sstr_error.str();
+      
+      output << str_value_ << " +/- " << str_error_;
     } else {
       if (error == 0.0) {
-        output << value << " +/- " << error;
+        
+        std::stringstream sstr_value;
+        sstr_value << value;
+        str_value_ = sstr_value.str();
+        
+        std::stringstream sstr_error;
+        sstr_error << error;
+        str_error_ = sstr_error.str();
+        
+        output << str_value_ << " +/- " << str_error_;
       } else {
         std::fesetround(FE_TONEAREST);
         int mantissa_err   = std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))));
@@ -122,14 +145,23 @@ namespace general {
           }
 
           std::fesetround(FE_TONEAREST);
-          output << boost::format(format) % value << " +/- " << boost::format(format) % error;
+          str_value_ = str(boost::format(format) % value);
+          str_error_ = str(boost::format(format) % error);
+          output << str_value_ << " +/- " << str_error_;
         } else {
           format = "%." + std::to_string(add_digits) + "f";
           T exp_new_err      = std::floor(exp_err);
           T mantissa_new_err = error/std::pow(10.0,exp_new_err);
           T mantissa_new_val = value/std::pow(10.0,exp_new_err);
           
-          output << boost::format(format) % mantissa_new_val << "e" << exp_new_err << " +/- " << boost::format(format) % mantissa_new_err << "e" << exp_new_err;
+          std::stringstream sstr_value;
+          sstr_value << boost::format(format) % mantissa_new_val << "e" << exp_new_err;
+          str_value_ = sstr_value.str();
+
+          std::stringstream sstr_error;
+          sstr_error << boost::format(format) % mantissa_new_err << "e" << exp_new_err;
+          str_error_ = sstr_error.str();
+          output << str_value_ << " +/- " << str_error_;
         }
       }
       
