@@ -8,6 +8,7 @@
 #include <string>
 #include <chrono>
 #include <random>
+#include <iomanip>
 
 // from Boost
 #include <boost/format.hpp>
@@ -64,8 +65,8 @@ namespace general {
   template<typename T>
   class ValueWithError {
    public:
-    ValueWithError(T val, T err) : value(val), error(err), weight(1.0) {}
-    ValueWithError(T val, T err, T wgt) : value(val), error(err), weight(wgt) {}
+    ValueWithError(T val, T err) : value(val), error(err), weight(1.0), full_precision_printout_(false) {}
+    ValueWithError(T val, T err, T wgt) : value(val), error(err), weight(wgt), full_precision_printout_(false) {}
     
     /**
      *  @brief Format value +/- error with PDG rounding
@@ -80,57 +81,59 @@ namespace general {
     T value;
     T error;
     T weight;
+    
+    void set_full_precision_printout(bool full_precision_printout) {
+      full_precision_printout_ = full_precision_printout;
+    }
+    
+   private:
+    bool full_precision_printout_;
   };
   
   template<typename T>
   std::string doocore::statistics::general::ValueWithError<T>::FormatString() const {
     std::stringstream output;
-    if (error == 0.0) {
-      output << value << " +/- " << error;
-    } else {
-      std::fesetround(FE_TONEAREST);
-      int mantissa_err   = std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))));
-      
-//      using namespace doocore::io;
-//      sdebug << "std::log10(error) = " << std::log10(error) << endmsg;
-//      sdebug << "std::floor(std::log10(error)) = " << std::floor(std::log10(error)) << endmsg;
-//      sdebug << "std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) = " << std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) << endmsg;
-//      sdebug << "error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) = " << error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))) << endmsg;
-//      sdebug << "std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error))))) = " << std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error))))) << endmsg;
-      
-      // additional digits if mantissa of error <= 3.54
-      int add_digits     = 0;
-      if (mantissa_err <= 354) add_digits++;
-      
-      T exp_err     = std::log10(error);
-      T abs_exp_err = std::abs(exp_err);
-      
-      std::string format;
-      
-//      sdebug << "std::abs(std::log10(error)) = " << abs_exp_err << endmsg;
-      
-      // depending on exponent use scientific notation or not
-      if (abs_exp_err < 5) {
-        if (exp_err < 1.0) {
-          std::fesetround(FE_DOWNWARD);
-          format = "%." + std::to_string(static_cast<int>(std::abs(std::nearbyint(exp_err))+add_digits)) + "f";
-        } else {
-          format = "%.0f";
-        }
-        
-//        sdebug << "format = " << format << endmsg;
-        std::fesetround(FE_TONEAREST);
-        output << boost::format(format) % value << " +/- " << boost::format(format) % error;
-      } else {
-        format = "%." + std::to_string(add_digits) + "f";
-        T exp_new_err      = std::floor(exp_err);
-        T mantissa_new_err = error/std::pow(10.0,exp_new_err);
-        T mantissa_new_val = value/std::pow(10.0,exp_new_err);
-        
-        output << boost::format(format) % mantissa_new_val << "e" << exp_new_err << " +/- " << boost::format(format) % mantissa_new_err << "e" << exp_new_err;
-      }
-    }
     
+    if (full_precision_printout_) {
+      output << std::setprecision(12) << value << " +/- " << error;
+    } else {
+      if (error == 0.0) {
+        output << value << " +/- " << error;
+      } else {
+        std::fesetround(FE_TONEAREST);
+        int mantissa_err   = std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))));
+        
+        // additional digits if mantissa of error <= 3.54
+        int add_digits     = 0;
+        if (mantissa_err <= 354) add_digits++;
+        
+        T exp_err     = std::log10(error);
+        T abs_exp_err = std::abs(exp_err);
+        
+        std::string format;
+        
+        // depending on exponent use scientific notation or not
+        if (abs_exp_err < 5) {
+          if (exp_err < 1.0) {
+            std::fesetround(FE_DOWNWARD);
+            format = "%." + std::to_string(static_cast<int>(std::abs(std::nearbyint(exp_err))+add_digits)) + "f";
+          } else {
+            format = "%.0f";
+          }
+
+          std::fesetround(FE_TONEAREST);
+          output << boost::format(format) % value << " +/- " << boost::format(format) % error;
+        } else {
+          format = "%." + std::to_string(add_digits) + "f";
+          T exp_new_err      = std::floor(exp_err);
+          T mantissa_new_err = error/std::pow(10.0,exp_new_err);
+          T mantissa_new_val = value/std::pow(10.0,exp_new_err);
+          
+          output << boost::format(format) % mantissa_new_val << "e" << exp_new_err << " +/- " << boost::format(format) % mantissa_new_err << "e" << exp_new_err;
+        }
+      }
+      
+    }
     return output.str();
   }
 
