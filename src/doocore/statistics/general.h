@@ -253,6 +253,9 @@ namespace general {
    *
    *  sample_variance = sum(w_i*(x_i - <x>)^2)/sum(w_i)
    *
+   *  This error is an estimator for the error of the average if the individual
+   *  values follow a Gaussian distribution with the width sample_variance.
+   *
    *  @param first iterator for values to start with
    *  @param last iterator for values to end with
    *  @return weighted average and its error as ValueWithError
