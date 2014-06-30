@@ -228,7 +228,7 @@ protected:
   /**
    *  \brief Stream for file output.
    */
-   std::ofstream filestream_;
+  std::ofstream filestream_;
 };
 
 /// \brief MsgStream function to end a message (i.e. newline) and force the output. 
