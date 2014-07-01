@@ -115,6 +115,8 @@ namespace general {
     
     const std::string& str_value() const { return str_value_; }
     const std::string& str_error() const { return str_error_; }
+    const std::string& str_error_lo() const { return str_error_lo_; }
+    const std::string& str_error_hi() const { return str_error_hi_; }
     
    private:
     bool full_precision_printout_;
