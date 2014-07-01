@@ -138,6 +138,32 @@ int main() {
   sinfo << ValueWithError<double>(0.00010, 0.00010) << endmsg;
   sinfo << ValueWithError<double>(0.000010, 0.000010) << endmsg;
   sinfo << ValueWithError<double>(0.0000010, 0.0000010) << endmsg;
+
+  sinfo << ValueWithError<double>(35400000, 354000, 354000, 356000) << endmsg;
+  sinfo << ValueWithError<double>(3540000, 35400, 35400, 35600) << endmsg;
+  sinfo << ValueWithError<double>(354000, 3540, 3540, 3560) << endmsg;
+  sinfo << ValueWithError<double>(35400, 354, 354, 356) << endmsg;
+  sinfo << ValueWithError<double>(3540, 35.4, 35.4, 35.6) << endmsg;
+  sinfo << ValueWithError<double>(35.4, 3.54, 3.54, 3.56) << endmsg;
+  sinfo << ValueWithError<double>(3.54, 0.354, 0.354, 0.356) << endmsg;
+  sinfo << ValueWithError<double>(3.4, 0.0354, 0.0354, 0.0356) << endmsg;
+  sinfo << ValueWithError<double>(0.354, 0.00354, 0.00354, 0.00356) << endmsg;
+  sinfo << ValueWithError<double>(0.0354, 0.000354, 0.000354, 0.000356) << endmsg;
+  sinfo << ValueWithError<double>(0.00354, 0.0000354, 0.0000354, 0.0000356) << endmsg;
+  sinfo << ValueWithError<double>(0.000354, 0.00000354, 0.00000354, 0.00000356) << endmsg;
+
+  sinfo << ValueWithError<double>(35400000, 354000, 356000, 356000) << endmsg;
+  sinfo << ValueWithError<double>(3540000, 35400, 35600, 35600) << endmsg;
+  sinfo << ValueWithError<double>(354000, 3540, 3560, 3560) << endmsg;
+  sinfo << ValueWithError<double>(35400, 354, 356, 356) << endmsg;
+  sinfo << ValueWithError<double>(3540, 35.4, 35.6, 35.6) << endmsg;
+  sinfo << ValueWithError<double>(35.4, 3.54, 3.56, 3.56) << endmsg;
+  sinfo << ValueWithError<double>(3.54, 0.354, 0.356, 0.356) << endmsg;
+  sinfo << ValueWithError<double>(3.4, 0.0354, 0.0356, 0.0356) << endmsg;
+  sinfo << ValueWithError<double>(0.354, 0.00354, 0.00356, 0.00356) << endmsg;
+  sinfo << ValueWithError<double>(0.0354, 0.000354, 0.000356, 0.000356) << endmsg;
+  sinfo << ValueWithError<double>(0.00354, 0.0000354, 0.0000356, 0.0000356) << endmsg;
+  sinfo << ValueWithError<double>(0.000354, 0.00000354, 0.00000356, 0.00000356) << endmsg;
   swarn << "" << endmsg;
 
   swarn << "Test of printout with and without usage of auto-precision:" << endmsg;
@@ -145,6 +171,13 @@ int main() {
   sinfo << num << endmsg;
   num.set_full_precision_printout(true);
   sinfo << num << endmsg;
+  
+  swarn << "Test of printout with and without usage of auto-precision with asymmetric errors:" << endmsg;
+  ValueWithError<double> num_asym(3.928191, 0.3472, 0.3627, 0.3231);
+  sinfo << num_asym << endmsg;
+  num_asym.set_full_precision_printout(true);
+  sinfo << num_asym << endmsg;
+
   
   swarn << "Test of WeightedAverage:" << endmsg;
   auto mean_error = doocore::statistics::general::WeightedAverage<double>(values.begin(), values.end());
