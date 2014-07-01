@@ -36,7 +36,7 @@ doocore::io::EasyTuple::EasyTuple(const std::string& file_name, const std::strin
   dataset_(NULL),
   tree_name_(tree_name),
   num_maximum_events_(-1),
-  cut_variable_range_(kCutExclusive)
+  cut_variable_range_(kCutInclusive)
 {
   file_ = new TFile(file_name.c_str());
   argset_ = new RooArgSet(argset);
@@ -78,7 +78,7 @@ tree_(tree),
 argset_(NULL),
 dataset_(NULL),
 num_maximum_events_(-1),
-cut_variable_range_(kCutExclusive)
+cut_variable_range_(kCutInclusive)
 {
   argset_ = new RooArgSet(argset);
   
@@ -163,15 +163,6 @@ doocore::io::EasyTuple::~EasyTuple() {
   if (argset_ != NULL) delete argset_;
   if (tree_ != NULL && file_!= NULL) delete tree_;
   if (file_ != NULL) delete file_;
-}
-
-RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const std::string& cut) {
-  if (argset_ == NULL) {
-    serr << "Internal argset not set. Cannot convert to RooDataSet without this." << endmsg;
-    throw 4;
-  }
-    
-  return ConvertToDataSet(*argset_, cut);
 }
 
 RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooCmdArg& arg1,
@@ -281,20 +272,6 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset,
   }
   
   return *dataset_;
-}
-
-RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, const std::string& cut) {
-  swarn << "doocore::io::EasyTuple::ConvertToDataSet(const std::string& cut) and doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, const std::string& cut) are deprecated." << endmsg;
-  swarn << "These functions will be removed in a future version of DooCore. Please use the appropriate versions with RooCmdArgs instead:" << endmsg;
-  swarn << " - doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset, const RooCmdArg& arg1, ...)" << endmsg;
-  swarn << " - doocore::io::EasyTuple::ConvertToDataSet(const RooCmdArg& arg1, ...)" << endmsg;
-  swarn << "In these a cut can be specified via the Cut(...) RooCmdArg." << endmsg;
-  
-  if (cut.length() == 0) {
-    return ConvertToDataSet(argset);
-  } else {
-    return ConvertToDataSet(argset, Cut(cut.c_str()));
-  }
 }
 
 RooRealVar& doocore::io::EasyTuple::Var(const std::string& name) {
