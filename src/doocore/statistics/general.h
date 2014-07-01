@@ -52,6 +52,17 @@ namespace general {
    *  @class doocore::statistics::general::ValueWithError
    *  @brief Simple value with error compound type (and optional weight)
    *
+   *  This class allows to store values and additional information such as
+   *  an error, a weight and asymmetric errors. It is intended as a container
+   *  to simplify printout and handling in calculations.
+   *
+   *  Keep in mind that not all classes and functions working with 
+   *  ValueWithError will always be able to handle all stored information
+   *  correctly. For example, a weighted average of values with asymmetric 
+   *  errors is far from trivial. A common best practise is to always store 
+   *  a more or less meaningful symmetric error as well when using asymmetric 
+   *  errors.
+   *
    *  @section Usage
    *
    *  @code
@@ -65,8 +76,13 @@ namespace general {
   template<typename T>
   class ValueWithError {
    public:
-    ValueWithError(T val, T err) : value(val), error(err), weight(1.0), full_precision_printout_(false) {}
-    ValueWithError(T val, T err, T wgt) : value(val), error(err), weight(wgt), full_precision_printout_(false) {}
+    ValueWithError(T val, T err, T err_lo, T err_hi, T wgt) : value(val), error(err), weight(wgt), error_lo(err_lo), error_hi(err_hi), full_precision_printout_(false) {}
+
+    ValueWithError(T val, T err, T err_lo, T err_hi) : ValueWithError(val, err, err_lo, err_hi, 1.0) {}
+    
+    ValueWithError(T val, T err, T wgt) : ValueWithError(val, err, 0.0, 0.0, wgt) {}
+
+    ValueWithError(T val, T err) : ValueWithError(val, err, 0.0, 0.0, 1.0) {}
     
     /**
      *  @brief Format value +/- error with PDG rounding
@@ -81,19 +97,34 @@ namespace general {
     T value;
     T error;
     T weight;
-    
+
+    /**
+     *  @brief Lower asymmetric error
+     */
+    T error_lo;
+
+    /**
+     *  @brief Upper asymmetric error
+     */
+    T error_hi;
+
+
     void set_full_precision_printout(bool full_precision_printout) {
       full_precision_printout_ = full_precision_printout;
     }
     
     const std::string& str_value() const { return str_value_; }
     const std::string& str_error() const { return str_error_; }
+    const std::string& str_error_lo() const { return str_error_lo_; }
+    const std::string& str_error_hi() const { return str_error_hi_; }
     
    private:
     bool full_precision_printout_;
     
     mutable std::string str_value_;
     mutable std::string str_error_;
+    mutable std::string str_error_lo_;
+    mutable std::string str_error_hi_;
   };
   
   template<typename T>
@@ -109,9 +140,15 @@ namespace general {
       sstr_error << std::setprecision(10) << error;
       str_error_ = sstr_error.str();
       
-      output << str_value_ << " +/- " << str_error_;
+      std::stringstream sstr_error_lo;
+      sstr_error_lo << std::setprecision(10) << error_lo;
+      str_error_lo_ = sstr_error_lo.str();
+
+      std::stringstream sstr_error_hi;
+      sstr_error_hi << std::setprecision(10) << error_hi;
+      str_error_hi_ = sstr_error_hi.str();
     } else {
-      if (error == 0.0) {
+      if (error == 0.0 && error_lo == 0.0 && error_hi == 0.0) {
         
         std::stringstream sstr_value;
         sstr_value << value;
@@ -121,23 +158,40 @@ namespace general {
         sstr_error << error;
         str_error_ = sstr_error.str();
         
-        output << str_value_ << " +/- " << str_error_;
+        std::stringstream sstr_error_lo;
+        sstr_error_lo << error_lo;
+        str_error_lo_ = sstr_error_lo.str();
+        
+        std::stringstream sstr_error_hi;
+        sstr_error_hi << error_hi;
+        str_error_hi_ = sstr_error_hi.str();
       } else {
+        double error_to_check = 0.0;
+        if (error_lo == 0.0 && error_hi == 0.0) {
+          error_to_check = error;
+        } else {
+          error_to_check = std::min(error_lo, error_hi);
+        }
+        
+        
         std::fesetround(FE_TONEAREST);
-        int mantissa_err   = std::nearbyint(error*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error)))));
+        int mantissa_err   = std::nearbyint(error_to_check*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error_to_check)))));
         
         // additional digits if mantissa of error <= 3.54
         int add_digits     = 0;
         if (mantissa_err <= 354) add_digits++;
         
-        T exp_err     = std::log10(error);
-        T abs_exp_err = std::abs(exp_err);
+        T exp_err_check     = std::log10(error_to_check);
+        T exp_err           = std::log10(error);
+//        T exp_err_lo        = std::log10(error_lo);
+//        T exp_err_hi        = std::log10(error_hi);
+        T abs_exp_err_check = std::abs(exp_err_check);
         
         std::string format;
         
         // depending on exponent use scientific notation or not
-        if (abs_exp_err < 5) {
-          if (exp_err < 1.0) {
+        if (abs_exp_err_check < 5) {
+          if (exp_err_check < 1.0) {
             std::fesetround(FE_DOWNWARD);
             format = "%." + std::to_string(static_cast<int>(std::abs(std::nearbyint(exp_err))+add_digits)) + "f";
           } else {
@@ -147,12 +201,18 @@ namespace general {
           std::fesetround(FE_TONEAREST);
           str_value_ = str(boost::format(format) % value);
           str_error_ = str(boost::format(format) % error);
-          output << str_value_ << " +/- " << str_error_;
+          str_error_lo_ = str(boost::format(format) % error_lo);
+          str_error_hi_ = str(boost::format(format) % error_hi);
         } else {
           format = "%." + std::to_string(add_digits) + "f";
+
+          // exponent to use for scientific notation
           T exp_new_err      = std::floor(exp_err);
-          T mantissa_new_err = error/std::pow(10.0,exp_new_err);
-          T mantissa_new_val = value/std::pow(10.0,exp_new_err);
+          
+          T mantissa_new_err    = error/std::pow(10.0,exp_new_err);
+          T mantissa_new_err_lo = error/std::pow(10.0,exp_new_err);
+          T mantissa_new_err_hi = error/std::pow(10.0,exp_new_err);
+          T mantissa_new_val    = value/std::pow(10.0,exp_new_err);
           
           std::stringstream sstr_value;
           sstr_value << boost::format(format) % mantissa_new_val << "e" << exp_new_err;
@@ -161,10 +221,23 @@ namespace general {
           std::stringstream sstr_error;
           sstr_error << boost::format(format) % mantissa_new_err << "e" << exp_new_err;
           str_error_ = sstr_error.str();
-          output << str_value_ << " +/- " << str_error_;
+
+          std::stringstream sstr_error_lo;
+          sstr_error_lo << boost::format(format) % mantissa_new_err_lo << "e" << exp_new_err;
+          str_error_lo_ = sstr_error_lo.str();
+
+          std::stringstream sstr_error_hi;
+          sstr_error_hi << boost::format(format) % mantissa_new_err_hi << "e" << exp_new_err;
+          str_error_hi_ = sstr_error_hi.str();
         }
       }
       
+    }
+    
+    if (error_lo == 0.0 && error_hi == 0.0) {
+      output << str_value_ << " +/- " << str_error_;
+    } else {
+      output << str_value_ << " + " << str_error_hi_ << " - " << str_error_lo_;
     }
     return output.str();
   }
