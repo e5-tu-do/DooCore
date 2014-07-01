@@ -1150,8 +1150,10 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-	PlotGauss(pName+gauss_suffix, pulls, pDir, chi2_reduced, chi2_pvalue);
-
+  if (gauss_suffix != "nogauss") {
+    PlotGauss(pName+gauss_suffix, pulls, pDir, chi2_reduced, chi2_pvalue);
+  }
+  
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
   
@@ -1285,7 +1287,9 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-	PlotGauss(pName+gauss_suffix, pulls, pDir);
+  if (gauss_suffix != "nogauss") {
+    PlotGauss(pName+gauss_suffix, pulls, pDir);
+  }
 
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
