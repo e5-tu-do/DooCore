@@ -140,6 +140,12 @@ int main() {
   sinfo << ValueWithError<double>(0.0000010, 0.0000010) << endmsg;
   swarn << "" << endmsg;
 
+  swarn << "Test of printout with and without usage of auto-precision:" << endmsg;
+  ValueWithError<double> num(122.572427568, 122.572427568);
+  sinfo << num << endmsg;
+  num.set_full_precision_printout(true);
+  sinfo << num << endmsg;
+  
   swarn << "Test of WeightedAverage:" << endmsg;
   auto mean_error = doocore::statistics::general::WeightedAverage<double>(values.begin(), values.end());
   sinfo << mean_error << endmsg;
