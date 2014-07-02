@@ -20,7 +20,7 @@ namespace styles {
  *  message will be printed and the style in gROOT will remain.
  */
 TStyle* CreateLHCbStyle(const std::string& style_name = "LHCbStyle",
-                     bool force_style_creation = false);
+                        bool force_style_creation = false);
 
 } // namespace styles
 } // namespace plot
