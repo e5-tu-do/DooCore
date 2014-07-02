@@ -200,7 +200,28 @@ TStyle* CreateLHCbStyle(const TString& style_name, bool force_style_creation) {
   
   return style;
 }
-      
+
+TStyle* CreateLHCbLogyStyle(const TString& style_name, bool force_style_creation) {
+  
+  TStyle* style = nullptr;
+  // check if style already exists
+  if ( !force_style_creation && gROOT->GetListOfStyles()->Contains(style_name) ){
+    io::serr << "Cannot create style " << style_name << "! "
+    << "Style with this name is already known to gROOT!" << io::endmsg;
+    style = dynamic_cast<TStyle*>(gROOT->GetListOfStyles()->FindObject(style_name));
+    return style;
+  } else {
+    style = CreateLHCbStyle(style_name, force_style_creation);
+  }
+  style->SetTitle("Dortmund E5 LHCb style for log plots");
+  
+  style->SetOptLogy(true);
+  // future: apply changes w.r.t. to standard lhcb style
+  
+  
+  return style;
+}
+  
 } // namespace styles
 } // namespace plot
 } // namespace doocore

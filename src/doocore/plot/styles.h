@@ -22,6 +22,9 @@ namespace styles {
 TStyle* CreateLHCbStyle(const std::string& style_name = "LHCbStyle",
                         bool force_style_creation = false);
 
+TStyle* CreateLHCbLogyStyle(const std::string& style_name = "LHCbLogyStyle",
+                           bool force_style_creation = false);
+  
 } // namespace styles
 } // namespace plot
 } // namespace doocore
