@@ -4,4 +4,4 @@ add_subdirectory(system)
 add_subdirectory(config)
 add_subdirectory(physics)
 add_subdirectory(statistics)
-
+add_subdirectory(plot)
