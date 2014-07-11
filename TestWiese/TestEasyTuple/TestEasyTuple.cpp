@@ -25,7 +25,7 @@ int main() {
   cat.defineType("blub", 0);
 
   RooGaussian pdf("pdf", "pdf", varMass, mean, sigma);
-  RooDataSet* data_gen = pdf.generate(RooArgSet(varMass, cat), 10000);
+  RooDataSet* data_gen = pdf.generate(RooArgSet(varMass, cat), 1000000);
 
   EasyTuple etuple1(*data_gen);
   etuple1.dataset().Print();

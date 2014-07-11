@@ -25,7 +25,8 @@ using namespace boost::assign;
 #include "RooCmdArg.h"
 
 // from project
-#include "doocore/io/MsgStream.h"
+#include <doocore/io/MsgStream.h>
+#include <doocore/io/Progress.h>
 
 using namespace ROOT;
 using namespace RooFit;
@@ -301,7 +302,7 @@ void doocore::io::EasyTuple::WriteDataSetToTree(const std::string& file_name, co
     RooAbsCategory* cat  = dynamic_cast<RooAbsCategory*>(arg);
     
     if (real != nullptr) {
-      real->Print();
+      //real->Print();
       std::string name_real = real->GetName();
       std::string name_real_leaflist = name_real + "/D";
       values_double[name_real] = 0.0;
@@ -309,7 +310,7 @@ void doocore::io::EasyTuple::WriteDataSetToTree(const std::string& file_name, co
     }
 
     if (cat != nullptr) {
-      cat->Print();
+      //cat->Print();
       std::string name_cat = cat->GetName();
       std::string name_cat_leaflist = name_cat + "/L";
       values_cats[name_cat] = 0;
@@ -318,6 +319,7 @@ void doocore::io::EasyTuple::WriteDataSetToTree(const std::string& file_name, co
   }
   delete it;
 
+  Progress p("Writing RooDataSet to TTree", dataset_->numEntries());
   for (int i=0; i<dataset_->numEntries(); ++i) {
     const RooArgSet* args = dataset_->get(i);
     for (auto value : values_double) {
@@ -328,7 +330,9 @@ void doocore::io::EasyTuple::WriteDataSetToTree(const std::string& file_name, co
       values_cats[cat.first] = args->getCatIndex(cat.first.c_str());
     }
     tree.Fill();
+    ++p;
   }
+  p.Finish();
 
   tree.Write();
   file.Close();
