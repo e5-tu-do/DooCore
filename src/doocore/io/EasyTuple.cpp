@@ -293,7 +293,7 @@ void doocore::io::EasyTuple::WriteDataSetToTree(const std::string& file_name, co
 
   std::vector<TBranch*> branches;
   std::map<std::string, double> values_double;
-  std::map<std::string, long long> values_cats;
+  std::map<std::string, int> values_cats;
 
   RooLinkedListIter* it  = dynamic_cast<RooLinkedListIter*>(argset_->createIterator());
   RooAbsArg*         arg = NULL;
@@ -312,7 +312,7 @@ void doocore::io::EasyTuple::WriteDataSetToTree(const std::string& file_name, co
     if (cat != nullptr) {
       //cat->Print();
       std::string name_cat = cat->GetName();
-      std::string name_cat_leaflist = name_cat + "/L";
+      std::string name_cat_leaflist = name_cat + "/I";
       values_cats[name_cat] = 0;
       branches.push_back(tree.Branch(name_cat.c_str(), &values_cats[name_cat], name_cat_leaflist.c_str()));
     }
