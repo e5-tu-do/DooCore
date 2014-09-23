@@ -57,9 +57,9 @@ doocore::statistics::montecarlo::MultiVarGaussianSampleGenerator::~MultiVarGauss
   if (dataset_ != NULL) {
     delete dataset_;
   }
-  if (last_generated_set_ != nullptr) {
-    delete last_generated_set_;
-  }
+  // if (last_generated_set_ != nullptr) {
+  //   delete last_generated_set_;
+  // }
   if (min_generated_set_ != nullptr) {
     delete min_generated_set_;
   }
@@ -71,10 +71,10 @@ doocore::statistics::montecarlo::MultiVarGaussianSampleGenerator::~MultiVarGauss
 const RooArgSet* doocore::statistics::montecarlo::MultiVarGaussianSampleGenerator::Generate() {
   using namespace doocore::io;
   
-  if (last_generated_set_ != nullptr) {
-    delete last_generated_set_;
-    last_generated_set_ = nullptr;
-  }
+  // if (last_generated_set_ != nullptr) {
+  //   delete last_generated_set_;
+  //   last_generated_set_ = nullptr;
+  // }
   pos_dataset_++;
   if (dataset_ == NULL || pos_dataset_ >= static_cast<unsigned int>(dataset_->numEntries())) {
     pos_dataset_ = 0;
