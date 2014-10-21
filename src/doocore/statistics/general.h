@@ -768,10 +768,12 @@ namespace general {
                                                    "shuffled_dataset",
                                                    *prototype->get(0));
 
-    unsigned int max = (n_shuffles == 0 ? prototype->numEntries() : n_shuffles);
+    unsigned int max_id = prototype->numEntries() - 1;
+    n_shuffles = (n_shuffles == 0 ? prototype->numEntries() : n_shuffles);
+    
     TRandom3 rgen(random_seed);
-    for(int i=0; i<prototype->numEntries(); i++) {
-      unsigned int event_id = rgen.Integer(max);
+    for(int i=0; i<n_shuffles; i++) {
+      unsigned int event_id = rgen.Integer(max_id);
       bootstrapped_data->add(*prototype->get(event_id));
     }
     return bootstrapped_data;
