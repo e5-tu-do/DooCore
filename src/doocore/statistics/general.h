@@ -15,6 +15,7 @@
 
 // from ROOT
 #include "TMath.h"
+#include "TRandom3.h"
 
 // from RooFit
 #include "RooDataSet.h"
@@ -750,6 +751,30 @@ namespace general {
    */
   inline double get_quantile_from_dataset(const std::vector<double>* sorted_dataset, double fraction){
     return gsl_stats_quantile_from_sorted_data(&(sorted_dataset->at(0)), 1, sorted_dataset->size(), fraction);
+  }
+
+  /**
+   *  @brief Shuffles a RooDataSet with replacement
+   *
+   *  Draws entries from a RooDataSet with replacement.
+   *  ATTENTION: User takes ownership of returned dataset.
+   *  
+   *  @param prototype proto dataset used for the shuffeling
+   *  @param random_seed a random seed used for the shuffeling
+   *  @param n_shuffles number of entries to draw
+   */
+  inline RooDataSet* shuffle_dataset_with_replacement(const RooDataSet* prototype, int random_seed, unsigned int n_shuffles = 0){
+    RooDataSet* bootstrapped_data = new RooDataSet("shuffled_dataset",
+                                                   "shuffled_dataset",
+                                                   *prototype->get(0));
+
+    unsigned int max = (n_shuffles == 0 ? prototype->numEntries() : n_shuffles);
+    TRandom3 rgen(random_seed);
+    for(int i=0; i<prototype->numEntries(); i++) {
+      unsigned int event_id = rgen.Integer(max);
+      bootstrapped_data->add(*prototype->get(event_id));
+    }
+    return bootstrapped_data;
   }
 
 
