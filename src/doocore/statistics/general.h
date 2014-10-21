@@ -17,12 +17,14 @@
 #include "TMath.h"
 
 // from RooFit
+#include "RooDataSet.h"
 
 // from DooCore
 #include "doocore/io/MsgStream.h"
 
 // from GSL
 #include "gsl/gsl_statistics.h"
+#include "gsl/gsl_sort.h"
 
 // forward decalarations
 
@@ -693,6 +695,63 @@ namespace general {
 
     return std::make_pair(quantile_lo, quantile_hi);
   }
+
+  /**
+   *  @brief Get Quantile from RooRealVar inside RooDataSet
+   *
+   *  Takes a RooDataSet and a parameter name and calculates the quantile with the
+   *  given fraction of lying values below that value. Also writes the sorted data
+   *  to a vector of doubles for the caller, to save time the next time a quantile is computed.
+   *  ATTENTION: The user takes ownership of this vector.
+   *
+   *  @param data RooDataSet from which to extract values
+   *  @param param_name parameter name to look for in dataset
+   *  @param fraction demanded fraction of data below quantile
+   *  @param sorted_dataset pointer to store sorted values (in ascending order). User takes ownership!
+   */
+  inline double get_quantile_from_dataset(const RooDataSet *data, const std::string& param_name, double fraction, std::vector<double>* sorted_dataset){
+    sorted_dataset = new std::vector<double>(data->numEntries());
+    for(int i=0; i<data->numEntries(); i++){
+      const RooArgSet* params = data->get(i);
+      sorted_dataset->push_back(params->getRealValue(param_name.c_str()));
+    }
+    std::sort(sorted_dataset->begin(), sorted_dataset->end());
+    return gsl_stats_quantile_from_sorted_data(&(sorted_dataset->at(0)), 1, sorted_dataset->size(), fraction);
+  }
+
+  /**
+   *  @brief Get Quantile from RooRealVar inside RooDataSet
+   *
+   *  Takes a RooDataSet and a parameter name and calculates the quantile with the
+   *  given fraction of lying values below that value. Also writes the sorted data
+   *  to a vector for the caller, to save time the next time a quantile is computed.
+   *  Does not store sorted values.
+   *
+   *  @param data RooDataSet from which to extract values
+   *  @param param_name parameter name to look for in dataset
+   *  @param fraction demanded fraction of data below quantile
+   */
+  inline double get_quantile_from_dataset(const RooDataSet *data, const std::string& param_name, double fraction){
+    std::vector<double>* dataptr;
+
+    double quantile = get_quantile_from_dataset(data, param_name, fraction, dataptr);
+    delete dataptr;
+    
+    return quantile;
+  }
+  
+  /**
+   *  @brief Get Quantile from sorted dataset
+   *
+   *  Simple wrapper of gsl_stats_quantile_from_sorted_data
+   *  
+   *  @param sorted_dataset dataset of values in ascending order
+   *  @param fraction demanded fraction of data below quantile
+   */
+  inline double get_quantile_from_dataset(const std::vector<double>* sorted_dataset, double fraction){
+    return gsl_stats_quantile_from_sorted_data(&(sorted_dataset->at(0)), 1, sorted_dataset->size(), fraction);
+  }
+
 
 } // namespace general
 } // namespace statistics
