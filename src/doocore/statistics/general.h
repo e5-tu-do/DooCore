@@ -750,7 +750,12 @@ namespace general {
    *  @param fraction demanded fraction of data below quantile
    */
   inline double get_quantile_from_dataset(const std::vector<double>* sorted_dataset, double fraction){
-    return gsl_stats_quantile_from_sorted_data(&(sorted_dataset->at(0)), 1, sorted_dataset->size(), fraction);
+    if(!sorted_dataset) {
+      doocore::io::serr << "get_quantile_from_dataset(const std::vector<double>* sorted_dataset, double fraction): sorted_dataset is null" << doocore::io::endmsg;
+      return -9999.0;
+    }
+    else
+      return gsl_stats_quantile_from_sorted_data(&(sorted_dataset->at(0)), 1, sorted_dataset->size(), fraction);
   }
 
   /**
