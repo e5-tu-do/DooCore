@@ -12,6 +12,7 @@ using namespace boost::assign;
 // from ROOT
 #include "TFile.h"
 #include "TTree.h"
+#include "TBranch.h"
 
 // from RooFit
 #include "RooArgSet.h"
@@ -24,7 +25,8 @@ using namespace boost::assign;
 #include "RooCmdArg.h"
 
 // from project
-#include "doocore/io/MsgStream.h"
+#include <doocore/io/MsgStream.h>
+#include <doocore/io/Progress.h>
 
 using namespace ROOT;
 using namespace RooFit;
@@ -100,6 +102,17 @@ cut_variable_range_(kCutInclusive)
     }
   }
   delete it;
+}
+
+doocore::io::EasyTuple::EasyTuple(RooDataSet& dataset)
+: file_(NULL),
+tree_(NULL),
+argset_(NULL),
+dataset_(&dataset),
+num_maximum_events_(-1),
+cut_variable_range_(kCutInclusive)
+{
+  argset_ = new RooArgSet(*dataset_->get());
 }
 
 doocore::io::EasyTuple::EasyTuple(const EasyTuple& other)
@@ -272,6 +285,57 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset,
   }
   
   return *dataset_;
+}
+
+void doocore::io::EasyTuple::WriteDataSetToTree(const std::string& file_name, const std::string& tree_name) {
+  TFile file(file_name.c_str(), "recreate");
+  TTree tree(tree_name.c_str(), tree_name.c_str());
+
+  std::vector<TBranch*> branches;
+  std::map<std::string, double> values_double;
+  std::map<std::string, int> values_cats;
+
+  RooLinkedListIter* it  = dynamic_cast<RooLinkedListIter*>(argset_->createIterator());
+  RooAbsArg*         arg = NULL;
+  while ((arg=dynamic_cast<RooAbsArg*>(it->Next()))) {
+    RooAbsReal*     real = dynamic_cast<RooAbsReal*>(arg);
+    RooAbsCategory* cat  = dynamic_cast<RooAbsCategory*>(arg);
+    
+    if (real != nullptr) {
+      //real->Print();
+      std::string name_real = real->GetName();
+      std::string name_real_leaflist = name_real + "/D";
+      values_double[name_real] = 0.0;
+      branches.push_back(tree.Branch(name_real.c_str(), &values_double[name_real], name_real_leaflist.c_str()));
+    }
+
+    if (cat != nullptr) {
+      //cat->Print();
+      std::string name_cat = cat->GetName();
+      std::string name_cat_leaflist = name_cat + "/I";
+      values_cats[name_cat] = 0;
+      branches.push_back(tree.Branch(name_cat.c_str(), &values_cats[name_cat], name_cat_leaflist.c_str()));
+    }
+  }
+  delete it;
+
+  Progress p("Writing RooDataSet to TTree", dataset_->numEntries());
+  for (int i=0; i<dataset_->numEntries(); ++i) {
+    const RooArgSet* args = dataset_->get(i);
+    for (auto value : values_double) {
+      values_double[value.first] = args->getRealValue(value.first.c_str());
+    }
+
+    for (auto cat : values_cats) {
+      values_cats[cat.first] = args->getCatIndex(cat.first.c_str());
+    }
+    tree.Fill();
+    ++p;
+  }
+  p.Finish();
+
+  tree.Write();
+  file.Close();
 }
 
 RooRealVar& doocore::io::EasyTuple::Var(const std::string& name) {

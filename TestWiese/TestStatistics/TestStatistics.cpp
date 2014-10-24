@@ -26,24 +26,24 @@ using namespace boost::assign; // bring 'operator+=()' into scope
 #include "gsl/gsl_randist.h"
 #include "gsl/gsl_rng.h"
 
-class MySampleGenerator {
- public:
-  MySampleGenerator() : rand_() {}
+// class MySampleGenerator {
+//  public:
+//   MySampleGenerator() : rand_() {}
   
-  double Generate() {
-    return rand_.Gaus(1, 0.5);
-  }
+//   double Generate() {
+//     return rand_.Gaus(1, 0.5);
+//   }
   
- private:
-  TRandom3 rand_;
-};
+//  private:
+//   TRandom3 rand_;
+// };
 
 class MyCalculator {
  public:
   double Calculate(const RooArgSet* values) const {
     using namespace doocore::io;
 //    sdebug << values->getRealValue("p1") << " - " << values->getRealValue("p2") << endmsg;
-    return values->getRealValue("p1");// + values->getRealValue("p2");
+    return values->getRealValue("p1") + values->getRealValue("p2");
   }
 };
 
@@ -65,6 +65,9 @@ int main() {
   RooRealVar p2("p2", "p2", 10.0, -100.0, 100.0);
   RooArgList args(p1, p2);
   
+  p1.setError(1.0);
+  p2.setError(1.0);
+
   TMatrixDSym cov(2);
   
   cov(0,0) = 0.25;
@@ -72,15 +75,20 @@ int main() {
   cov(1,1) = 0.25;
   
   MultiVarGaussianSampleGenerator mvggen(args, cov);
-  
+  VaryParameterErrorsGenerator varygen(args);
+
   MyCalculator mycalc;
-  MySampleGenerator mygen;
-  ErrorEstimator<MyCalculator, MultiVarGaussianSampleGenerator> est(mycalc, mvggen);
+  //MySampleGenerator mygen;
+  ErrorEstimator<MyCalculator, VaryParameterErrorsGenerator> est(mycalc, varygen);
   
   ValueWithError<double> mcval(est.Sample(10000));
   swarn << "Test of ErrorEstimator:" << endmsg;
   sinfo << mcval << " - " << mcval.value << " +/- " << mcval.error << endmsg;
   
+  sinfo << "Boundaries: " << est.MinimumGeneratedValue() << " - " << est.MaximumGeneratedValue() << endmsg;
+  sinfo << "Minimum parameters: " << *varygen.MinimumParameterSet() << endmsg;
+  sinfo << "Maximum parameters: " << *varygen.MaximumParameterSet() << endmsg;
+
   std::vector<ValueWithError<double>> values;
   
   values  += 
@@ -138,6 +146,32 @@ int main() {
   sinfo << ValueWithError<double>(0.00010, 0.00010) << endmsg;
   sinfo << ValueWithError<double>(0.000010, 0.000010) << endmsg;
   sinfo << ValueWithError<double>(0.0000010, 0.0000010) << endmsg;
+
+  sinfo << ValueWithError<double>(35400000, 354000, 354000, 356000) << endmsg;
+  sinfo << ValueWithError<double>(3540000, 35400, 35400, 35600) << endmsg;
+  sinfo << ValueWithError<double>(354000, 3540, 3540, 3560) << endmsg;
+  sinfo << ValueWithError<double>(35400, 354, 354, 356) << endmsg;
+  sinfo << ValueWithError<double>(3540, 35.4, 35.4, 35.6) << endmsg;
+  sinfo << ValueWithError<double>(35.4, 3.54, 3.54, 3.56) << endmsg;
+  sinfo << ValueWithError<double>(3.54, 0.354, 0.354, 0.356) << endmsg;
+  sinfo << ValueWithError<double>(3.4, 0.0354, 0.0354, 0.0356) << endmsg;
+  sinfo << ValueWithError<double>(0.354, 0.00354, 0.00354, 0.00356) << endmsg;
+  sinfo << ValueWithError<double>(0.0354, 0.000354, 0.000354, 0.000356) << endmsg;
+  sinfo << ValueWithError<double>(0.00354, 0.0000354, 0.0000354, 0.0000356) << endmsg;
+  sinfo << ValueWithError<double>(0.000354, 0.00000354, 0.00000354, 0.00000356) << endmsg;
+
+  sinfo << ValueWithError<double>(35400000, 354000, 356000, 356000) << endmsg;
+  sinfo << ValueWithError<double>(3540000, 35400, 35600, 35600) << endmsg;
+  sinfo << ValueWithError<double>(354000, 3540, 3560, 3560) << endmsg;
+  sinfo << ValueWithError<double>(35400, 354, 356, 356) << endmsg;
+  sinfo << ValueWithError<double>(3540, 35.4, 35.6, 35.6) << endmsg;
+  sinfo << ValueWithError<double>(35.4, 3.54, 3.56, 3.56) << endmsg;
+  sinfo << ValueWithError<double>(3.54, 0.354, 0.356, 0.356) << endmsg;
+  sinfo << ValueWithError<double>(3.4, 0.0354, 0.0356, 0.0356) << endmsg;
+  sinfo << ValueWithError<double>(0.354, 0.00354, 0.00356, 0.00356) << endmsg;
+  sinfo << ValueWithError<double>(0.0354, 0.000354, 0.000356, 0.000356) << endmsg;
+  sinfo << ValueWithError<double>(0.00354, 0.0000354, 0.0000356, 0.0000356) << endmsg;
+  sinfo << ValueWithError<double>(0.000354, 0.00000354, 0.00000356, 0.00000356) << endmsg;
   swarn << "" << endmsg;
 
   swarn << "Test of printout with and without usage of auto-precision:" << endmsg;
@@ -145,6 +179,13 @@ int main() {
   sinfo << num << endmsg;
   num.set_full_precision_printout(true);
   sinfo << num << endmsg;
+  
+  swarn << "Test of printout with and without usage of auto-precision with asymmetric errors:" << endmsg;
+  ValueWithError<double> num_asym(3.928191, 0.3472, 0.3627, 0.3231);
+  sinfo << num_asym << endmsg;
+  num_asym.set_full_precision_printout(true);
+  sinfo << num_asym << endmsg;
+
   
   swarn << "Test of WeightedAverage:" << endmsg;
   auto mean_error = doocore::statistics::general::WeightedAverage<double>(values.begin(), values.end());

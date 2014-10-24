@@ -4,6 +4,9 @@
 // from STL
 #include <vector>
 
+// from ROOT
+#include "TRandom3.h"
+
 // from RooFit
 #include "RooMultiVarGaussian.h"
 
@@ -40,7 +43,10 @@ class RooDataSet;
  *
  *  SampleGenerator::Generate() must be defined as well as 
  *  Calculator::Calculate(inputs) where inputs is the return value of 
- *  SampleGenerator::Generate().
+ *  SampleGenerator::Generate(). Additionally SampleGenerator needs the 
+ *  following functions: SampleGenerator::SaveMinimumParameterSet() and
+ *  SampleGenerator::SaveMaximumParameterSet() to save the generated parameter 
+ *  sets that result in the largest variation of the target value.
  *
  *  @section sec_example Usage example
  *
@@ -95,13 +101,41 @@ class ErrorEstimator {
     
     return doocore::statistics::general::ArithmeticMean<double>(generated_values_.begin(), generated_values_.end());
   }
+
+  /**
+   *  @brief Get minimum generated value
+   */
+  double MinimumGeneratedValue() const { return min_generated_value_; }
+
+  /**
+   *  @brief Get maximum generated value
+   */
+  double MaximumGeneratedValue() const { return max_generated_value_; }
   
  protected:
   /**
    *  @brief Draw one target value
    */
   void DrawSingleValue() {
-    generated_values_.push_back(calculator_.Calculate(sample_generator_.Generate()));
+    double single_value(calculator_.Calculate(sample_generator_.Generate()));
+
+    if (generated_values_.size() == 0) {
+      min_generated_value_ = single_value;
+      sample_generator_.SaveMinimumParameterSet();
+      max_generated_value_ = single_value;
+      sample_generator_.SaveMaximumParameterSet();
+    } else {
+      if (single_value < min_generated_value_) {
+        min_generated_value_ = single_value;
+        sample_generator_.SaveMinimumParameterSet();
+      }
+      if (single_value > max_generated_value_) {
+        max_generated_value_ = single_value;
+        sample_generator_.SaveMaximumParameterSet();
+      }
+    }
+
+    generated_values_.push_back(single_value);
   }
   
  private:
@@ -119,6 +153,16 @@ class ErrorEstimator {
    *  @brief Generated target values
    */
   std::vector<double> generated_values_;
+
+  /**
+   *  @brief Minimum target value
+   */
+  double min_generated_value_;  
+
+  /**
+   *  @brief Minimum target value
+   */
+  double max_generated_value_;
 };
   
 /** @class doocore::statistics::montecarlo::MultiVarGaussianSampleGenerator
@@ -137,12 +181,39 @@ public:
   ~MultiVarGaussianSampleGenerator();
   
   const RooArgSet* Generate();
+
+  void SaveMinimumParameterSet();
+  void SaveMaximumParameterSet();
+
+  const RooArgSet* MinimumParameterSet() const {
+    return min_generated_set_;
+  }
+
+  const RooArgSet* MaximumParameterSet() const {
+    return max_generated_set_;
+  }
+
 private:
   RooMultiVarGaussian* mvg_;
   
   RooArgSet* values_expected_;
   RooArgList* values_mu_;
   
+  /**
+   *  @brief Last generated set of values
+   */
+  const RooArgSet* last_generated_set_;
+
+  /**
+   *  @brief Set of values for minimum target value
+   */
+  RooArgSet* min_generated_set_;
+
+  /**
+   *  @brief Set of values for minimum target value
+   */
+  RooArgSet* max_generated_set_;
+
   /**
    *  @brief Number of generated events so far
    */
@@ -157,6 +228,55 @@ private:
    *  @brief Dataset with drawn values
    */
   RooDataSet* dataset_;
+};
+
+/** @class doocore::statistics::montecarlo::VaryParameterErrorsGenerator
+ *  @brief Sample generator varying set of values up and down their given error
+ *
+ *  Based on a given set of expectation values for a list of parameters incl. 
+ *  errors, this sample generator draws a sample of parameters by varying the 
+ *  parameters errors up and down randomly.
+ *
+ *  @author Florian Kruse
+ */
+class VaryParameterErrorsGenerator {
+public:
+  VaryParameterErrorsGenerator(const RooArgList& values_expected);
+  
+  ~VaryParameterErrorsGenerator();
+  
+  const RooArgSet* Generate();
+
+  void SaveMinimumParameterSet();
+  void SaveMaximumParameterSet();
+
+  const RooArgSet* MinimumParameterSet() const {
+    return min_generated_set_;
+  }
+
+  const RooArgSet* MaximumParameterSet() const {
+    return max_generated_set_;
+  }
+
+private:
+  RooArgList* values_;
+
+  /**
+   *  @brief Last generated set of values
+   */
+  RooArgSet* last_generated_set_;
+
+  /**
+   *  @brief Set of values for minimum target value
+   */
+  RooArgSet* min_generated_set_;
+
+  /**
+   *  @brief Set of values for minimum target value
+   */
+  RooArgSet* max_generated_set_;
+
+  TRandom3 random_;
 };
 
 } // namespace montecarlo

@@ -1150,7 +1150,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-  if (gauss_suffix.length() > 0) {
+  if (gauss_suffix != "nogauss") {
     PlotGauss(pName+gauss_suffix, pulls, pDir, chi2_reduced, chi2_pvalue);
   }
   
@@ -1287,7 +1287,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-  if (gauss_suffix.length() > 0) {
+  if (gauss_suffix != "nogauss") {
     PlotGauss(pName+gauss_suffix, pulls, pDir);
   }
 
