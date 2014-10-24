@@ -276,6 +276,18 @@ std::pair<double,double> MedianLimitsForTuple(TTree& tree, std::string var_name)
  */
 RooBinning GetQuantileBinning(RooDataSet* data, std::string var_name, int nbins = 10);
 
+/**
+ *  @brief Limits for DataSet
+ *
+ *  This function will return a pair as (min, max) as plotting
+ *  range for all values of the distribution.
+ *
+ *  @param dataset RooDataSet to evaluate
+ *  @param var_name name of variable in dataset to evaluate
+ *  @return pair of (double,double) as (min,max) to use for plotting
+ */
+std::pair<double,double> MinMaxLimitsForDataSet(const RooDataSet& dataset, std::string var_name);
+
 } // namespace lutils
 } // namespace doocore
 
