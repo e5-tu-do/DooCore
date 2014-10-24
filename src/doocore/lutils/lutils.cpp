@@ -1689,4 +1689,49 @@ RooBinning doocore::lutils::GetQuantileBinning(RooDataSet* data, std::string var
   return Binning;
 }
 
+std::pair<double,double> doocore::lutils::MinMaxLimitsForDataSet(const RooDataSet& dataset, std::string var_name) {
+  bool debug = false;
+
+  int num_entries = dataset.numEntries();
+  std::pair<double, double> minmax;
+
+  if (num_entries == 0) {
+    minmax.first  = 0;
+    minmax.second = 1;
+    return minmax;
+  }
+
+  std::vector<double> entries;
+
+  // convert entries into vector (for sorting)
+  const RooArgSet* args = NULL;
+  for (int i = 0; i < num_entries; ++i) {
+    args = dataset.get(i);
+    if (isfinite(dynamic_cast<RooRealVar*>(args->find(var_name.c_str()))->getVal())) {
+      entries.push_back(dynamic_cast<RooRealVar*>(args->find(var_name.c_str()))->getVal());
+    }
+  }
+
+  // if (debug) sdebug << "#non-finite entries neglected: " << num_entries-entries.size() << endmsg;
+
+  std::sort(entries.begin(), entries.end());
+
+  // for (int i = 0; i < entries.size(); ++i) {
+    // if (debug) sdebug << entries[i] << endmsg;
+  // }
+
+  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) range: " << entries.front() << " - " << entries.back() << endmsg;
+
+  minmax.first = entries.front();
+  minmax.second = entries.back();
+
+  // just take a little more
+  minmax.first  = minmax.first*(minmax.first  > 0 ? 0.9998 : 1.0002);
+  minmax.second = minmax.second*(minmax.second > 0 ? 1.0002 : 0.9998);
+
+  // if (debug) sdebug << "first: " << minmax.first << endmsg;
+  // if (debug) sdebug << "second: " << minmax.second << endmsg;
+
+  return minmax;
+}
 
