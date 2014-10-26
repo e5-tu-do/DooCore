@@ -698,6 +698,45 @@ namespace general {
   }
 
   /**
+   *  @brief Get Mean from RooRealVar inside RooDataSet
+   *
+   *  @param dataset RooDataSet from which to extract values
+   *  @param param_name parameter name to look for in dataset
+   */
+  inline double get_mean_from_dataset(const RooDataSet *dataset, const std::string& param_name){
+    std::vector<double> data;
+
+    for(int i=0; i<dataset->numEntries(); i++){
+      const RooArgSet* params = dataset->get(i);
+      data.push_back(params->getRealValue(param_name.c_str()));
+    }
+
+    double mean = gsl_stats_mean(&(data.at(0)), 1, data.size());
+
+    return mean;
+  }
+
+  /**
+   *  @brief Get Median from RooRealVar inside RooDataSet
+   *
+   *  @param dataset RooDataSet from which to extract values
+   *  @param param_name parameter name to look for in dataset
+   */
+  inline double get_median_from_dataset(const RooDataSet *dataset, const std::string& param_name){
+    std::vector<double> data;
+
+    for(int i=0; i<dataset->numEntries(); i++){
+      const RooArgSet* params = dataset->get(i);
+      data.push_back(params->getRealValue(param_name.c_str()));
+    }
+
+    std::sort(data.begin(), data.end());
+    double median = gsl_stats_median_from_sorted_data(&(data.at(0)), 1, data.size());
+
+    return median;
+  }
+
+  /**
    *  @brief Get Quantile from RooRealVar inside RooDataSet
    *
    *  Takes a RooDataSet and a parameter name and calculates the quantile with the
