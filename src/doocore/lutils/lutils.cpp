@@ -1502,9 +1502,10 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
 //  }
   
   
-  //if (debug) 
-  sdebug << "num_entries = " << num_entries << endmsg;
-  sdebug << "entries.size() = " << entries.size() << endmsg;
+  if (debug) {
+    sdebug << "num_entries = " << num_entries << endmsg;
+    sdebug << "entries.size() = " << entries.size() << endmsg;
+  }
   
   if (!entries.empty()) {
     if (debug) {
