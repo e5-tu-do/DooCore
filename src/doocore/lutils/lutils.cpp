@@ -1491,7 +1491,7 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
       entries.push_back(dynamic_cast<RooRealVar*>(args->find(var_name.c_str()))->getVal());
     }
   }
-  
+
 //  if (debug) sdebug << "#non-finite entries neglected: " << num_entries-entries.size() << endmsg;
   
   std::sort(entries.begin(), entries.end());
@@ -1502,46 +1502,57 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
 //  }
   
   
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) range: " << entries.front() << " - " << entries.back() << endmsg;
-  
-  minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
-  minmax.second = -4*entries[idx_median]+5*entries[(int)(entries.size()-idx_median*0.32)];
-  
-//  if (debug) sdebug << "idx_median = " << idx_median << ", entries[idx_median] = " << entries[idx_median] << endmsg;
-//  if (debug) sdebug << "(int)(idx_median*0.32) = " << (int)(idx_median*0.32) << endmsg;
-//  if (debug) sdebug << "(int)(entries.size()-idx_median*0.32) = " << (int)(entries.size()-idx_median*0.32) << endmsg;
-//  if (debug) sdebug << "-4*entries[idx_median] = " << -4*entries[idx_median] << endmsg;
-//  if (debug) sdebug << "5*entries[(int)(idx_median*0.32)] = " << 5*entries[(int)(idx_median*0.32)] << endmsg;
-//  if (debug) sdebug << "5*entries[(int)(entries.size()-idx_median*0.32)] = " << 5*entries[(int)(entries.size()-idx_median*0.32)] << endmsg;
-//  if (debug) sdebug << "first: " << minmax.first << endmsg;
-//  if (debug) sdebug << "second: " << minmax.second << endmsg;
-  
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after quantiles: " << minmax.first << " - " << minmax.second << endmsg;
-  
-  // if computed range is larger than min/max value choose those
-  if (minmax.first < entries.front()){
-  	minmax.first = entries.front();
-  }
-  if (minmax.second > entries.back()){
-  	minmax.second = entries.back();
+  if (debug) {
+    sdebug << "num_entries = " << num_entries << endmsg;
+    sdebug << "entries.size() = " << entries.size() << endmsg;
   }
   
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after overflow check: " << minmax.first << " - " << minmax.second << endmsg;
+  if (!entries.empty()) {
+    if (debug) {
+      sdebug << "doocore::lutils::MedianLimitsForTuple(...) range: " << entries.front() << " - " << entries.back() << endmsg;
+      sdebug << "idx_median = " << idx_median << ", entries[idx_median] = " << entries[idx_median] << endmsg;
+      sdebug << "(int)(idx_median*0.32) = " << (int)(idx_median*0.32) << endmsg;
+      sdebug << "(int)(entries.size()-idx_median*0.32) = " << (int)(entries.size()-idx_median*0.32) << endmsg;
+      sdebug << "-4*entries[idx_median] = " << -4*entries[idx_median] << endmsg;
+      sdebug << "5*entries[(int)(idx_median*0.32)] = " << 5*entries[(int)(idx_median*0.32)] << endmsg;
+      sdebug << "5*entries[(int)(entries.size()-idx_median*0.32)] = " << 5*entries[(int)(entries.size()-idx_median*0.32)] << endmsg;
+      sdebug << "first: " << minmax.first << endmsg;
+      sdebug << "second: " << minmax.second << endmsg;
+    }
 
-  if (minmax.first >= minmax.second) {
-    minmax.first  = entries[idx_median]*(minmax.first  > 0 ? 0.98 : 1.02);
-    minmax.second = entries[idx_median]*(minmax.second > 0 ? 1.02 : 0.98);
+    minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
+    minmax.second = -4*entries[idx_median]+5*entries[(int)(entries.size()-idx_median*0.32)];
+
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after quantiles: " << minmax.first << " - " << minmax.second << endmsg;
+  
+    // if computed range is larger than min/max value choose those
+    if (minmax.first < entries.front()){
+      minmax.first = entries.front();
+    }
+    if (minmax.second > entries.back()){
+      minmax.second = entries.back();
+    }
+    
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after overflow check: " << minmax.first << " - " << minmax.second << endmsg;
+
+    if (minmax.first >= minmax.second) {
+      minmax.first  = entries[idx_median]*(minmax.first  > 0 ? 0.98 : 1.02);
+      minmax.second = entries[idx_median]*(minmax.second > 0 ? 1.02 : 0.98);
+    }
+    
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after flip/equality check: " << minmax.first << " - " << minmax.second << endmsg;
+    
+    // if everything fails, just take all
+    if (minmax.first == 0 && minmax.second == 0) {
+      minmax.first  = entries[0]-0.1*(entries[entries.size()-1]-entries[0]);
+      minmax.second = entries[num_entries-1]+0.1*(entries[entries.size()-1]-entries[0]);
+    }
+    
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after zero check: " << minmax.first << " - " << minmax.second << endmsg;
+  } else {
+    minmax.first  = -1;
+    minmax.second = +1;
   }
-  
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after flip/equality check: " << minmax.first << " - " << minmax.second << endmsg;
-  
-  // if everything fails, just take all
-  if (minmax.first == 0 && minmax.second == 0) {
-    minmax.first  = entries[0]-0.1*(entries[entries.size()-1]-entries[0]);
-    minmax.second = entries[num_entries-1]+0.1*(entries[entries.size()-1]-entries[0]);
-  }
-  
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after zero check: " << minmax.first << " - " << minmax.second << endmsg;
   
   // if still empty range, go from -1 to +1
   if (minmax.first == 0 && minmax.second == 0) {
@@ -1689,4 +1700,49 @@ RooBinning doocore::lutils::GetQuantileBinning(RooDataSet* data, std::string var
   return Binning;
 }
 
+std::pair<double,double> doocore::lutils::MinMaxLimitsForDataSet(const RooDataSet& dataset, std::string var_name) {
+  bool debug = false;
+
+  int num_entries = dataset.numEntries();
+  std::pair<double, double> minmax;
+
+  if (num_entries == 0) {
+    minmax.first  = 0;
+    minmax.second = 1;
+    return minmax;
+  }
+
+  std::vector<double> entries;
+
+  // convert entries into vector (for sorting)
+  const RooArgSet* args = NULL;
+  for (int i = 0; i < num_entries; ++i) {
+    args = dataset.get(i);
+    if (isfinite(dynamic_cast<RooRealVar*>(args->find(var_name.c_str()))->getVal())) {
+      entries.push_back(dynamic_cast<RooRealVar*>(args->find(var_name.c_str()))->getVal());
+    }
+  }
+
+  // if (debug) sdebug << "#non-finite entries neglected: " << num_entries-entries.size() << endmsg;
+
+  std::sort(entries.begin(), entries.end());
+
+  // for (int i = 0; i < entries.size(); ++i) {
+    // if (debug) sdebug << entries[i] << endmsg;
+  // }
+
+  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) range: " << entries.front() << " - " << entries.back() << endmsg;
+
+  minmax.first = entries.front();
+  minmax.second = entries.back();
+
+  // just take a little more
+  minmax.first  = minmax.first*(minmax.first  > 0 ? 0.9998 : 1.0002);
+  minmax.second = minmax.second*(minmax.second > 0 ? 1.0002 : 0.9998);
+
+  // if (debug) sdebug << "first: " << minmax.first << endmsg;
+  // if (debug) sdebug << "second: " << minmax.second << endmsg;
+
+  return minmax;
+}
 

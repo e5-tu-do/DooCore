@@ -26,24 +26,24 @@ using namespace boost::assign; // bring 'operator+=()' into scope
 #include "gsl/gsl_randist.h"
 #include "gsl/gsl_rng.h"
 
-class MySampleGenerator {
- public:
-  MySampleGenerator() : rand_() {}
+// class MySampleGenerator {
+//  public:
+//   MySampleGenerator() : rand_() {}
   
-  double Generate() {
-    return rand_.Gaus(1, 0.5);
-  }
+//   double Generate() {
+//     return rand_.Gaus(1, 0.5);
+//   }
   
- private:
-  TRandom3 rand_;
-};
+//  private:
+//   TRandom3 rand_;
+// };
 
 class MyCalculator {
  public:
   double Calculate(const RooArgSet* values) const {
     using namespace doocore::io;
 //    sdebug << values->getRealValue("p1") << " - " << values->getRealValue("p2") << endmsg;
-    return values->getRealValue("p1");// + values->getRealValue("p2");
+    return values->getRealValue("p1") + values->getRealValue("p2");
   }
 };
 
@@ -65,6 +65,9 @@ int main() {
   RooRealVar p2("p2", "p2", 10.0, -100.0, 100.0);
   RooArgList args(p1, p2);
   
+  p1.setError(1.0);
+  p2.setError(1.0);
+
   TMatrixDSym cov(2);
   
   cov(0,0) = 0.25;
@@ -72,15 +75,20 @@ int main() {
   cov(1,1) = 0.25;
   
   MultiVarGaussianSampleGenerator mvggen(args, cov);
-  
+  VaryParameterErrorsGenerator varygen(args);
+
   MyCalculator mycalc;
-  MySampleGenerator mygen;
-  ErrorEstimator<MyCalculator, MultiVarGaussianSampleGenerator> est(mycalc, mvggen);
+  //MySampleGenerator mygen;
+  ErrorEstimator<MyCalculator, VaryParameterErrorsGenerator> est(mycalc, varygen);
   
   ValueWithError<double> mcval(est.Sample(10000));
   swarn << "Test of ErrorEstimator:" << endmsg;
   sinfo << mcval << " - " << mcval.value << " +/- " << mcval.error << endmsg;
   
+  sinfo << "Boundaries: " << est.MinimumGeneratedValue() << " - " << est.MaximumGeneratedValue() << endmsg;
+  sinfo << "Minimum parameters: " << *varygen.MinimumParameterSet() << endmsg;
+  sinfo << "Maximum parameters: " << *varygen.MaximumParameterSet() << endmsg;
+
   std::vector<ValueWithError<double>> values;
   
   values  += 
