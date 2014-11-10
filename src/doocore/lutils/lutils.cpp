@@ -335,6 +335,7 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
     paths.push_back(fs::path(dir+"C/"));
     paths.push_back(fs::path(dir+"png/"));
   }
+  paths.push_back(fs::path(dir+"tex/"));
   paths.push_back(fs::path(dir+"pdf/"));
   for (std::vector<fs::path>::const_iterator it=paths.begin(), end= paths.end();
        it != end; ++it) {
@@ -351,6 +352,7 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
     c->Print(dir+"png/" + name + ".png");
   }
   c->Print(dir+"pdf/" + name + ".pdf");
+  c->Print(dir+"tex/" + name + ".tex", "tex");
   gErrorIgnoreLevel = ignore_level;
 }
   
@@ -1502,9 +1504,10 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
 //  }
   
   
-  //if (debug) 
-  sdebug << "num_entries = " << num_entries << endmsg;
-  sdebug << "entries.size() = " << entries.size() << endmsg;
+  if (debug) {
+    sdebug << "num_entries = " << num_entries << endmsg;
+    sdebug << "entries.size() = " << entries.size() << endmsg;
+  }
   
   if (!entries.empty()) {
     if (debug) {
