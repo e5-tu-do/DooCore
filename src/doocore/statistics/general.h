@@ -15,14 +15,17 @@
 
 // from ROOT
 #include "TMath.h"
+#include "TRandom3.h"
 
 // from RooFit
+#include "RooDataSet.h"
 
 // from DooCore
 #include "doocore/io/MsgStream.h"
 
 // from GSL
 #include "gsl/gsl_statistics.h"
+#include "gsl/gsl_sort.h"
 
 // forward decalarations
 
@@ -693,6 +696,130 @@ namespace general {
 
     return std::make_pair(quantile_lo, quantile_hi);
   }
+
+  /**
+   *  @brief Get Mean from RooRealVar inside RooDataSet
+   *
+   *  @param dataset RooDataSet from which to extract values
+   *  @param param_name parameter name to look for in dataset
+   */
+  inline double get_mean_from_dataset(const RooDataSet *dataset, const std::string& param_name){
+    std::vector<double> data;
+
+    for(int i=0; i<dataset->numEntries(); i++){
+      const RooArgSet* params = dataset->get(i);
+      data.push_back(params->getRealValue(param_name.c_str()));
+    }
+
+    double mean = gsl_stats_mean(&(data.at(0)), 1, data.size());
+
+    return mean;
+  }
+
+  /**
+   *  @brief Get Median from RooRealVar inside RooDataSet
+   *
+   *  @param dataset RooDataSet from which to extract values
+   *  @param param_name parameter name to look for in dataset
+   */
+  inline double get_median_from_dataset(const RooDataSet *dataset, const std::string& param_name){
+    std::vector<double> data;
+
+    for(int i=0; i<dataset->numEntries(); i++){
+      const RooArgSet* params = dataset->get(i);
+      data.push_back(params->getRealValue(param_name.c_str()));
+    }
+
+    std::sort(data.begin(), data.end());
+    double median = gsl_stats_median_from_sorted_data(&(data.at(0)), 1, data.size());
+
+    return median;
+  }
+
+  /**
+   *  @brief Get Quantile from RooRealVar inside RooDataSet
+   *
+   *  Takes a RooDataSet and a parameter name and calculates the quantile with the
+   *  given fraction of lying values below that value. Also writes the sorted data
+   *  to a vector of doubles for the caller, to save time the next time a quantile is computed.
+   *  This vector needs to have the same dimension as data.
+   *
+   *  @param data RooDataSet from which to extract values
+   *  @param param_name parameter name to look for in dataset
+   *  @param fraction demanded fraction of data below quantile
+   *  @param sorted_dataset vector to store sorted values (in ascending order).
+   */
+  inline double get_quantile_from_dataset(const RooDataSet *data, const std::string& param_name, double fraction, std::vector<double>& sorted_dataset){
+    if(!sorted_dataset.empty())
+      sorted_dataset.clear();
+
+    for(int i=0; i<data->numEntries(); i++){
+      const RooArgSet* params = data->get(i);
+      sorted_dataset.push_back(params->getRealValue(param_name.c_str()));
+    }
+
+    std::sort(sorted_dataset.begin(), sorted_dataset.end());
+    double quantile = gsl_stats_quantile_from_sorted_data(&(sorted_dataset.at(0)), 1, sorted_dataset.size(), fraction);
+    
+    return quantile;
+  }
+
+  /**
+   *  @brief Get Quantile from RooRealVar inside RooDataSet
+   *
+   *  Takes a RooDataSet and a parameter name and calculates the quantile with the
+   *  given fraction of lying values below that value. Also writes the sorted data
+   *  to a vector for the caller, to save time the next time a quantile is computed.
+   *  Does not store sorted values.
+   *
+   *  @param data RooDataSet from which to extract values
+   *  @param param_name parameter name to look for in dataset
+   *  @param fraction demanded fraction of data below quantile
+   */
+  inline double get_quantile_from_dataset(const RooDataSet *data, const std::string& param_name, double fraction){
+    std::vector<double> dataptr(data->numEntries());
+    double quantile = get_quantile_from_dataset(data, param_name, fraction, dataptr);
+    return quantile;
+  }
+  
+  /**
+   *  @brief Get Quantile from sorted dataset
+   *
+   *  Simple wrapper of gsl_stats_quantile_from_sorted_data
+   *  
+   *  @param sorted_dataset dataset of values in ascending order
+   *  @param fraction demanded fraction of data below quantile
+   */
+  inline double get_quantile_from_dataset(const std::vector<double>& sorted_dataset, double fraction){
+    return gsl_stats_quantile_from_sorted_data(&(sorted_dataset.at(0)), 1, sorted_dataset.size(), fraction);
+  }
+
+  /**
+   *  @brief Shuffles a RooDataSet with replacement
+   *
+   *  Draws entries from a RooDataSet with replacement.
+   *  ATTENTION: User takes ownership of returned dataset.
+   *  
+   *  @param prototype proto dataset used for the shuffeling
+   *  @param random_seed a random seed used for the shuffeling
+   *  @param n_shuffles number of entries to draw
+   */
+  inline RooDataSet* shuffle_dataset_with_replacement(const RooDataSet* prototype, int random_seed, unsigned int n_shuffles = 0){
+    RooDataSet* bootstrapped_data = new RooDataSet("shuffled_dataset",
+                                                   "shuffled_dataset",
+                                                   *prototype->get(0));
+
+    unsigned int max_id = prototype->numEntries() - 1;
+    n_shuffles = (n_shuffles == 0 ? prototype->numEntries() : n_shuffles);
+    
+    TRandom3 rgen(random_seed);
+    for(int i=0; i<n_shuffles; i++) {
+      unsigned int event_id = rgen.Integer(max_id);
+      bootstrapped_data->add(*prototype->get(event_id));
+    }
+    return bootstrapped_data;
+  }
+
 
 } // namespace general
 } // namespace statistics
