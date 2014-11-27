@@ -52,7 +52,7 @@ namespace fs = boost::filesystem;
  */
 void doocore::lutils::setStyle(TString option)
 {
-	if (option == "LHCb") {
+  if (option.Contains("LHCb")) {
 		// Use times new roman, precision 2
 //	  Int_t kLHCbFont        = 132;  // Old LHCb style: 62;
 	  // Line thickness
@@ -109,7 +109,11 @@ void doocore::lutils::setStyle(TString option)
     
 	  // use medium bold lines and thick markers
 	  lhcbStyle->SetLineWidth(lhcbWidth);
-	  lhcbStyle->SetFrameLineWidth(lhcbWidth);
+
+	  // deactivating this bad boy as it creates a solid black line in the lower
+	  // left of pull plots.
+	  // lhcbStyle->SetFrameLineWidth(lhcbWidth); 
+	  
 	  lhcbStyle->SetHistLineWidth(lhcbWidth);
 	  lhcbStyle->SetFuncWidth(lhcbWidth);
 	  lhcbStyle->SetGridWidth(lhcbWidth);
@@ -151,6 +155,14 @@ void doocore::lutils::setStyle(TString option)
 	  lhcbStyle->SetStatW(0.25);
 	  lhcbStyle->SetStatH(0.15);
     
+	  //lhcbStyle->SetLineWidth(1);
+	  
+	  // additional optimizations
+	  if (option.Contains("LHCbOptimized")) {
+	  	lhcbStyle->SetLineScalePS(2);
+	  }
+
+
 	  // put tick marks on top and RHS of plots
 	  lhcbStyle->SetPadTickX(1);
 	  lhcbStyle->SetPadTickY(1);
@@ -874,7 +886,6 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
       limits.push_back(x+data->GetErrorXhigh(i));
       values.push_back((y-c)/e);
       errors.push_back(0);
-      
     }
     //residuals
     else {
@@ -894,6 +905,10 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
     pulls.SetBinContent(i,values[i-1]);
     pulls.SetBinError(i,errors[i-1]);
   }
+
+  // for (unsigned int i = 0; i <= values.size(); ++i) {
+  //   std::cout << pulls.GetBinContent(i) << std::endl;
+  // }
   
   return pulls;
 }
@@ -1132,6 +1147,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
 
   //Draw pull
   pulls.Draw();
+  pulls.GetYaxis()->SetRangeUser(-5.8,5.8);
   zero_line.Draw();
   //Draw color coded pull graphs
   upper_box.Draw();
