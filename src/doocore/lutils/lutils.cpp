@@ -52,7 +52,7 @@ namespace fs = boost::filesystem;
  */
 void doocore::lutils::setStyle(TString option)
 {
-	if (option == "LHCb") {
+  if (option.Contains("LHCb")) {
 		// Use times new roman, precision 2
 //	  Int_t kLHCbFont        = 132;  // Old LHCb style: 62;
 	  // Line thickness
@@ -109,7 +109,11 @@ void doocore::lutils::setStyle(TString option)
     
 	  // use medium bold lines and thick markers
 	  lhcbStyle->SetLineWidth(lhcbWidth);
-	  lhcbStyle->SetFrameLineWidth(lhcbWidth);
+
+	  // deactivating this bad boy as it creates a solid black line in the lower
+	  // left of pull plots.
+	  // lhcbStyle->SetFrameLineWidth(lhcbWidth); 
+	  
 	  lhcbStyle->SetHistLineWidth(lhcbWidth);
 	  lhcbStyle->SetFuncWidth(lhcbWidth);
 	  lhcbStyle->SetGridWidth(lhcbWidth);
@@ -151,6 +155,14 @@ void doocore::lutils::setStyle(TString option)
 	  lhcbStyle->SetStatW(0.25);
 	  lhcbStyle->SetStatH(0.15);
     
+	  //lhcbStyle->SetLineWidth(1);
+	  
+	  // additional optimizations
+	  if (option.Contains("LHCbOptimized")) {
+	  	lhcbStyle->SetLineScalePS(2);
+	  }
+
+
 	  // put tick marks on top and RHS of plots
 	  lhcbStyle->SetPadTickX(1);
 	  lhcbStyle->SetPadTickY(1);
@@ -335,6 +347,7 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
     paths.push_back(fs::path(dir+"C/"));
     paths.push_back(fs::path(dir+"png/"));
   }
+  paths.push_back(fs::path(dir+"tex/"));
   paths.push_back(fs::path(dir+"pdf/"));
   for (std::vector<fs::path>::const_iterator it=paths.begin(), end= paths.end();
        it != end; ++it) {
@@ -351,6 +364,7 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
     c->Print(dir+"png/" + name + ".png");
   }
   c->Print(dir+"pdf/" + name + ".pdf");
+  c->Print(dir+"tex/" + name + ".tex", "tex");
   gErrorIgnoreLevel = ignore_level;
 }
   
@@ -872,7 +886,6 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
       limits.push_back(x+data->GetErrorXhigh(i));
       values.push_back((y-c)/e);
       errors.push_back(0);
-      
     }
     //residuals
     else {
@@ -892,6 +905,10 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
     pulls.SetBinContent(i,values[i-1]);
     pulls.SetBinError(i,errors[i-1]);
   }
+
+  // for (unsigned int i = 0; i <= values.size(); ++i) {
+  //   std::cout << pulls.GetBinContent(i) << std::endl;
+  // }
   
   return pulls;
 }
@@ -1130,6 +1147,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
 
   //Draw pull
   pulls.Draw();
+  pulls.GetYaxis()->SetRangeUser(-5.8,5.8);
   zero_line.Draw();
   //Draw color coded pull graphs
   upper_box.Draw();
@@ -1491,7 +1509,7 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
       entries.push_back(dynamic_cast<RooRealVar*>(args->find(var_name.c_str()))->getVal());
     }
   }
-  
+
 //  if (debug) sdebug << "#non-finite entries neglected: " << num_entries-entries.size() << endmsg;
   
   std::sort(entries.begin(), entries.end());
@@ -1502,46 +1520,57 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
 //  }
   
   
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) range: " << entries.front() << " - " << entries.back() << endmsg;
-  
-  minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
-  minmax.second = -4*entries[idx_median]+5*entries[(int)(entries.size()-idx_median*0.32)];
-  
-//  if (debug) sdebug << "idx_median = " << idx_median << ", entries[idx_median] = " << entries[idx_median] << endmsg;
-//  if (debug) sdebug << "(int)(idx_median*0.32) = " << (int)(idx_median*0.32) << endmsg;
-//  if (debug) sdebug << "(int)(entries.size()-idx_median*0.32) = " << (int)(entries.size()-idx_median*0.32) << endmsg;
-//  if (debug) sdebug << "-4*entries[idx_median] = " << -4*entries[idx_median] << endmsg;
-//  if (debug) sdebug << "5*entries[(int)(idx_median*0.32)] = " << 5*entries[(int)(idx_median*0.32)] << endmsg;
-//  if (debug) sdebug << "5*entries[(int)(entries.size()-idx_median*0.32)] = " << 5*entries[(int)(entries.size()-idx_median*0.32)] << endmsg;
-//  if (debug) sdebug << "first: " << minmax.first << endmsg;
-//  if (debug) sdebug << "second: " << minmax.second << endmsg;
-  
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after quantiles: " << minmax.first << " - " << minmax.second << endmsg;
-  
-  // if computed range is larger than min/max value choose those
-  if (minmax.first < entries.front()){
-  	minmax.first = entries.front();
-  }
-  if (minmax.second > entries.back()){
-  	minmax.second = entries.back();
+  if (debug) {
+    sdebug << "num_entries = " << num_entries << endmsg;
+    sdebug << "entries.size() = " << entries.size() << endmsg;
   }
   
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after overflow check: " << minmax.first << " - " << minmax.second << endmsg;
+  if (!entries.empty()) {
+    if (debug) {
+      sdebug << "doocore::lutils::MedianLimitsForTuple(...) range: " << entries.front() << " - " << entries.back() << endmsg;
+      sdebug << "idx_median = " << idx_median << ", entries[idx_median] = " << entries[idx_median] << endmsg;
+      sdebug << "(int)(idx_median*0.32) = " << (int)(idx_median*0.32) << endmsg;
+      sdebug << "(int)(entries.size()-idx_median*0.32) = " << (int)(entries.size()-idx_median*0.32) << endmsg;
+      sdebug << "-4*entries[idx_median] = " << -4*entries[idx_median] << endmsg;
+      sdebug << "5*entries[(int)(idx_median*0.32)] = " << 5*entries[(int)(idx_median*0.32)] << endmsg;
+      sdebug << "5*entries[(int)(entries.size()-idx_median*0.32)] = " << 5*entries[(int)(entries.size()-idx_median*0.32)] << endmsg;
+      sdebug << "first: " << minmax.first << endmsg;
+      sdebug << "second: " << minmax.second << endmsg;
+    }
 
-  if (minmax.first >= minmax.second) {
-    minmax.first  = entries[idx_median]*(minmax.first  > 0 ? 0.98 : 1.02);
-    minmax.second = entries[idx_median]*(minmax.second > 0 ? 1.02 : 0.98);
+    minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
+    minmax.second = -4*entries[idx_median]+5*entries[(int)(entries.size()-idx_median*0.32)];
+
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after quantiles: " << minmax.first << " - " << minmax.second << endmsg;
+  
+    // if computed range is larger than min/max value choose those
+    if (minmax.first < entries.front()){
+      minmax.first = entries.front();
+    }
+    if (minmax.second > entries.back()){
+      minmax.second = entries.back();
+    }
+    
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after overflow check: " << minmax.first << " - " << minmax.second << endmsg;
+
+    if (minmax.first >= minmax.second) {
+      minmax.first  = entries[idx_median]*(minmax.first  > 0 ? 0.98 : 1.02);
+      minmax.second = entries[idx_median]*(minmax.second > 0 ? 1.02 : 0.98);
+    }
+    
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after flip/equality check: " << minmax.first << " - " << minmax.second << endmsg;
+    
+    // if everything fails, just take all
+    if (minmax.first == 0 && minmax.second == 0) {
+      minmax.first  = entries[0]-0.1*(entries[entries.size()-1]-entries[0]);
+      minmax.second = entries[num_entries-1]+0.1*(entries[entries.size()-1]-entries[0]);
+    }
+    
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after zero check: " << minmax.first << " - " << minmax.second << endmsg;
+  } else {
+    minmax.first  = -1;
+    minmax.second = +1;
   }
-  
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after flip/equality check: " << minmax.first << " - " << minmax.second << endmsg;
-  
-  // if everything fails, just take all
-  if (minmax.first == 0 && minmax.second == 0) {
-    minmax.first  = entries[0]-0.1*(entries[entries.size()-1]-entries[0]);
-    minmax.second = entries[num_entries-1]+0.1*(entries[entries.size()-1]-entries[0]);
-  }
-  
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after zero check: " << minmax.first << " - " << minmax.second << endmsg;
   
   // if still empty range, go from -1 to +1
   if (minmax.first == 0 && minmax.second == 0) {
