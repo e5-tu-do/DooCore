@@ -12,6 +12,7 @@
 
 // from Boost
 #include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
 
 // from ROOT
 #include "TMath.h"
@@ -96,6 +97,23 @@ namespace general {
      *  @return value +/- error as string
      */
     std::string FormatString() const;
+
+    /**
+     *  @brief Format value +/- error with PDG rounding in TLatex format
+     *
+     *  Based on the PDG rounding rules, the value and error will be formatted 
+     *  as strings.
+     *
+     *  @return value +/- error as string in TLatex compatible format
+     */
+    std::string FormatStringTLatex() const {
+      std::string str(FormatString());
+
+      boost::replace_all(str, "+/-", "#pm");
+      boost::replace_all(str, "-", "#minus");
+
+      return str;
+    }
     
     T value;
     T error;
