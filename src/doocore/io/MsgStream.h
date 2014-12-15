@@ -7,6 +7,7 @@
 #include <sstream> 
 #include <cstring>
 #include <vector>
+#include <set>
 #include <unistd.h>
 
 #include "TStopwatch.h"
@@ -263,6 +264,24 @@ inline MsgStream& operator<<(MsgStream& lhs, const std::vector<T>& arg) {
     lhs << arg.front();
     for (typename std::vector<T>::const_iterator it = arg.begin()+1;
          it != arg.end(); ++it) {
+      lhs << ", " << *it;
+    }
+    lhs << ")";
+  }
+  return lhs;
+}
+
+/**
+ *  @brief Print a set via MsgStream
+ */
+template<typename T>
+inline MsgStream& operator<<(MsgStream& lhs, const std::set<T>& arg) {
+  if (arg.size() > 0) {
+    lhs << "(";
+    typename std::set<T>::const_iterator it = arg.begin();
+    lhs << *it;
+    ++it;
+    for (;it != arg.end(); ++it) {
       lhs << ", " << *it;
     }
     lhs << ")";
