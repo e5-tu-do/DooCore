@@ -90,6 +90,14 @@ void ReplaceScientificNotationInFile(std::string filename, bool debug_mode){
   boost::filesystem::remove(tmpfilename);
 }
 
+std::string SecondsToTimeString(double seconds) {
+  char buffer[20];
+  snprintf ( buffer, 20, "%02.0f:%02.0f:%02.0f", floor(seconds/3600.0), floor(fmod(seconds,3600.0)/60.0), fmod(seconds,60.0) );
+  
+  std::string ret(buffer);
+  return ret;
+}
+
 } // namespace tools
 } // namespace io
 } // namespace doocore
