@@ -9,6 +9,7 @@
 #include <chrono>
 #include <random>
 #include <iomanip>
+#include <iostream>
 
 // from Boost
 #include <boost/format.hpp>
@@ -194,10 +195,15 @@ namespace general {
           error_to_check = std::min(error_lo, error_hi);
         }
         
-        
+        using namespace std;
+        // std::cout << value << " +/- " << error << " + " << error_hi << " - " << error_lo << std::endl;
+        // std::cout << "error_to_check = " << error_to_check << std::endl;
+
         std::fesetround(FE_TONEAREST);
         int mantissa_err   = std::nearbyint(error_to_check*100.0*std::pow(10.0,-static_cast<int>(std::floor(std::log10(error_to_check)))));
         
+        // cout << "mantissa_err   = " << mantissa_err << endl;
+
         // additional digits if mantissa of error <= 3.54
         int add_digits     = 0;
         if (mantissa_err <= 354) add_digits++;
@@ -210,14 +216,19 @@ namespace general {
         
         std::string format;
         
+        // cout << "exp_err_check   = " << exp_err_check << endl;
+        // cout << "exp_err         = " << exp_err << endl;
+
         // depending on exponent use scientific notation or not
         if (abs_exp_err_check < 5) {
           if (exp_err_check < 1.0) {
             std::fesetround(FE_DOWNWARD);
-            format = "%." + std::to_string(static_cast<int>(std::abs(std::nearbyint(exp_err))+add_digits)) + "f";
+            format = "%." + std::to_string(static_cast<int>(std::abs(std::nearbyint(exp_err_check))+add_digits)) + "f";
           } else {
             format = "%.0f";
           }
+
+          // cout << format << endl;
 
           std::fesetround(FE_TONEAREST);
           str_value_ = str(boost::format(format) % value);

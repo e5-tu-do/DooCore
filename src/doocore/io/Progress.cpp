@@ -10,6 +10,7 @@
 
 // from DooCore
 #include "doocore/io/MsgStream.h"
+#include "doocore/io/Tools.h"
 
 doocore::io::Progress::Progress(std::string name_task, long long num_steps_total) :
 name_task_(name_task),
@@ -31,11 +32,7 @@ elapsed_(0)
 }
 
 std::string doocore::io::Progress::SecondsToTimeString(double seconds) const {
-  char buffer[20];
-  snprintf ( buffer, 20, "%02.0f:%02.0f:%02.0f", floor(seconds/3600.0), floor(fmod(seconds,3600.0)/60.0), fmod(seconds,60.0) );
-  
-  std::string ret(buffer);
-  return ret;
+  return doocore::io::tools::SecondsToTimeString(seconds);
 }
 
 std::string doocore::io::Progress::MakeProgressBar(double fraction) const {

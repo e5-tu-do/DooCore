@@ -35,6 +35,8 @@ namespace tools {
  */
 void ReplaceScientificNotationInFile(std::string filename, bool debug_mode=false);
 
+std::string SecondsToTimeString(double seconds);
+
 } // namespace tools
 } // namespace io
 } // namespace doocore
