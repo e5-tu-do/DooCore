@@ -45,6 +45,8 @@ using namespace std;
 using namespace doocore::io;
 namespace fs = boost::filesystem;
 
+double doocore::lutils::GlobalLhcbTSize(0.06);
+
 /*
  * Set global layout
  *
@@ -58,8 +60,14 @@ void doocore::lutils::setStyle(TString option)
 	  // Line thickness
 	  Double_t lhcbWidth    = 2.00; // Old LHCb style: 3.00;
 	  // Text size
-	  Double_t lhcbTSize    = 0.06;
-    
+	  if (option.Contains("Enlarged")) {
+	  	GlobalLhcbTSize = 0.08;
+	  } else {
+	  	GlobalLhcbTSize = 0.06;
+	  }
+
+	  Double_t lhcbTSize    = GlobalLhcbTSize;
+
 	  // use plain black on white colors
 	  gROOT->SetStyle("Plain");
 	  TStyle *lhcbStyle= new TStyle("lhcbStyle","LHCb plots style");
@@ -708,8 +716,8 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label,
   // some global definitions
   double pad_border       = 0.02;
   double pad_relysplit    = 0.00;
-  double left_margin      = 0.16;
-  double top_label_size   = 0.06;
+  double left_margin      = 0.16*GlobalLhcbTSize/0.06;
+  double top_label_size   = GlobalLhcbTSize;
   double top_title_offset = 1.2;
   double title2label_size_ratio = 1.1;
   
@@ -788,10 +796,10 @@ double doocore::lutils::RunTest(const TH1 & hist) {
 void doocore::lutils::PreparePadForPulls(TCanvas * c1, bool plot_logx, bool plot_logy, double & top_label_size, double & top_title_offset, double & title2label_size_ratio, double & bottom_label_size, double & bottom_title_offset) {
   // some global definitions
   double pad_border       = 0.02;
-  double pad_relysplit    = 0.3;
-  double left_margin      = 0.16;
+  double pad_relysplit    = 0.3+GlobalLhcbTSize/0.06*0.05;
+  double left_margin      = 0.16*GlobalLhcbTSize/0.06;
 
-  top_label_size   = 0.06;
+  top_label_size   = GlobalLhcbTSize;
   top_title_offset = 1.2;
   title2label_size_ratio = 1.1;
   
