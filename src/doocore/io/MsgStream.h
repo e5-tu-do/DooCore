@@ -396,7 +396,7 @@ inline MsgStream& operator<< <RooAbsCollection>(MsgStream& lhs, const RooAbsColl
     TIterator* iter = argset.createIterator();
     const RooAbsArg* arg  = (RooAbsArg*)iter->Next();
     //lhs.stream() << arg->GetName();
-    lhs << *arg;
+    lhs.stream() << arg->GetName();
     
     while ((arg = (const RooAbsArg*)iter->Next())) {
       //lhs.stream() << "," << arg->GetName();
@@ -405,7 +405,8 @@ inline MsgStream& operator<< <RooAbsCollection>(MsgStream& lhs, const RooAbsColl
       } else {
         lhs << ", ";
       }
-      lhs << *arg;
+      //lhs << *arg;
+      lhs.stream() << arg->GetName();
     }
     //lhs.stream() << ")";
   }
