@@ -114,6 +114,7 @@ public:
 };
 
 const int kLHCbFont = 132;
+extern double GlobalLhcbTSize;
   
 //	
 // plots
