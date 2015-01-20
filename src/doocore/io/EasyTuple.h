@@ -126,7 +126,7 @@ class EasyTuple {
    *
    *  @param dataset RooDataSet to use
    */
-  EasyTuple(RooDataSet& dataset);
+  EasyTuple(RooDataSet& dataset, const RooArgSet& argset=RooArgSet());
   
   /**
    *  @brief Copy constructor for EasyTuple
