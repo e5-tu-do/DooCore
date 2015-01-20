@@ -104,7 +104,7 @@ cut_variable_range_(kCutInclusive)
   delete it;
 }
 
-doocore::io::EasyTuple::EasyTuple(RooDataSet& dataset)
+doocore::io::EasyTuple::EasyTuple(RooDataSet& dataset, const RooArgSet& argset)
 : file_(NULL),
 tree_(NULL),
 argset_(NULL),
@@ -112,7 +112,11 @@ dataset_(&dataset),
 num_maximum_events_(-1),
 cut_variable_range_(kCutInclusive)
 {
-  argset_ = new RooArgSet(*dataset_->get());
+  if (argset.getSize() > 0) {
+    argset_ = new RooArgSet(argset);
+  } else {
+    argset_ = new RooArgSet(*dataset_->get());
+  }
 }
 
 doocore::io::EasyTuple::EasyTuple(const EasyTuple& other)
@@ -288,12 +292,22 @@ RooDataSet& doocore::io::EasyTuple::ConvertToDataSet(const RooArgSet& argset,
 }
 
 void doocore::io::EasyTuple::WriteDataSetToTree(const std::string& file_name, const std::string& tree_name) {
+  using namespace doocore::io;
+
   TFile file(file_name.c_str(), "recreate");
   TTree tree(tree_name.c_str(), tree_name.c_str());
 
   std::vector<TBranch*> branches;
+  TBranch*              branch_weight(nullptr);
+  double                value_weight;
   std::map<std::string, double> values_double;
   std::map<std::string, int> values_cats;
+
+  bool is_weighted(false);
+  if (dataset_->isWeighted()) {
+    is_weighted = true;
+    sinfo << "The dataset is weighted. RooFit allows no access to the weight's name. Thus, it will be called 'weight' in the TTree." << endmsg;
+  }
 
   RooLinkedListIter* it  = dynamic_cast<RooLinkedListIter*>(argset_->createIterator());
   RooAbsArg*         arg = NULL;
@@ -318,6 +332,9 @@ void doocore::io::EasyTuple::WriteDataSetToTree(const std::string& file_name, co
     }
   }
   delete it;
+  if (is_weighted) {
+    branch_weight = tree.Branch("weight", &value_weight, "weight/D");
+  }
 
   Progress p("Writing RooDataSet to TTree", dataset_->numEntries());
   for (int i=0; i<dataset_->numEntries(); ++i) {
@@ -328,6 +345,10 @@ void doocore::io::EasyTuple::WriteDataSetToTree(const std::string& file_name, co
 
     for (auto cat : values_cats) {
       values_cats[cat.first] = args->getCatIndex(cat.first.c_str());
+    }
+
+    if (is_weighted) {
+      value_weight = dataset_->weight();
     }
     tree.Fill();
     ++p;
