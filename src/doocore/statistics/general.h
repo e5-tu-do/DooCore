@@ -480,6 +480,32 @@ namespace general {
                              std::sqrt((sum_error - (sum*sum)/static_cast<double>(n))/static_cast<double>(n-1)));
   }
 
+    /**
+     *  @brief Calculate sum based on values
+     *
+     *  Based on given iterators of values, the sum and the error on the sum are
+     *  computed
+     *
+     *  @param parameter description
+     *  @param first iterator for values to start with
+     *  @param last iterator for values to end with
+     *  @return sum and error as ValueWithError
+     */
+    template <typename T, typename ValueIterator>
+    inline ValueWithError<T> Sum(ValueIterator first, ValueIterator last) {
+      T sum          = 0.0;
+      T sum_error    = 0.0;
+      
+      while (first != last) {
+        // doocore::io::sdebug << "x = " << (*first).value << " +/- " << (*first).error<< doocore::io::endmsg;
+        sum         += (*first).value;
+        sum_error   += std::pow((*first).error,2);
+        ++first;
+      }
+        // doocore::io::sdebug << "sum = " << sum << " +/- " << std::sqrt(sum_error) << doocore::io::endmsg;
+      return ValueWithError<T>(sum, std::sqrt(sum_error));
+    }
+
   /**
    *  @brief Calculate weighted covariance based on provides values and weights
    *
