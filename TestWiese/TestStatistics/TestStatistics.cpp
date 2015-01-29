@@ -21,6 +21,7 @@ using namespace boost::assign; // bring 'operator+=()' into scope
 #include "doocore/statistics/montecarlo/ErrorEstimator.h"
 #include "doocore/io/MsgStream.h"
 #include "doocore/lutils/lutils.h"
+#include "effic/effic2.hpp"
 
 // from GSL
 #include "gsl/gsl_randist.h"
@@ -56,6 +57,13 @@ int main() {
   swarn << "Starting TestStatistics.cpp" << endmsg;
   swarn << "" << endmsg;
   
+  // void effic2(int k, int N, double conflevel, 
+  //       double& mode, double& low, double& high);
+
+  double eff, low, high;
+  effic2(100, 1000, 0.683, eff, low, high);
+  sinfo << "eff = " << 100 << "/" << 1000 << " = " << eff << " - " << eff-low << " + " << high-eff << endmsg;
+
   ValueWithError<double> test_num(0.99,0.109);
   sinfo << "My parameter is " << test_num << doocore::io::endmsg;
 
