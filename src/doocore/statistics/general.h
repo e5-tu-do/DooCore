@@ -18,12 +18,14 @@
 // from ROOT
 #include "TMath.h"
 #include "TRandom3.h"
+#include "TEfficiency.h"
 
 // from RooFit
 #include "RooDataSet.h"
 
 // from DooCore
 #include "doocore/io/MsgStream.h"
+#include "effic/effic2.hpp"
 
 // from GSL
 #include "gsl/gsl_statistics.h"
@@ -304,6 +306,46 @@ namespace general {
   inline double EfficiencyBinomialError(double num_subset, double num_all) {
     return (1.0/num_all)*TMath::Sqrt(num_subset*(1.0-num_subset/num_all));
   }
+
+  /**
+   *  @brief Calculate confidence interval of an efficiency according to FERMILAB-TM-2286-CD (Calculating Efficiencies and Their Uncertainties)
+   *
+   *  Assuming an efficiency num_subset/num_all where the number num_subset is a
+   *  subset of num_all, this function will calculate the lower and upper 68.3% 
+   *  confidence interval of the efficiency using the Bayesian approach 
+   *  discussed in FERMILAB-TM-2286-CD (Calculating Efficiencies and Their 
+   *  Uncertainties).
+   *
+   *  @param num_subset number of events that are passing some criterion
+   *  @param num_all number of all events
+   *  @return lower and upper confidence interval as std::pair
+   */
+  inline std::pair<double, double> EfficiencyBayesianErrorBayesian(double num_subset, double num_all) {
+    double eff, low, high;
+    effic2(num_subset, num_all, 0.683, eff, low, high);
+    return std::make_pair(low, high);
+  }
+
+  /**
+   *  @brief Calculate confidence interval of an efficiency according to Clopper-Pearson
+   *
+   *  Assuming an efficiency num_subset/num_all where the number num_subset is a
+   *  subset of num_all, this function will calculate the binomial error of the 
+   *  efficiency.
+   *
+   *  Assuming an efficiency num_subset/num_all where the number num_subset is a
+   *  subset of num_all, this function will calculate the lower and upper 68.3% 
+   *  confidence interval of the efficiency using Clopper-Pearson (as 
+   *  recommended by the PDG)
+   *
+   *  @param num_subset number of events that are passing some criterion
+   *  @param num_all number of all events
+   *  @return lower and upper confidence interval as std::pair
+   */
+  inline std::pair<double, double> EfficiencyBayesianErrorClopperPearson(double num_subset, double num_all) {
+    return std::make_pair(TEfficiency::ClopperPearson(num_all, num_subset, 0.683, false), 
+                          TEfficiency::ClopperPearson(num_all, num_subset, 0.683, true));
+  }
   
   /**
    *  @brief Calculate weighted average and its error based on values with errors and weights
@@ -479,6 +521,32 @@ namespace general {
     return ValueWithError<T>(x_e + sum/static_cast<double>(n),
                              std::sqrt((sum_error - (sum*sum)/static_cast<double>(n))/static_cast<double>(n-1)));
   }
+
+    /**
+     *  @brief Calculate sum based on values
+     *
+     *  Based on given iterators of values, the sum and the error on the sum are
+     *  computed
+     *
+     *  @param parameter description
+     *  @param first iterator for values to start with
+     *  @param last iterator for values to end with
+     *  @return sum and error as ValueWithError
+     */
+    template <typename T, typename ValueIterator>
+    inline ValueWithError<T> Sum(ValueIterator first, ValueIterator last) {
+      T sum          = 0.0;
+      T sum_error    = 0.0;
+      
+      while (first != last) {
+        // doocore::io::sdebug << "x = " << (*first).value << " +/- " << (*first).error<< doocore::io::endmsg;
+        sum         += (*first).value;
+        sum_error   += std::pow((*first).error,2);
+        ++first;
+      }
+        // doocore::io::sdebug << "sum = " << sum << " +/- " << std::sqrt(sum_error) << doocore::io::endmsg;
+      return ValueWithError<T>(sum, std::sqrt(sum_error));
+    }
 
   /**
    *  @brief Calculate weighted covariance based on provides values and weights
