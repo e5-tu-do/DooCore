@@ -28,6 +28,9 @@
 #include "TH1D.h"
 #include "TF1.h"
 #include "TLeaf.h"
+#include "TPluginManager.h"
+#include "TVirtualPS.h"
+#include "TTeXDump.h"
 
 // from RooFit
 #include "RooPlot.h"
@@ -46,6 +49,7 @@ using namespace doocore::io;
 namespace fs = boost::filesystem;
 
 double doocore::lutils::GlobalLhcbTSize(0.06);
+double doocore::lutils::GlobalLineWidth(2.0);
 
 /*
  * Set global layout
@@ -58,13 +62,17 @@ void doocore::lutils::setStyle(TString option)
 		// Use times new roman, precision 2
 //	  Int_t kLHCbFont        = 132;  // Old LHCb style: 62;
 	  // Line thickness
-	  Double_t lhcbWidth    = 2.00; // Old LHCb style: 3.00;
+	  Double_t lhcbWidth    = GlobalLineWidth; // Old LHCb style: 3.00;
 	  // Text size
 	  if (option.Contains("Enlarged")) {
 	  	GlobalLhcbTSize = 0.08;
 	  } else {
 	  	GlobalLhcbTSize = 0.06;
 	  }
+	  if (option.Contains("LHCbOptimized")) {
+	  	lhcbWidth = GlobalLineWidth = 1.0;
+	  }
+
 
 	  Double_t lhcbTSize    = GlobalLhcbTSize;
 
@@ -343,6 +351,27 @@ void doocore::lutils::printSystemRecources(TString cmd)
 }
 
 
+void doocore::lutils::printPlotTex(TCanvas* c, TString name, TString dir, bool pdf_only)
+{
+  //sinfo << "doocore::lutils::printPlot(...): Printing plots for " << name << " in directory " << dir << endmsg;
+
+  if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
+
+  std::vector<fs::path> paths;
+  paths.push_back(fs::path(dir+"tex/"));
+  for (std::vector<fs::path>::const_iterator it=paths.begin(), end= paths.end();
+       it != end; ++it) {
+    if (!fs::is_directory(*it)) {
+      fs::create_directories(*it);
+    }
+  }
+
+  int ignore_level = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kWarning;
+  c->Print(dir+"tex/" + name + ".tex", "tex");
+  gErrorIgnoreLevel = ignore_level;
+}
+
 void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_only)
 {
   //sinfo << "doocore::lutils::printPlot(...): Printing plots for " << name << " in directory " << dir << endmsg;
@@ -375,6 +404,7 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
   c->Print(dir+"tex/" + name + ".tex", "tex");
   gErrorIgnoreLevel = ignore_level;
 }
+
   
 void doocore::lutils::printPlotOpenStack(TCanvas* c, TString name, TString dir)
 {
@@ -1083,10 +1113,11 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   pulls3->SetFillColor(14);
   pulls4->SetFillColor(12);
   
-  pulls1->SetLineWidth(2);
-  pulls2->SetLineWidth(2);
-  pulls3->SetLineWidth(2);
-  pulls4->SetLineWidth(2);
+  double line_width=GlobalLineWidth;
+  pulls1->SetLineWidth(line_width);
+  pulls2->SetLineWidth(line_width);
+  pulls3->SetLineWidth(line_width);
+  pulls4->SetLineWidth(line_width);
   
   for (int i = 1; i <= pulls.GetNbinsX(); ++i) {
     pulls1->SetBinContent(i,0);
@@ -1143,7 +1174,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   lower_box.SetLineWidth(0);
   
   //Style for pull histogram
-  pulls.SetLineWidth(2);
+  pulls.SetLineWidth(line_width);
   pulls.SetAxisRange(-5.8,5.8,"Y");
   pulls.SetTitle("");
   pulls.SetYTitle("Pull");
@@ -1174,6 +1205,19 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   label.Draw();
   
   printPlot(&c1, pName, pDir);
+
+  // c1.cd(2);
+  // gPad->RedrawAxis(); 
+
+  // TPluginHandler* h = gROOT->GetPluginManager()->FindHandler("TVirtualPS", "tex");
+  // h->LoadPlugin();  
+  // h->ExecPlugin(0);
+  // TTeXDump* td = dynamic_cast<TTeXDump*>(gVirtualPS);
+  // if (td != nullptr) {
+  // 	td->SetLineScale(10);
+  // }
+
+  printPlotTex(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
   if (gauss_suffix != "nogauss") {
