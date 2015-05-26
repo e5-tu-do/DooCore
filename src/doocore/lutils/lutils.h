@@ -107,7 +107,7 @@ public:
     }
   }
   
-  int size() {
+  int size() const {
     boost::mutex::scoped_lock lock(the_mutex);
     return the_queue.size();
   }
