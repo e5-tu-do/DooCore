@@ -951,6 +951,33 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
   return pulls;
 }
 
+TH1D doocore::lutils::GetPulls(TH1D* h1, TH1D* h2) {
+  std::vector<double> limits;
+  std::vector<double> values;
+
+  limits.push_back(h1->GetBinLowEdge(1));
+  limits.push_back(h1->GetBinLowEdge(h1->GetNbinsX()+1)); //lower edge of overlow bin
+
+  double delta_y;
+  double error_y;
+
+  for(unsigned int i = 0; i < h1->GetNbinsX(); i++){
+    delta_y = h1->GetBinContent(i) - h2->GetBinContent(i); 
+    error_y = sqrt(h1->GetBinError(i) * h1->GetBinError(i) + h2->GetBinError(i) * h2->GetBinError(i));
+    if(error_y>0)
+    	values.push_back(delta_y / error_y);
+    else
+    	values.push_back(0);
+  }
+
+  TH1D pulls("pulls","Pulls",values.size(),limits[0],limits[1]);
+  for(unsigned int i=0; i<values.size(); i++){
+    pulls.SetBinContent(i, values[i]);
+  }
+
+  return pulls;
+}
+
 void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& pad, TF1* f_gauss_norm, TF1* f_gauss_fit, TH1* h_pulls, TH1* h_error, TLegend* legend, double chi2_reduced, double chi2_pvalue) {
   setStyle();
   
@@ -1054,6 +1081,144 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	f_gauss_norm->Draw("same");
 	
 	gPad->RedrawAxis();
+}
+
+void doocore::lutils::PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label, std::string gauss_suffix) {
+  gStyle->SetTitle(0);
+  
+  TCanvas c1("c_Utils","c_Utils",900,900);
+
+  double top_label_size   = 0;
+  double top_title_offset = 0;
+  double title2label_size_ratio = 0;
+
+  double bottom_label_size = 0;
+  double bottom_title_offset = 0;
+
+  double plot_min = h1->GetXaxis()->GetXmin();
+  double plot_max = h1->GetXaxis()->GetXmax();
+
+  //Used function is actually independent of plotdummy - change PreparePadForPulls() signature later
+  RooPlot* plotdummy = NULL;
+  PreparePadForPulls(&c1, plot_logx, plot_logy, top_label_size, top_title_offset, title2label_size_ratio, bottom_label_size, bottom_title_offset);  
+  
+  TH1D pulls = GetPulls(h1,h2);
+  
+  TH1D * pulls1 = (TH1D*) pulls.Clone("pulls1");
+  TH1D * pulls2 = (TH1D*) pulls.Clone("pulls2");
+  TH1D * pulls3 = (TH1D*) pulls.Clone("pulls3");
+  TH1D * pulls4 = (TH1D*) pulls.Clone("pulls4");
+  
+  //Additional pull histograms for color coding only used if normalize = true
+  pulls1->SetFillColor(18);
+  pulls2->SetFillColor(16);
+  pulls3->SetFillColor(14);
+  pulls4->SetFillColor(12);
+  
+  pulls1->SetLineWidth(2);
+  pulls2->SetLineWidth(2);
+  pulls3->SetLineWidth(2);
+  pulls4->SetLineWidth(2);
+  
+  for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
+    pulls1->SetBinContent(i,0);
+    pulls2->SetBinContent(i,0);
+    pulls3->SetBinContent(i,0);
+    pulls4->SetBinContent(i,0);
+    
+    if (TMath::Abs(pulls.GetBinContent(i)) < 1) {
+      pulls1->SetBinContent(i,pulls.GetBinContent(i));
+    }
+    else if (TMath::Abs(pulls.GetBinContent(i)) < 2) {
+      pulls2->SetBinContent(i,pulls.GetBinContent(i));
+    }
+    else if (TMath::Abs(pulls.GetBinContent(i)) < 3) {
+      pulls3->SetBinContent(i,pulls.GetBinContent(i));
+    }
+    else {
+      pulls4->SetBinContent(i,pulls.GetBinContent(i));
+    }
+  }
+  //end of histogram creation
+
+  c1.cd(1);
+
+  //SavePlotXTitle
+  TString temp_xtitle =  h1->GetXaxis()->GetTitle();
+
+  h1->SetLabelSize(0.0,"x");
+  h1->SetLabelSize(top_label_size,"y");
+  h1->SetXTitle("");
+  h1->SetTitleSize(top_label_size*title2label_size_ratio,"y");
+  h1->GetYaxis()->SetTitleOffset(top_title_offset);
+
+  double max = h1->GetMaximum() > h2->GetMaximum() ? h1->GetMaximum() : h2->GetMaximum();
+  h1->SetMaximum(1.3*max);
+    
+  //pFrame->Draw();
+  h1->SetLineColor(2);
+  h2->SetLineColor(4);
+
+  h1->Draw("E");
+  h2->Draw("E SAME");
+
+  // lower frame with residuals plot
+  c1.cd(2);
+  
+  pulls.SetXTitle(temp_xtitle);
+  pulls.GetXaxis()->SetLimits(plot_min,plot_max);
+  
+  TLine zero_line(plot_min, 0, plot_max, 0);
+  
+  //some boxes for new residual plots:
+  TBox lower_box(plot_min, -1., plot_max, -2.);
+  TBox upper_box(plot_min, +1., plot_max, +2.);
+  
+  upper_box.SetFillColor(11);
+  upper_box.SetFillStyle(1001);
+  upper_box.SetLineWidth(0);
+  lower_box.SetFillColor(11);
+  lower_box.SetFillStyle(1001);
+  lower_box.SetLineWidth(0);
+  
+  //Style for pull histogram
+  pulls.SetLineWidth(2);
+  pulls.SetAxisRange(-5.8,5.8,"Y");
+  pulls.SetTitle("");
+  pulls.SetYTitle("Pull");
+  
+  pulls.SetLabelSize(bottom_label_size, "xy");
+  pulls.SetTitleSize(bottom_label_size*title2label_size_ratio, "xy");
+  pulls.GetYaxis()->SetTitleOffset(bottom_title_offset);  
+  pulls.GetYaxis()->SetNdivisions(5,5,0);
+
+  //Draw pull
+  pulls.Draw();
+  zero_line.Draw();
+  //Draw color coded pull graphs
+  upper_box.Draw();
+  lower_box.Draw();
+  pulls1->Draw("same");
+  pulls2->Draw("same");
+  pulls3->Draw("same");
+  pulls4->Draw("same");
+  
+  gPad->RedrawAxis(); 
+
+  //Draw label, possibly better on c1.cd(1) Tobi 2013-04-16
+  c1.cd(0);
+	if (label) {
+  	label->SetTextSize(0.05);
+  	label->Draw();
+	}
+  
+  printPlot(&c1, pName, pDir);
+
+	//produce a plot with distribution of pulls
+	PlotGauss(pName+gauss_suffix, pulls, pDir);
+
+  // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
+  h1->SetXTitle(temp_xtitle);
 }
 
 void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir, double chi2_reduced, double chi2_pvalue) {
