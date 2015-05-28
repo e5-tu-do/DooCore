@@ -215,6 +215,12 @@ void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "",
                TLegend * label = NULL,
                std::string gauss_suffix="_Gauss");
  
+//Plot Pulldistribution for two histograms
+void PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir = "",
+               bool plot_logy = false, bool plot_logx = false, bool greyscale = false,
+               TLegend * label = NULL,
+               std::string gauss_suffix="_Gauss");
+
 void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, TLatex& label, TString pDir = "", bool normalize_residuals = true, bool plot_logy = false, bool plot_logx = false);
 
 void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, TString pDir, bool normalize_residuals, bool plot_logy, TLegend * label = NULL, bool plot_logx = false);
