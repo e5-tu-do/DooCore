@@ -917,7 +917,36 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
     if (y == 0 && c < 0.5) {
       c = 0;
     }
-//    sdebug << "doocore::lutils::GetPulls(...): i = " << i << ", x = " << x << ", y = " << y << ", c = " << c << ", e = " << e << ", p = " << (y-c)/e << endmsg;
+
+    // consistency check: On sweighted datasets there can be bins with small y
+    // values and the error being identical to the value, i.e. y=e; this results
+    // in absurd pulls; need to capture this
+    if (std::abs((y-c)/e) > 3 && std::abs(std::abs(y)-std::abs(e))<1e-08) {
+    	// swarn << "Caught y==e!" << endmsg;
+    	// swarn << " data->GetErrorYlow(i)  = " << data->GetErrorYlow(i) << endmsg;
+    	// swarn << " data->GetErrorYhigh(i) = " << data->GetErrorYhigh(i) << endmsg;
+    	// swarn << " data->GetErrorY(i)     = " << data->GetErrorY(i) << endmsg;
+
+    	// Only way to handle: ignore this bin :-(
+    	y = c;
+    }
+
+    // consistency check 2: On sweighted datasets, negative y values can occur
+    // which usually result in absurd pulls (probably errors wrong)
+    if (y < 0 && std::abs((y-c)/e) < 3) {
+    	// swarn << "Found y<0 with reasonable pulls." << endmsg;
+    } else if (y < 0 && std::abs((y-c)/e) > 3) {
+    	// serr << "Found y<0 with unreasonable pulls." << endmsg;
+    	// serr << " Difference between y and e = " << std::abs(std::abs(y)-std::abs(e)) << endmsg;
+    	// serr << " data->GetErrorYlow(i)  = " << data->GetErrorYlow(i) << endmsg;
+    	// serr << " data->GetErrorYhigh(i) = " << data->GetErrorYhigh(i) << endmsg;
+    	// serr << " data->GetErrorY(i)     = " << data->GetErrorY(i) << endmsg;
+
+    	// Only way to handle: ignore this bin :-(
+    	y = c;
+    }
+
+    // sdebug << "doocore::lutils::GetPulls(...): i = " << i << ", x = " << x << ", y = " << y << ", c = " << c << ", e = " << e << ", p = " << (y-c)/e << endmsg;
     
     //pulls
     if (normalize) {
