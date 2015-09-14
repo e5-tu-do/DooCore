@@ -96,8 +96,8 @@ void doocore::lutils::setStyle(TString option)
 	  // If you want the usual gradient palette (blue -> red)
 	  lhcbStyle->SetPalette(1);
 	  // If you want colors that correspond to gray scale in black and white:
-	  int colors[8] = {0,5,7,3,6,2,4,1};
-	  lhcbStyle->SetPalette(8,colors);
+	  // int colors[8] = {0,5,7,3,6,2,4,1};
+	  // lhcbStyle->SetPalette(8,colors);
     
 	  // set the paper & margin sizes
 	  lhcbStyle->SetPaperSize(20,26);
@@ -106,6 +106,13 @@ void doocore::lutils::setStyle(TString option)
 	  lhcbStyle->SetPadBottomMargin(0.16);
 	  lhcbStyle->SetPadLeftMargin(0.14);
     
+		if (option.Contains("2d")) {
+			// sdebug << "2D!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endmsg;
+			gStyle->SetPadBottomMargin(0.15);
+			gStyle->SetPadRightMargin(0.18);
+		}
+
+
 	  // use large fonts
 	  lhcbStyle->SetTextFont(kLHCbFont);
 	  lhcbStyle->SetTextSize(lhcbTSize);
