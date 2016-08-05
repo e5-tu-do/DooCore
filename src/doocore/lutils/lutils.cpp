@@ -741,12 +741,7 @@ void doocore::lutils::addEtaPtLabels(TH2D* h)
 	h->GetYaxis()->SetTitle("y");
 }
 
-void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex& label, bool plot_logx) {
-  doocore::io::swarn << "doocore::lutils::PlotSimple(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
-  PlotSimple(pName, pFrame, label, pDir, plot_logy, plot_logx);
-}
-
-void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx) {
+void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx, bool canvas_quadratic) {
 //	setStyle();
   gStyle->SetTitle(0);
   
@@ -767,6 +762,9 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label,
 //  double plot_max = pFrame->GetXaxis()->GetXmax();
   
   TCanvas c1("c1","c1",900,630);
+  if (canvas_quadratic) {
+    c1.SetCanvasSize(800,800);
+  }
   TPad* pad = (TPad*)c1.cd();
   if(plot_logy){
     pad->SetLogy(1);
