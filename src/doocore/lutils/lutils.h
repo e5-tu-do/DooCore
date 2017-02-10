@@ -148,15 +148,9 @@ void addEtaPtLabels(TH2D* h);
  *  @param pDir Directory to put plots in (will be created on demand)
  *  @param plot_logy whether to plot with log scale on y axis
  *  @param plot_logx whether to plot with log scale on x axis
+ *  @param canvas_quadratic whether to set canvas quadractic, default: rectangular
  */
-void PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir = "", bool plot_logy = false, bool plot_logx = false);
-
-/**
- *  @brief (DEPRECATED:) Plot simple RooPlot frame
- *
- *  Just a compatibility wrapper for the other PlotSimple function.
- */
-void PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex& label, bool plot_logx = false);
+void PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir = "", bool plot_logy = false, bool plot_logx = false, bool canvas_quadratic = false);
   
 ///Do a run test as in http://de.wikipedia.org/wiki/Run-Test
 double RunTest(const TH1 & hist);

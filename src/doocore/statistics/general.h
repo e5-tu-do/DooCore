@@ -910,7 +910,7 @@ namespace general {
     n_shuffles = (n_shuffles == 0 ? prototype->numEntries() : n_shuffles);
     
     TRandom3 rgen(random_seed);
-    for(int i=0; i<n_shuffles; i++) {
+    for(unsigned int i=0; i<n_shuffles; i++) {
       unsigned int event_id = rgen.Integer(max_id);
       bootstrapped_data->add(*prototype->get(event_id));
     }
