@@ -126,7 +126,7 @@ void setRedBluePalette(TH2* h=0);
 
 void printPlotOpenStack(TCanvas* c, TString name, TString dir="");
 void printPlot(TCanvas* c, TString name, TString dir="", bool pdf_only=false);
-void printPlotTex(TCanvas* c, TString name, TString dir="", bool pdf_only=false);
+void printPlotTex(TCanvas* c, TString name, TString dir="");
 void printPlotCloseStack(TCanvas* c, TString name, TString dir="");
 
 void drawDate(float x1=0.10, float y1=0.02, float x2=0.5, float y2=0.1);	
@@ -211,7 +211,7 @@ void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "",
  
 //Plot Pulldistribution for two histograms
 void PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir = "",
-               bool plot_logy = false, bool plot_logx = false, bool greyscale = false,
+               bool plot_logy = false, bool plot_logx = false,
                TLegend * label = NULL,
                std::string gauss_suffix="_Gauss");
 

@@ -358,7 +358,7 @@ void doocore::lutils::printSystemRecources(TString cmd)
 }
 
 
-void doocore::lutils::printPlotTex(TCanvas* c, TString name, TString dir, bool pdf_only)
+void doocore::lutils::printPlotTex(TCanvas* c, TString name, TString dir)
 {
   //sinfo << "doocore::lutils::printPlot(...): Printing plots for " << name << " in directory " << dir << endmsg;
 
@@ -1117,7 +1117,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	gPad->RedrawAxis();
 }
 
-void doocore::lutils::PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label, std::string gauss_suffix) {
+void doocore::lutils::PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir, bool plot_logy, bool plot_logx, TLegend * label, std::string gauss_suffix) {
   gStyle->SetTitle(0);
   
   TCanvas c1("c_Utils","c_Utils",900,900);

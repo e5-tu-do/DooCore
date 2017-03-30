@@ -16,12 +16,10 @@ int main() {
   double d1_px = -7.90399999999999977e+02;
   double d1_py = 3.91569999999999993e+02;
   double d1_pz = 8.83469000000000051e+03;
-  double d1_m = 1.39570175170937631e+02;
   double d1_E = 8.87971207048951874e+03;
   double d2_px = -1.95069999999999993e+02;
   double d2_py = 4.48259999999999991e+02;
   double d2_pz = 5.27313000000000011e+03;
-  double d2_m = 1.39570175170937631e+02;
   double d2_E = 5.29758144469693252e+03;
   double m_pi = 1.39570175170937631e+02;
   double m_K = 493.68;
@@ -49,21 +47,21 @@ int main() {
   TLorentzVector d1_n(d1_px, d1_py, d1_pz, d1_E);
   TLorentzVector d2_n(d2_px, d2_py, d2_pz, d2_E);
   for (int i=0; i<num_steps; ++i) {
-    double wrong_mother_mass = MotherTwoBodyWrongMassHypothesis(d1_n,d2_n,m_K).M();
+    MotherTwoBodyWrongMassHypothesis(d1_n,d2_n,m_K).M();
   }
   sinfo << "time per call: " << sw.CpuTime()/num_steps << " s." << endmsg;
   
   sw.Reset();
   sw.Start();
   for (int i=0; i<num_steps; ++i) {
-    double wrong_mother_mass = MotherTwoBodyDecay(d1_px, d1_py, d1_pz, m_K, d2_px, d2_py, d2_pz, m_pi).M();
+    MotherTwoBodyDecay(d1_px, d1_py, d1_pz, m_K, d2_px, d2_py, d2_pz, m_pi).M();
   }
   sinfo << "time per call: " << sw.CpuTime()/num_steps << " s." << endmsg;
   
   sw.Reset();
   sw.Start();
   for (int i=0; i<num_steps; ++i) {
-    double wrong_mother_mass = MotherTwoBodyDecayMass(d1_px, d1_py, d1_pz, m_K, d2_px, d2_py, d2_pz, m_pi);
+    MotherTwoBodyDecayMass(d1_px, d1_py, d1_pz, m_K, d2_px, d2_py, d2_pz, m_pi);
   }
   sinfo << "time per call: " << sw.CpuTime()/num_steps << " s." << endmsg;
 }
