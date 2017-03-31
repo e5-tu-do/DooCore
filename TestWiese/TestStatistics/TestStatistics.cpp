@@ -211,7 +211,7 @@ int main() {
   swarn << "Test of WeightedCovariance:" << endmsg;
   std::vector<double> y_wavg;
   y_wavg += 3.4, 1.9, 6.8, 5.8, 11.4;
-  sinfo << Covariance(x_wavg, y_wavg, w_wavg_pos) << endmsg;
+  sinfo << Covariance<double>(x_wavg.begin(), x_wavg.end(), y_wavg.begin(), w_wavg_pos.begin()) << endmsg;
   swarn << "" << endmsg;
 
   swarn << "Test of PearsonCorrelation (incl. permutation test and bootstrap test):" << endmsg;
@@ -271,7 +271,7 @@ int main() {
   sinfo << "" << endmsg;
 
   swarn << "Test of weighted PearsonCorrelation (incl. bootstrap test):" << endmsg;
-  sinfo << PearsonCorrelation(x_rdm, y_rdm, w_rdm) << endmsg;
+  sinfo << PearsonCorrelation<double>(std::begin(x_rdm), std::end(x_rdm), std::begin(y_rdm), std::begin(w_rdm)) << endmsg;
   sinfo << BootstrapTest(x_rdm, y_rdm, w_rdm) << endmsg;
 
   // sinfo << PearsonCorrelation(x_rdm_wc, y_rdm_wc, w_rdm_wc) << endmsg;
