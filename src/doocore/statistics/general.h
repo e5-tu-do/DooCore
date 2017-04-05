@@ -549,22 +549,21 @@ namespace general {
     }
 
   /**
-   *  @brief Calculate weighted covariance based on provides values and weights
+   *  @brief Calculate weighted covariance based on provided values and weights
    *
-   *  Based on two given vectors of values and a vector of weights the 
-   *  weighted covariance is calculated.
+   *  Based on two given iterators of values and an iterator of weights the
+   *  weighted covariance is calculated. Be aware that right now it is not
+   *  checked that the two sets have the same number of entries.
    *
    *  @param parameter description
-   *  @param x vector of first set of values
-   *  @param y vector of second set of values
-   *  @param w vector of weight values
+   *  @param x_first first iterator for first set of values
+   *  @param x_last last iterator for first set of values
+   *  @param y_first first iterator for second set of values
+   *  @param w_first first iterator for weight values
    *  @return weighted covariance as double
    */
-  inline double Covariance(const std::vector<double>&x, const std::vector<double>& y, const std::vector<double>&w){
-    if ((x.size() != y.size()) || (x.size() != w.size())){
-      doocore::io::serr << "Covariance: Different size of vectors!" << doocore::io::endmsg;
-      abort();
-    }
+  template <typename T, typename ValueIterator, typename WeightIterator>
+  inline T Covariance(ValueIterator x_first, ValueIterator x_last, ValueIterator y_first, WeightIterator w_first){
 
     // using re-implementation to prevent unnecessary loops
     // double numerator = 0;
@@ -577,12 +576,15 @@ namespace general {
     // }
     // return numerator / denominator;
 
-    double xy_sum(0), x_sum(0), y_sum(0), w_sum(0);
-    for (unsigned long i = 0; i < x.size(); i++){
-      xy_sum += w.at(i) * x.at(i) * y.at(i);
-      x_sum += w.at(i) * x.at(i);
-      y_sum += w.at(i) * y.at(i);
-      w_sum += w.at(i);
+    T xy_sum(0), x_sum(0), y_sum(0), w_sum(0);
+    while (x_first != x_last) {
+      xy_sum += (*w_first) * (*x_first) * (*y_first);
+      x_sum += (*w_first) * (*x_first);
+      y_sum += (*w_first) * (*y_first);
+      w_sum += (*w_first);
+      ++x_first;
+      ++y_first;
+      ++w_first;
     }
 
     xy_sum /= w_sum;
@@ -612,35 +614,36 @@ namespace general {
   /**
    *  @brief Calculate weighted Pearson product-moment correlation coefficient
    *
-   *  Based on two std::vector<double>'s for the values and one additional vector 
+   *  Based on two iterators for the values and one additional iterator
    *  for the associated weights, the Pearson product-moment correlation 
-   *  coefficient is calculated
+   *  coefficient is calculated.
    *
    *  @param parameter description
-   *  @param x vector of first set of values
-   *  @param y vector of second set of values
-   *  @param w vector of weight values
-   *  @return weighted Pearson product-moment correlation coefficient as double
+   *  @param x_first first iterator for first set of values
+   *  @param x_last last iterator for first set of values
+   *  @param y_first first iterator for second set of values
+   *  @param w_first first iterator for weight values
+   *  @return weighted Pearson product-moment correlation coefficient
    */
-  inline double PearsonCorrelation(const std::vector<double>& x, const std::vector<double>& y, const std::vector<double>& w){
-    if ((x.size() != y.size()) || (x.size() != w.size())){
-      doocore::io::serr << "PearsonCorrelation: Different size of vectors!" << doocore::io::endmsg;
-      abort();
-    }
-    
+  template <typename T, typename ValueIterator, typename WeightIterator>
+  inline T PearsonCorrelation(ValueIterator x_first, ValueIterator x_last, ValueIterator y_first, WeightIterator w_first){
+
     // using re-implementation to prevend unnecessary loops
     // double numerator = Covariance(x, y, w);
     // double denominator = sqrt(Covariance(x, x, w) * Covariance(y, y, w));
     // return numerator / denominator;
 
-    double xy_sum(0), x_sum(0), x2_sum(0), y2_sum(0), y_sum(0), w_sum(0);
-    for (unsigned long i = 0; i < x.size(); i++){
-      xy_sum += w.at(i) * x.at(i) * y.at(i);
-      x_sum += w.at(i) * x.at(i);
-      y_sum += w.at(i) * y.at(i);
-      x2_sum += w.at(i) * x.at(i) * x.at(i);
-      y2_sum += w.at(i) * y.at(i) * y.at(i);
-      w_sum += w.at(i);
+    T xy_sum(0), x_sum(0), x2_sum(0), y2_sum(0), y_sum(0), w_sum(0);
+    while (x_first != x_last) {
+      xy_sum += (*w_first) * (*x_first) * (*y_first);
+      x_sum += (*w_first) * (*x_first);
+      y_sum += (*w_first) * (*y_first);
+      x2_sum += (*w_first) * (*x_first) * (*x_first);
+      y2_sum += (*w_first) * (*y_first) * (*y_first);
+      w_sum += (*w_first);
+      ++x_first;
+      ++y_first;
+      ++w_first;
     }
 
     xy_sum /= w_sum;
@@ -655,7 +658,7 @@ namespace general {
   /**
    *  @brief Permutation null hypothesis test
    *
-   *  Based on two std::vector<double>'s, a p-value for
+   *  Based on two std::vectors of any types, a p-value for
    *  the compatibility of the data with the null hypothesis
    *  is calculated
    *
@@ -668,7 +671,8 @@ namespace general {
    *  @param n_permutations number of permutations (default value: 1000)
    *  @return p-value for the null hypothesis as double
    */
-  inline double PermutationTest(const std::vector<double>& x, const std::vector<double>& y, const unsigned long n_permutations=1000){
+  template <typename T>
+  inline double PermutationTest(const std::vector<T>& x, const std::vector<T>& y, const unsigned long n_permutations=1000){
     if (x.size() != y.size()){
       doocore::io::serr << "PermutationTest: Different size of vectors!" << doocore::io::endmsg;
       abort();
@@ -676,7 +680,7 @@ namespace general {
     double rho = PearsonCorrelation(x, y); // Pearson correlation coeff for original data
 
     // copy y to y_prime to shuffle
-    std::vector<double> y_prime = y;
+    std::vector<T> y_prime = y;
     std::random_device random_device;
     std::mt19937 mersenne_generator(random_device());
 
@@ -684,7 +688,7 @@ namespace general {
     for (unsigned long i = 0; i < n_permutations; ++i){
       std::shuffle(std::begin(y_prime), std::end(y_prime), mersenne_generator);
       double r = PearsonCorrelation(x, y_prime);
-      if (((rho > 0) && (r > rho)) || ((rho < 0) && (r < rho))){
+      if (abs(r) > abs(rho)){
         n_larger++;
       }
     }
@@ -696,7 +700,7 @@ namespace general {
   /**
    *  @brief Bootstrap test
    *
-   *  Based on two std::vector<double>'s, a 95% CL for the
+   *  Based on two std::vectors of any types, a 95% CL for the
    *  underlying sample distribution is calculated
    *
    *  see: http://en.wikipedia.org/wiki/Bootstrapping_(statistics)
@@ -705,15 +709,12 @@ namespace general {
    *  @param x vector of first set of values
    *  @param y vector of second set of values
    *  @param n_permutations number of permutations (default value: 1000)
-   *  @return low (2.5%) and high (97.5%) quantile values as std::pair<double, double> 
+   *  @return low (2.5%) and high (97.5%) quantile values as std::pair<T, T>
    */
-  inline std::pair<double, double> BootstrapTest(const std::vector<double>& x, const std::vector<double>& y, const unsigned long n_permutations=1000){
-    if (x.size() != y.size()){
-      doocore::io::serr << "BootstrapTest: Different size of vectors!" << doocore::io::endmsg;
-      abort();
-    }
-    std::vector<double> x_prime;
-    std::vector<double> y_prime;
+  template <typename T>
+  inline std::pair<T, T> BootstrapTest(const std::vector<T>& x, const std::vector<T>& y, const unsigned long n_permutations=1000){
+    std::vector<T> x_prime;
+    std::vector<T> y_prime;
 
     unsigned long vx_size = x.size();
 
@@ -785,7 +786,7 @@ namespace general {
         y_prime.push_back(y.at(idx));
         w_prime.push_back(w.at(idx));
       }
-      r.push_back(PearsonCorrelation(x_prime, y_prime, w_prime));
+      r.push_back(PearsonCorrelation<double>(std::begin(x_prime), std::end(x_prime), std::begin(y_prime), std::begin(w_prime)));
     }
     std::sort(r.begin(), r.end());
     double quantile_lo = gsl_stats_quantile_from_sorted_data(&r[0], 1, n_permutations, 0.025);
@@ -910,7 +911,7 @@ namespace general {
     n_shuffles = (n_shuffles == 0 ? prototype->numEntries() : n_shuffles);
     
     TRandom3 rgen(random_seed);
-    for(int i=0; i<n_shuffles; i++) {
+    for(unsigned int i=0; i<n_shuffles; i++) {
       unsigned int event_id = rgen.Integer(max_id);
       bootstrapped_data->add(*prototype->get(event_id));
     }

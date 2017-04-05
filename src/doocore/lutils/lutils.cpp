@@ -96,8 +96,8 @@ void doocore::lutils::setStyle(TString option)
 	  // If you want the usual gradient palette (blue -> red)
 	  lhcbStyle->SetPalette(1);
 	  // If you want colors that correspond to gray scale in black and white:
-	  int colors[8] = {0,5,7,3,6,2,4,1};
-	  lhcbStyle->SetPalette(8,colors);
+	  // int colors[8] = {0,5,7,3,6,2,4,1};
+	  // lhcbStyle->SetPalette(8,colors);
     
 	  // set the paper & margin sizes
 	  lhcbStyle->SetPaperSize(20,26);
@@ -106,6 +106,13 @@ void doocore::lutils::setStyle(TString option)
 	  lhcbStyle->SetPadBottomMargin(0.16);
 	  lhcbStyle->SetPadLeftMargin(0.14);
     
+		if (option.Contains("2d")) {
+			// sdebug << "2D!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endmsg;
+			gStyle->SetPadBottomMargin(0.15);
+			gStyle->SetPadRightMargin(0.18);
+		}
+
+
 	  // use large fonts
 	  lhcbStyle->SetTextFont(kLHCbFont);
 	  lhcbStyle->SetTextSize(lhcbTSize);
@@ -351,7 +358,7 @@ void doocore::lutils::printSystemRecources(TString cmd)
 }
 
 
-void doocore::lutils::printPlotTex(TCanvas* c, TString name, TString dir, bool pdf_only)
+void doocore::lutils::printPlotTex(TCanvas* c, TString name, TString dir)
 {
   //sinfo << "doocore::lutils::printPlot(...): Printing plots for " << name << " in directory " << dir << endmsg;
 
@@ -734,12 +741,7 @@ void doocore::lutils::addEtaPtLabels(TH2D* h)
 	h->GetYaxis()->SetTitle("y");
 }
 
-void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex& label, bool plot_logx) {
-  doocore::io::swarn << "doocore::lutils::PlotSimple(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
-  PlotSimple(pName, pFrame, label, pDir, plot_logy, plot_logx);
-}
-
-void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx) {
+void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx, bool canvas_quadratic) {
 //	setStyle();
   gStyle->SetTitle(0);
   
@@ -760,6 +762,9 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label,
 //  double plot_max = pFrame->GetXaxis()->GetXmax();
   
   TCanvas c1("c1","c1",900,630);
+  if (canvas_quadratic) {
+    c1.SetCanvasSize(800,800);
+  }
   TPad* pad = (TPad*)c1.cd();
   if(plot_logy){
     pad->SetLogy(1);
@@ -917,7 +922,36 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
     if (y == 0 && c < 0.5) {
       c = 0;
     }
-//    sdebug << "doocore::lutils::GetPulls(...): i = " << i << ", x = " << x << ", y = " << y << ", c = " << c << ", e = " << e << ", p = " << (y-c)/e << endmsg;
+
+    // consistency check: On sweighted datasets there can be bins with small y
+    // values and the error being identical to the value, i.e. y=e; this results
+    // in absurd pulls; need to capture this
+    if (std::abs((y-c)/e) > 3 && std::abs(std::abs(y)-std::abs(e))<1e-08) {
+    	// swarn << "Caught y==e!" << endmsg;
+    	// swarn << " data->GetErrorYlow(i)  = " << data->GetErrorYlow(i) << endmsg;
+    	// swarn << " data->GetErrorYhigh(i) = " << data->GetErrorYhigh(i) << endmsg;
+    	// swarn << " data->GetErrorY(i)     = " << data->GetErrorY(i) << endmsg;
+
+    	// Only way to handle: ignore this bin :-(
+    	y = c;
+    }
+
+    // consistency check 2: On sweighted datasets, negative y values can occur
+    // which usually result in absurd pulls (probably errors wrong)
+    if (y < 0 && std::abs((y-c)/e) < 3) {
+    	// swarn << "Found y<0 with reasonable pulls." << endmsg;
+    } else if (y < 0 && std::abs((y-c)/e) > 3) {
+    	// serr << "Found y<0 with unreasonable pulls." << endmsg;
+    	// serr << " Difference between y and e = " << std::abs(std::abs(y)-std::abs(e)) << endmsg;
+    	// serr << " data->GetErrorYlow(i)  = " << data->GetErrorYlow(i) << endmsg;
+    	// serr << " data->GetErrorYhigh(i) = " << data->GetErrorYhigh(i) << endmsg;
+    	// serr << " data->GetErrorY(i)     = " << data->GetErrorY(i) << endmsg;
+
+    	// Only way to handle: ignore this bin :-(
+    	y = c;
+    }
+
+    // sdebug << "doocore::lutils::GetPulls(...): i = " << i << ", x = " << x << ", y = " << y << ", c = " << c << ", e = " << e << ", p = " << (y-c)/e << endmsg;
     
     //pulls
     if (normalize) {
@@ -1083,7 +1117,7 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	gPad->RedrawAxis();
 }
 
-void doocore::lutils::PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir, bool plot_logy, bool plot_logx, bool greyscale, TLegend * label, std::string gauss_suffix) {
+void doocore::lutils::PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir, bool plot_logy, bool plot_logx, TLegend * label, std::string gauss_suffix) {
   gStyle->SetTitle(0);
   
   TCanvas c1("c_Utils","c_Utils",900,900);

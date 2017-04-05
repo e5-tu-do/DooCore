@@ -14,7 +14,7 @@
 
 template <class T> T sign(T a, T b) { return b>0.0 ? std::abs(a) : -std::abs(a);}
 
-template <class T> void shift(T& a, T& b, T& c, const T&d)
+template <class T> void shift(T& a, T& b, T& c, const T& d)
 {
   a = b;
   b = c;
@@ -29,7 +29,8 @@ double brent(double ax, double bx, double cx,
   const double ZEPS = 1.0e-10;
 
   int iter;
-  double a,b,d,etemp,fu,fv,fw,fx,p,q,r,tol1,tol2,u,v,w,x,xm;
+  double a,b,etemp,fu,fv,fw,fx,p,q,r,tol1,tol2,u,v,w,x,xm;
+  double d=0.0;
   double e=0.0;
 
   a=(ax < cx ? ax : cx);
@@ -53,12 +54,12 @@ double brent(double ax, double bx, double cx,
       etemp=e;
       e=d;
       if (std::abs(p) >= std::abs(0.5*q*etemp) || p <= q*(a-x) || p >= q*(b-x))
-	d=CGOLD*(e=(x >= xm ? a-x : b-x));
+        d=CGOLD*(e=(x >= xm ? a-x : b-x));
       else {
-	d=p/q;
-	u=x+d;
-	if (u-a < tol2 || b-u < tol2)
-	  d=sign(tol1,xm-x);
+        d=p/q;
+        u=x+d;
+	      if (u-a < tol2 || b-u < tol2)
+	        d=sign(tol1,xm-x);
       }
     } else {
       d=CGOLD*(e=(x >= xm ? a-x : b-x));
@@ -72,13 +73,13 @@ double brent(double ax, double bx, double cx,
     } else {
       if (u < x) a=u; else b=u;
       if (fu <= fw || w == x) {
-	v=w;
-	w=u;
-	fv=fw;
-	fw=fu;
+	      v=w;
+	      w=u;
+	      fv=fw;
+	      fw=fu;
       } else if (fu <= fv || v == x || v == w) {
-	v=u;
-	fv=fu;
+	      v=u;
+	      fv=fu;
       }
     }
   }

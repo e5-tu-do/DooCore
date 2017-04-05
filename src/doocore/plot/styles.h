@@ -4,6 +4,9 @@
 // from STL
 #include <string>
 
+// from ROOT
+#include <TString.h>
+
 // forward declarations
 class TStyle;
 
@@ -19,10 +22,10 @@ namespace styles {
  *  gROOT list of styles. If a style with this name already exists, an error
  *  message will be printed and the style in gROOT will remain.
  */
-TStyle* CreateLHCbStyle(const std::string& style_name = "LHCbStyle",
+TStyle* CreateLHCbStyle(const TString& style_name = "LHCbStyle",
                         bool force_style_creation = false);
 
-TStyle* CreateLHCbLogyStyle(const std::string& style_name = "LHCbLogyStyle",
+TStyle* CreateLHCbLogyStyle(const TString& style_name = "LHCbLogyStyle",
                            bool force_style_creation = false);
   
 } // namespace styles

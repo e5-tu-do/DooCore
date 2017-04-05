@@ -126,7 +126,7 @@ void setRedBluePalette(TH2* h=0);
 
 void printPlotOpenStack(TCanvas* c, TString name, TString dir="");
 void printPlot(TCanvas* c, TString name, TString dir="", bool pdf_only=false);
-void printPlotTex(TCanvas* c, TString name, TString dir="", bool pdf_only=false);
+void printPlotTex(TCanvas* c, TString name, TString dir="");
 void printPlotCloseStack(TCanvas* c, TString name, TString dir="");
 
 void drawDate(float x1=0.10, float y1=0.02, float x2=0.5, float y2=0.1);	
@@ -148,15 +148,9 @@ void addEtaPtLabels(TH2D* h);
  *  @param pDir Directory to put plots in (will be created on demand)
  *  @param plot_logy whether to plot with log scale on y axis
  *  @param plot_logx whether to plot with log scale on x axis
+ *  @param canvas_quadratic whether to set canvas quadractic, default: rectangular
  */
-void PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir = "", bool plot_logy = false, bool plot_logx = false);
-
-/**
- *  @brief (DEPRECATED:) Plot simple RooPlot frame
- *
- *  Just a compatibility wrapper for the other PlotSimple function.
- */
-void PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex& label, bool plot_logx = false);
+void PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir = "", bool plot_logy = false, bool plot_logx = false, bool canvas_quadratic = false);
   
 ///Do a run test as in http://de.wikipedia.org/wiki/Run-Test
 double RunTest(const TH1 & hist);
@@ -217,7 +211,7 @@ void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "",
  
 //Plot Pulldistribution for two histograms
 void PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir = "",
-               bool plot_logy = false, bool plot_logx = false, bool greyscale = false,
+               bool plot_logy = false, bool plot_logx = false,
                TLegend * label = NULL,
                std::string gauss_suffix="_Gauss");
 
