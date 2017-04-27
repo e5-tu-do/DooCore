@@ -13,6 +13,7 @@ set(CMAKE_CXX_FLAGS_DBG "-O0 -ggdb -pg" CACHE STRING "Debug options." FORCE)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3" CACHE STRING "Debug options." FORCE)
 SET(CMAKE_CXX_FLAGS_PROFILING "-O3 -pg" CACHE STRING "Debug options." FORCE)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "$ENV{DOOMODULESYS}/cmake/Modules/")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 set(BASEPATH "${CMAKE_SOURCE_DIR}/src")
@@ -37,14 +38,13 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 install(FILES external/FindDooCore.cmake DESTINATION cmake/Modules)
 
+#set(Boost_DEBUG ON)
 FIND_PACKAGE(Boost 1.48 COMPONENTS program_options filesystem regex thread system random REQUIRED)
-set(Boost_LIBRARY_DIRS "$ENV{BOOST_ROOT}/lib")
-
 find_package(ROOT REQUIRED)
 FIND_PACKAGE(GSL REQUIRED)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIRS})
+link_directories(${Boost_LIBRARY_DIR})
 
 include_directories(${ROOT_INCLUDE_DIR})
 
