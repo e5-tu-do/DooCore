@@ -7,6 +7,7 @@
 #include <sstream> 
 #include <cstring>
 #include <vector>
+#include <set>
 #include <unistd.h>
 
 #include "TStopwatch.h"
@@ -38,6 +39,17 @@ enum TerminalColor {
   kTextWhite   = 7,
   kTextNone    = -1
 };
+  
+  /**
+   *  @brief Check if terminal is redirected to suppress control characters
+   */
+  inline bool TerminalIsRedirected() {
+    if (!isatty(fileno(stdout))){
+      return true;
+    } else {
+      return false;
+    }
+  }
   
 /*! \class doocore::io::MsgStream 
  * \brief A class for message output using different messages and colors.
@@ -180,16 +192,6 @@ public:
   void increment_indent(int indent_add) {indent_ += indent_add;}
   
 protected:
-  /**
-   *  @brief Check if terminal is redirected to suppress control characters
-   */
-  bool TerminalIsRedirected() {
-    if (!isatty(fileno(stdout))){
-      return true;
-    } else {
-      return false;
-    }
-  }
   
   /**
    *  @brief Set terminal color
@@ -228,7 +230,7 @@ protected:
   /**
    *  \brief Stream for file output.
    */
-   std::ofstream filestream_;
+  std::ofstream filestream_;
 };
 
 /// \brief MsgStream function to end a message (i.e. newline) and force the output. 
@@ -262,6 +264,24 @@ inline MsgStream& operator<<(MsgStream& lhs, const std::vector<T>& arg) {
     lhs << arg.front();
     for (typename std::vector<T>::const_iterator it = arg.begin()+1;
          it != arg.end(); ++it) {
+      lhs << ", " << *it;
+    }
+    lhs << ")";
+  }
+  return lhs;
+}
+
+/**
+ *  @brief Print a set via MsgStream
+ */
+template<typename T>
+inline MsgStream& operator<<(MsgStream& lhs, const std::set<T>& arg) {
+  if (arg.size() > 0) {
+    lhs << "(";
+    typename std::set<T>::const_iterator it = arg.begin();
+    lhs << *it;
+    ++it;
+    for (;it != arg.end(); ++it) {
       lhs << ", " << *it;
     }
     lhs << ")";
@@ -376,7 +396,7 @@ inline MsgStream& operator<< <RooAbsCollection>(MsgStream& lhs, const RooAbsColl
     TIterator* iter = argset.createIterator();
     const RooAbsArg* arg  = (RooAbsArg*)iter->Next();
     //lhs.stream() << arg->GetName();
-    lhs << *arg;
+    lhs.stream() << arg->GetName();
     
     while ((arg = (const RooAbsArg*)iter->Next())) {
       //lhs.stream() << "," << arg->GetName();
@@ -385,7 +405,8 @@ inline MsgStream& operator<< <RooAbsCollection>(MsgStream& lhs, const RooAbsColl
       } else {
         lhs << ", ";
       }
-      lhs << *arg;
+      //lhs << *arg;
+      lhs.stream() << arg->GetName();
     }
     //lhs.stream() << ")";
   }
@@ -412,7 +433,6 @@ template<>
 inline MsgStream& operator<< <RooArgList>(MsgStream& lhs, const RooArgList& argset) {
   return operator<<(lhs, dynamic_cast<const RooAbsCollection&>(argset));
 }
-
   
 /// MsgStream for errors. Color: Red
 extern MsgStream serr; 
@@ -426,7 +446,7 @@ extern MsgStream scfg;
 extern MsgStream sout;
 /// MsgStream for debug messages. Color: None
 extern MsgStream sdebug;
-} // namespace utils
-} // namespace doofit
+} // namespace io
+} // namespace coocore
 
 #endif // DOOCORE_IO_MSGSTREAM_H

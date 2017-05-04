@@ -13,10 +13,12 @@ set(CMAKE_CXX_FLAGS_DBG "-O0 -ggdb -pg" CACHE STRING "Debug options." FORCE)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3" CACHE STRING "Debug options." FORCE)
 SET(CMAKE_CXX_FLAGS_PROFILING "-O3 -pg" CACHE STRING "Debug options." FORCE)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "$ENV{DOOMODULESYS}/cmake/Modules/")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 set(BASEPATH "${CMAKE_SOURCE_DIR}/src")
 include_directories(${BASEPATH})
+include_directories(${BASEPATH}/effic2)
 
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
@@ -30,19 +32,19 @@ if(${APPLE})
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++ -pedantic -Wall -Wextra")
 endif(${APPLE})
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  MESSAGE( STATUS "Building for Linux, switching off C++11 flags for Linux/gcc" )
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -pedantic -Wall -Wextra")
+  MESSAGE( STATUS "Building for Linux, switching on C++11 and C++14 flags for Linux/gcc" )
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=c++14 -pedantic -Wall -Wextra")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 install(FILES external/FindDooCore.cmake DESTINATION cmake/Modules)
 
+#set(Boost_DEBUG ON)
 FIND_PACKAGE(Boost 1.48 COMPONENTS program_options filesystem regex thread system random REQUIRED)
-set(Boost_LIBRARY_DIRS "$ENV{BOOST_ROOT}/lib")
-
 find_package(ROOT REQUIRED)
+FIND_PACKAGE(GSL REQUIRED)
 
-include_directories(${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+link_directories(${Boost_LIBRARY_DIR})
 
 include_directories(${ROOT_INCLUDE_DIR})
 

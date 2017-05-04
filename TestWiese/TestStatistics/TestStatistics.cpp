@@ -6,6 +6,7 @@
 // from Boost
 #include <boost/assign/std/vector.hpp> // for 'operator+=()'
 using namespace boost::assign; // bring 'operator+=()' into scope
+#include <boost/format.hpp>
 
 // from ROOT
 #include "TRandom3.h"
@@ -20,29 +21,30 @@ using namespace boost::assign; // bring 'operator+=()' into scope
 #include "doocore/statistics/montecarlo/ErrorEstimator.h"
 #include "doocore/io/MsgStream.h"
 #include "doocore/lutils/lutils.h"
+#include "effic/effic2.hpp"
 
 // from GSL
 #include "gsl/gsl_randist.h"
 #include "gsl/gsl_rng.h"
 
-class MySampleGenerator {
- public:
-  MySampleGenerator() : rand_() {}
+// class MySampleGenerator {
+//  public:
+//   MySampleGenerator() : rand_() {}
   
-  double Generate() {
-    return rand_.Gaus(1, 0.5);
-  }
+//   double Generate() {
+//     return rand_.Gaus(1, 0.5);
+//   }
   
- private:
-  TRandom3 rand_;
-};
+//  private:
+//   TRandom3 rand_;
+// };
 
 class MyCalculator {
  public:
   double Calculate(const RooArgSet* values) const {
     using namespace doocore::io;
 //    sdebug << values->getRealValue("p1") << " - " << values->getRealValue("p2") << endmsg;
-    return values->getRealValue("p1");// + values->getRealValue("p2");
+    return values->getRealValue("p1") + values->getRealValue("p2");
   }
 };
 
@@ -55,10 +57,25 @@ int main() {
   swarn << "Starting TestStatistics.cpp" << endmsg;
   swarn << "" << endmsg;
   
+  // void effic2(int k, int N, double conflevel, 
+  //       double& mode, double& low, double& high);
+
+  double eff, low, high;
+  effic2(100, 1000, 0.683, eff, low, high);
+  sinfo << "eff = " << 100 << "/" << 1000 << " = " << eff << " - " << eff-low << " + " << high-eff << endmsg;
+
+  ValueWithError<double> test_num(0.99,0.109);
+  sinfo << "My parameter is " << test_num << doocore::io::endmsg;
+
+  sinfo << boost::format("%.2f") % 0.109 << endmsg;
+  
   RooRealVar p1("p1", "p1", 10.0, -100.0, 100.0);
   RooRealVar p2("p2", "p2", 10.0, -100.0, 100.0);
   RooArgList args(p1, p2);
   
+  p1.setError(1.0);
+  p2.setError(1.0);
+
   TMatrixDSym cov(2);
   
   cov(0,0) = 0.25;
@@ -66,15 +83,20 @@ int main() {
   cov(1,1) = 0.25;
   
   MultiVarGaussianSampleGenerator mvggen(args, cov);
-  
+  VaryParameterErrorsGenerator varygen(args);
+
   MyCalculator mycalc;
-  MySampleGenerator mygen;
-  ErrorEstimator<MyCalculator, MultiVarGaussianSampleGenerator> est(mycalc, mvggen);
+  //MySampleGenerator mygen;
+  ErrorEstimator<MyCalculator, VaryParameterErrorsGenerator> est(mycalc, varygen);
   
   ValueWithError<double> mcval(est.Sample(10000));
   swarn << "Test of ErrorEstimator:" << endmsg;
   sinfo << mcval << " - " << mcval.value << " +/- " << mcval.error << endmsg;
   
+  sinfo << "Boundaries: " << est.MinimumGeneratedValue() << " - " << est.MaximumGeneratedValue() << endmsg;
+  sinfo << "Minimum parameters: " << *varygen.MinimumParameterSet() << endmsg;
+  sinfo << "Maximum parameters: " << *varygen.MaximumParameterSet() << endmsg;
+
   std::vector<ValueWithError<double>> values;
   
   values  += 
@@ -132,8 +154,47 @@ int main() {
   sinfo << ValueWithError<double>(0.00010, 0.00010) << endmsg;
   sinfo << ValueWithError<double>(0.000010, 0.000010) << endmsg;
   sinfo << ValueWithError<double>(0.0000010, 0.0000010) << endmsg;
+
+  sinfo << ValueWithError<double>(35400000, 354000, 354000, 356000) << endmsg;
+  sinfo << ValueWithError<double>(3540000, 35400, 35400, 35600) << endmsg;
+  sinfo << ValueWithError<double>(354000, 3540, 3540, 3560) << endmsg;
+  sinfo << ValueWithError<double>(35400, 354, 354, 356) << endmsg;
+  sinfo << ValueWithError<double>(3540, 35.4, 35.4, 35.6) << endmsg;
+  sinfo << ValueWithError<double>(35.4, 3.54, 3.54, 3.56) << endmsg;
+  sinfo << ValueWithError<double>(3.54, 0.354, 0.354, 0.356) << endmsg;
+  sinfo << ValueWithError<double>(3.4, 0.0354, 0.0354, 0.0356) << endmsg;
+  sinfo << ValueWithError<double>(0.354, 0.00354, 0.00354, 0.00356) << endmsg;
+  sinfo << ValueWithError<double>(0.0354, 0.000354, 0.000354, 0.000356) << endmsg;
+  sinfo << ValueWithError<double>(0.00354, 0.0000354, 0.0000354, 0.0000356) << endmsg;
+  sinfo << ValueWithError<double>(0.000354, 0.00000354, 0.00000354, 0.00000356) << endmsg;
+
+  sinfo << ValueWithError<double>(35400000, 354000, 356000, 356000) << endmsg;
+  sinfo << ValueWithError<double>(3540000, 35400, 35600, 35600) << endmsg;
+  sinfo << ValueWithError<double>(354000, 3540, 3560, 3560) << endmsg;
+  sinfo << ValueWithError<double>(35400, 354, 356, 356) << endmsg;
+  sinfo << ValueWithError<double>(3540, 35.4, 35.6, 35.6) << endmsg;
+  sinfo << ValueWithError<double>(35.4, 3.54, 3.56, 3.56) << endmsg;
+  sinfo << ValueWithError<double>(3.54, 0.354, 0.356, 0.356) << endmsg;
+  sinfo << ValueWithError<double>(3.4, 0.0354, 0.0356, 0.0356) << endmsg;
+  sinfo << ValueWithError<double>(0.354, 0.00354, 0.00356, 0.00356) << endmsg;
+  sinfo << ValueWithError<double>(0.0354, 0.000354, 0.000356, 0.000356) << endmsg;
+  sinfo << ValueWithError<double>(0.00354, 0.0000354, 0.0000356, 0.0000356) << endmsg;
+  sinfo << ValueWithError<double>(0.000354, 0.00000354, 0.00000356, 0.00000356) << endmsg;
   swarn << "" << endmsg;
 
+  swarn << "Test of printout with and without usage of auto-precision:" << endmsg;
+  ValueWithError<double> num(122.572427568, 122.572427568);
+  sinfo << num << endmsg;
+  num.set_full_precision_printout(true);
+  sinfo << num << endmsg;
+  
+  swarn << "Test of printout with and without usage of auto-precision with asymmetric errors:" << endmsg;
+  ValueWithError<double> num_asym(3.928191, 0.3472, 0.3627, 0.3231);
+  sinfo << num_asym << endmsg;
+  num_asym.set_full_precision_printout(true);
+  sinfo << num_asym << endmsg;
+
+  
   swarn << "Test of WeightedAverage:" << endmsg;
   auto mean_error = doocore::statistics::general::WeightedAverage<double>(values.begin(), values.end());
   sinfo << mean_error << endmsg;
@@ -144,13 +205,13 @@ int main() {
   x_wavg += 1.2, 2.6, 4.9, 7.2, 10.3;
   w_wavg_neg += -6.3, 2.8, 1.4, -3.7, 10.8;
   w_wavg_pos += 0.2, 1.3, 0.9, 1.2, 1.4;
-  sinfo << WeightedAverage(x_wavg, w_wavg_pos) << endmsg;
+  sinfo << WeightedAverage<double>(x_wavg.begin(), x_wavg.end(), w_wavg_pos.begin()) << endmsg;
   swarn << "" << endmsg;
   
   swarn << "Test of WeightedCovariance:" << endmsg;
   std::vector<double> y_wavg;
   y_wavg += 3.4, 1.9, 6.8, 5.8, 11.4;
-  sinfo << Covariance(x_wavg, y_wavg, w_wavg_pos) << endmsg;
+  sinfo << Covariance<double>(x_wavg.begin(), x_wavg.end(), y_wavg.begin(), w_wavg_pos.begin()) << endmsg;
   swarn << "" << endmsg;
 
   swarn << "Test of PearsonCorrelation (incl. permutation test and bootstrap test):" << endmsg;
@@ -210,9 +271,49 @@ int main() {
   sinfo << "" << endmsg;
 
   swarn << "Test of weighted PearsonCorrelation (incl. bootstrap test):" << endmsg;
-  sinfo << PearsonCorrelation(x_rdm, y_rdm, w_rdm) << endmsg;
+  sinfo << PearsonCorrelation<double>(std::begin(x_rdm), std::end(x_rdm), std::begin(y_rdm), std::begin(w_rdm)) << endmsg;
   sinfo << BootstrapTest(x_rdm, y_rdm, w_rdm) << endmsg;
 
   // sinfo << PearsonCorrelation(x_rdm_wc, y_rdm_wc, w_rdm_wc) << endmsg;
   // sinfo << BootstrapTest(x_rdm_wc, y_rdm_wc, w_rdm_wc) << endmsg;
+
+  swarn << "Correlation between 'Divorce rate in Maine' and 'Per capita consuption of margarine (US)':" << endmsg;
+  std::vector<double> divorce_rate_in_maine;
+  divorce_rate_in_maine += 5.0, 4.7, 4.6, 4.4, 4.3, 4.1, 4.2, 4.2, 4.2, 4.1;
+  std::vector<double> margarine_consuption;
+  margarine_consuption += 8.2, 7.0, 6.5, 5.3, 5.2, 4.0, 4.6, 4.5, 4.2, 3.7;
+  sinfo << "rho = " << PearsonCorrelation(divorce_rate_in_maine, margarine_consuption) << endmsg;
+  sinfo << "p = " << PermutationTest(divorce_rate_in_maine, margarine_consuption) << endmsg;
+  sinfo << "95% CL: " << BootstrapTest(divorce_rate_in_maine, margarine_consuption) << endmsg;
+  sinfo << "" << endmsg;
+
+  swarn << "Correlation between 'Number of people who drowned by falling into a swimming-pool' and 'Number of films Nicolas Cage appeared in':" << endmsg;
+  std::vector<double> drowned_in_swimming_pool;
+  drowned_in_swimming_pool += 109, 102, 102, 98, 85, 95, 96, 98, 123, 94, 102;
+  std::vector<double> number_of_films_w_nicolas_cage;
+  number_of_films_w_nicolas_cage += 2, 2, 2, 3, 1, 1, 2, 3, 4, 1, 4;
+  sinfo << "rho = " << PearsonCorrelation(drowned_in_swimming_pool, number_of_films_w_nicolas_cage) << endmsg;
+  sinfo << "p = " << PermutationTest(drowned_in_swimming_pool, number_of_films_w_nicolas_cage) << endmsg;
+  sinfo << "95% CL: " << BootstrapTest(drowned_in_swimming_pool, number_of_films_w_nicolas_cage) << endmsg;
+  sinfo << "" << endmsg;
+
+  swarn << "Correlation between 'Honey producing bee colonies (US)' and 'Juveline arrests for possession of marijuana':" << endmsg;
+  std::vector<double> honey_bees;
+  honey_bees += 3.220, 3.211, 3.045, 2.875, 2.783, 2.655, 2.581, 2.631, 2.637, 2.652, 2.622, 2.550, 2.574, 2.599, 2.554, 2.409, 2.394, 2.443, 2.342, 2.498;
+  std::vector<double> marijuana_arrests;
+  marijuana_arrests += 20.940, 16.490, 25.004, 37.915, 61.003, 82.015, 87.712, 94.046, 91.467, 89.523, 95.962, 97.088, 85.769, 87.909, 87.717, 88.909, 95.120, 97.671, 93.042, 90.927;
+  sinfo << "rho = " << PearsonCorrelation(honey_bees, marijuana_arrests) << endmsg;
+  sinfo << "p = " << PermutationTest(honey_bees, marijuana_arrests) << endmsg;
+  sinfo << "95% CL: " << BootstrapTest(honey_bees, marijuana_arrests) << endmsg;
+  sinfo << "" << endmsg;
+
+  swarn << "Correlation between 'Sunlight in Arkansas' and 'Female Editors on Harvard Law Review':" << endmsg;
+  std::vector<double> sunlight_in_arkansas;
+  sunlight_in_arkansas += 17243.83, 17327.61, 16681.82, 17031.89, 16475.66;
+  std::vector<double> female_editors_harvard_law_review;
+  female_editors_harvard_law_review += 9, 14, 19, 12, 19;
+  sinfo << "rho = " << PearsonCorrelation(sunlight_in_arkansas, female_editors_harvard_law_review) << endmsg;
+  sinfo << "p = " << PermutationTest(sunlight_in_arkansas, female_editors_harvard_law_review) << endmsg;
+  sinfo << "95% CL: " << BootstrapTest(sunlight_in_arkansas, female_editors_harvard_law_review) << endmsg;
+  sinfo << "" << endmsg;
 }

@@ -105,7 +105,7 @@ class Progress {
       time_now_ = std::chrono::high_resolution_clock::now();
       elapsed_ = std::chrono::duration_cast<std::chrono::microseconds>(time_now_ - time_start_).count()*1e-6;
       double remaining = static_cast<double>(elapsed_)/progress_fraction_-static_cast<double>(elapsed_);
-      printf("%s %.2f %% (time elapsed / remaining / per step[ms]: %s / %s / %.2f)        \xd", MakeProgressBar(progress_fraction_).c_str(), (progress_fraction_*100.0), SecondsToTimeString(elapsed_).c_str(), SecondsToTimeString(remaining).c_str(), (elapsed_/position_*1000.0));
+      printf("%s %.2f %% (el. / rem. / it.[ms]: %s / %s / %.2f)        \xd", MakeProgressBar(progress_fraction_).c_str(), (progress_fraction_*100.0), SecondsToTimeString(elapsed_).c_str(), SecondsToTimeString(remaining).c_str(), (elapsed_/position_*1000.0));
       fflush(stdout);
     } else if ((!tty_ && steps_since_update_ > step_position_update_notty_) || force_update){
       position_ += steps_since_update_;
@@ -119,7 +119,7 @@ class Progress {
       time_now_ = std::chrono::high_resolution_clock::now();
       elapsed_ = std::chrono::duration_cast<std::chrono::microseconds>(time_now_ - time_start_).count()*1e-6;
       double remaining = static_cast<double>(elapsed_)/progress_fraction_-static_cast<double>(elapsed_);
-      printf("%s %.2f %% (time elapsed / remaining / per step[ms]: %s / %s / %.2f)        \n", MakeProgressBar(progress_fraction_).c_str(), progress_fraction_*100.0, SecondsToTimeString(elapsed_).c_str(), SecondsToTimeString(remaining).c_str(), elapsed_/position_*1000.0);
+      printf("%s %.2f %% (el. / rem. / it.[ms]: %s / %s / %.2f)        \n", MakeProgressBar(progress_fraction_).c_str(), progress_fraction_*100.0, SecondsToTimeString(elapsed_).c_str(), SecondsToTimeString(remaining).c_str(), elapsed_/position_*1000.0);
       fflush(stdout);
     }
   }

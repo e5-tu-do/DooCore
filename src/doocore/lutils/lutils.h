@@ -107,13 +107,15 @@ public:
     }
   }
   
-  int size() {
+  int size() const {
     boost::mutex::scoped_lock lock(the_mutex);
     return the_queue.size();
   }
 };
 
 const int kLHCbFont = 132;
+extern double GlobalLhcbTSize;
+extern double GlobalLineWidth;
   
 //	
 // plots
@@ -124,6 +126,7 @@ void setRedBluePalette(TH2* h=0);
 
 void printPlotOpenStack(TCanvas* c, TString name, TString dir="");
 void printPlot(TCanvas* c, TString name, TString dir="", bool pdf_only=false);
+void printPlotTex(TCanvas* c, TString name, TString dir="");
 void printPlotCloseStack(TCanvas* c, TString name, TString dir="");
 
 void drawDate(float x1=0.10, float y1=0.02, float x2=0.5, float y2=0.1);	
@@ -145,15 +148,9 @@ void addEtaPtLabels(TH2D* h);
  *  @param pDir Directory to put plots in (will be created on demand)
  *  @param plot_logy whether to plot with log scale on y axis
  *  @param plot_logx whether to plot with log scale on x axis
+ *  @param canvas_quadratic whether to set canvas quadractic, default: rectangular
  */
-void PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir = "", bool plot_logy = false, bool plot_logx = false);
-
-/**
- *  @brief (DEPRECATED:) Plot simple RooPlot frame
- *
- *  Just a compatibility wrapper for the other PlotSimple function.
- */
-void PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex& label, bool plot_logx = false);
+void PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir = "", bool plot_logy = false, bool plot_logx = false, bool canvas_quadratic = false);
   
 ///Do a run test as in http://de.wikipedia.org/wiki/Run-Test
 double RunTest(const TH1 & hist);
@@ -212,6 +209,12 @@ void PlotPulls(TString pName, RooPlot * pFrame, TString pDir = "",
                TLegend * label = NULL,
                std::string gauss_suffix="_Gauss");
  
+//Plot Pulldistribution for two histograms
+void PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir = "",
+               bool plot_logy = false, bool plot_logx = false,
+               TLegend * label = NULL,
+               std::string gauss_suffix="_Gauss");
+
 void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue * pVar, TLatex& label, TString pDir = "", bool normalize_residuals = true, bool plot_logy = false, bool plot_logx = false);
 
 void PlotResiduals(TString pName, RooPlot * pFrame, const RooAbsRealLValue* pVar, TString pDir, bool normalize_residuals, bool plot_logy, TLegend * label = NULL, bool plot_logx = false);
@@ -275,6 +278,18 @@ std::pair<double,double> MedianLimitsForTuple(TTree& tree, std::string var_name)
  *  populated bins. The number of bins can be specified.
  */
 RooBinning GetQuantileBinning(RooDataSet* data, std::string var_name, int nbins = 10);
+
+/**
+ *  @brief Limits for DataSet
+ *
+ *  This function will return a pair as (min, max) as plotting
+ *  range for all values of the distribution.
+ *
+ *  @param dataset RooDataSet to evaluate
+ *  @param var_name name of variable in dataset to evaluate
+ *  @return pair of (double,double) as (min,max) to use for plotting
+ */
+std::pair<double,double> MinMaxLimitsForDataSet(const RooDataSet& dataset, std::string var_name);
 
 } // namespace lutils
 } // namespace doocore

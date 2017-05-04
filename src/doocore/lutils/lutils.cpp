@@ -28,6 +28,9 @@
 #include "TH1D.h"
 #include "TF1.h"
 #include "TLeaf.h"
+#include "TPluginManager.h"
+#include "TVirtualPS.h"
+#include "TTeXDump.h"
 
 // from RooFit
 #include "RooPlot.h"
@@ -45,6 +48,9 @@ using namespace std;
 using namespace doocore::io;
 namespace fs = boost::filesystem;
 
+double doocore::lutils::GlobalLhcbTSize(0.06);
+double doocore::lutils::GlobalLineWidth(2.0);
+
 /*
  * Set global layout
  *
@@ -52,14 +58,24 @@ namespace fs = boost::filesystem;
  */
 void doocore::lutils::setStyle(TString option)
 {
-	if (option == "LHCb") {
+  if (option.Contains("LHCb")) {
 		// Use times new roman, precision 2
 //	  Int_t kLHCbFont        = 132;  // Old LHCb style: 62;
 	  // Line thickness
-	  Double_t lhcbWidth    = 2.00; // Old LHCb style: 3.00;
+	  Double_t lhcbWidth    = GlobalLineWidth; // Old LHCb style: 3.00;
 	  // Text size
-	  Double_t lhcbTSize    = 0.06;
-    
+	  if (option.Contains("Enlarged")) {
+	  	GlobalLhcbTSize = 0.08;
+	  } else {
+	  	GlobalLhcbTSize = 0.06;
+	  }
+	  if (option.Contains("LHCbOptimized")) {
+	  	lhcbWidth = GlobalLineWidth = 1.0;
+	  }
+
+
+	  Double_t lhcbTSize    = GlobalLhcbTSize;
+
 	  // use plain black on white colors
 	  gROOT->SetStyle("Plain");
 	  TStyle *lhcbStyle= new TStyle("lhcbStyle","LHCb plots style");
@@ -80,8 +96,8 @@ void doocore::lutils::setStyle(TString option)
 	  // If you want the usual gradient palette (blue -> red)
 	  lhcbStyle->SetPalette(1);
 	  // If you want colors that correspond to gray scale in black and white:
-	  int colors[8] = {0,5,7,3,6,2,4,1};
-	  lhcbStyle->SetPalette(8,colors);
+	  // int colors[8] = {0,5,7,3,6,2,4,1};
+	  // lhcbStyle->SetPalette(8,colors);
     
 	  // set the paper & margin sizes
 	  lhcbStyle->SetPaperSize(20,26);
@@ -90,6 +106,13 @@ void doocore::lutils::setStyle(TString option)
 	  lhcbStyle->SetPadBottomMargin(0.16);
 	  lhcbStyle->SetPadLeftMargin(0.14);
     
+		if (option.Contains("2d")) {
+			// sdebug << "2D!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endmsg;
+			gStyle->SetPadBottomMargin(0.15);
+			gStyle->SetPadRightMargin(0.18);
+		}
+
+
 	  // use large fonts
 	  lhcbStyle->SetTextFont(kLHCbFont);
 	  lhcbStyle->SetTextSize(lhcbTSize);
@@ -109,7 +132,11 @@ void doocore::lutils::setStyle(TString option)
     
 	  // use medium bold lines and thick markers
 	  lhcbStyle->SetLineWidth(lhcbWidth);
-	  lhcbStyle->SetFrameLineWidth(lhcbWidth);
+
+	  // deactivating this bad boy as it creates a solid black line in the lower
+	  // left of pull plots.
+	  // lhcbStyle->SetFrameLineWidth(lhcbWidth); 
+	  
 	  lhcbStyle->SetHistLineWidth(lhcbWidth);
 	  lhcbStyle->SetFuncWidth(lhcbWidth);
 	  lhcbStyle->SetGridWidth(lhcbWidth);
@@ -151,6 +178,14 @@ void doocore::lutils::setStyle(TString option)
 	  lhcbStyle->SetStatW(0.25);
 	  lhcbStyle->SetStatH(0.15);
     
+	  //lhcbStyle->SetLineWidth(1);
+	  
+	  // additional optimizations
+	  if (option.Contains("LHCbOptimized")) {
+	  	lhcbStyle->SetLineScalePS(2);
+	  }
+
+
 	  // put tick marks on top and RHS of plots
 	  lhcbStyle->SetPadTickX(1);
 	  lhcbStyle->SetPadTickY(1);
@@ -323,6 +358,27 @@ void doocore::lutils::printSystemRecources(TString cmd)
 }
 
 
+void doocore::lutils::printPlotTex(TCanvas* c, TString name, TString dir)
+{
+  //sinfo << "doocore::lutils::printPlot(...): Printing plots for " << name << " in directory " << dir << endmsg;
+
+  if ( dir!="" && !dir.EndsWith("/") ) dir += "/";
+
+  std::vector<fs::path> paths;
+  paths.push_back(fs::path(dir+"tex/"));
+  for (std::vector<fs::path>::const_iterator it=paths.begin(), end= paths.end();
+       it != end; ++it) {
+    if (!fs::is_directory(*it)) {
+      fs::create_directories(*it);
+    }
+  }
+
+  int ignore_level = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kWarning;
+  c->Print(dir+"tex/" + name + ".tex", "tex");
+  gErrorIgnoreLevel = ignore_level;
+}
+
 void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_only)
 {
   //sinfo << "doocore::lutils::printPlot(...): Printing plots for " << name << " in directory " << dir << endmsg;
@@ -335,6 +391,7 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
     paths.push_back(fs::path(dir+"C/"));
     paths.push_back(fs::path(dir+"png/"));
   }
+  paths.push_back(fs::path(dir+"tex/"));
   paths.push_back(fs::path(dir+"pdf/"));
   for (std::vector<fs::path>::const_iterator it=paths.begin(), end= paths.end();
        it != end; ++it) {
@@ -351,8 +408,10 @@ void doocore::lutils::printPlot(TCanvas* c, TString name, TString dir, bool pdf_
     c->Print(dir+"png/" + name + ".png");
   }
   c->Print(dir+"pdf/" + name + ".pdf");
+  c->Print(dir+"tex/" + name + ".tex", "tex");
   gErrorIgnoreLevel = ignore_level;
 }
+
   
 void doocore::lutils::printPlotOpenStack(TCanvas* c, TString name, TString dir)
 {
@@ -682,20 +741,15 @@ void doocore::lutils::addEtaPtLabels(TH2D* h)
 	h->GetYaxis()->SetTitle("y");
 }
 
-void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TString pDir, bool plot_logy, TLatex& label, bool plot_logx) {
-  doocore::io::swarn << "doocore::lutils::PlotSimple(...): This function is deprecated. Please move to the updated versions with different parameter list. This function will be removed in a future release of DooCore!" << doocore::io::endmsg;
-  PlotSimple(pName, pFrame, label, pDir, plot_logy, plot_logx);
-}
-
-void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx) {
+void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label, TString pDir, bool plot_logy, bool plot_logx, bool canvas_quadratic) {
 //	setStyle();
   gStyle->SetTitle(0);
   
   // some global definitions
   double pad_border       = 0.02;
   double pad_relysplit    = 0.00;
-  double left_margin      = 0.16;
-  double top_label_size   = 0.06;
+  double left_margin      = 0.16*GlobalLhcbTSize/0.06;
+  double top_label_size   = GlobalLhcbTSize;
   double top_title_offset = 1.2;
   double title2label_size_ratio = 1.1;
   
@@ -708,6 +762,9 @@ void doocore::lutils::PlotSimple(TString pName, RooPlot * pFrame, TLatex& label,
 //  double plot_max = pFrame->GetXaxis()->GetXmax();
   
   TCanvas c1("c1","c1",900,630);
+  if (canvas_quadratic) {
+    c1.SetCanvasSize(800,800);
+  }
   TPad* pad = (TPad*)c1.cd();
   if(plot_logy){
     pad->SetLogy(1);
@@ -774,10 +831,10 @@ double doocore::lutils::RunTest(const TH1 & hist) {
 void doocore::lutils::PreparePadForPulls(TCanvas * c1, bool plot_logx, bool plot_logy, double & top_label_size, double & top_title_offset, double & title2label_size_ratio, double & bottom_label_size, double & bottom_title_offset) {
   // some global definitions
   double pad_border       = 0.02;
-  double pad_relysplit    = 0.3;
-  double left_margin      = 0.16;
+  double pad_relysplit    = 0.3+GlobalLhcbTSize/0.06*0.05;
+  double left_margin      = 0.16*GlobalLhcbTSize/0.06;
 
-  top_label_size   = 0.06;
+  top_label_size   = GlobalLhcbTSize;
   top_title_offset = 1.2;
   title2label_size_ratio = 1.1;
   
@@ -865,14 +922,42 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
     if (y == 0 && c < 0.5) {
       c = 0;
     }
-//    sdebug << "doocore::lutils::GetPulls(...): i = " << i << ", x = " << x << ", y = " << y << ", c = " << c << ", e = " << e << ", p = " << (y-c)/e << endmsg;
+
+    // consistency check: On sweighted datasets there can be bins with small y
+    // values and the error being identical to the value, i.e. y=e; this results
+    // in absurd pulls; need to capture this
+    if (std::abs((y-c)/e) > 3 && std::abs(std::abs(y)-std::abs(e))<1e-08) {
+    	// swarn << "Caught y==e!" << endmsg;
+    	// swarn << " data->GetErrorYlow(i)  = " << data->GetErrorYlow(i) << endmsg;
+    	// swarn << " data->GetErrorYhigh(i) = " << data->GetErrorYhigh(i) << endmsg;
+    	// swarn << " data->GetErrorY(i)     = " << data->GetErrorY(i) << endmsg;
+
+    	// Only way to handle: ignore this bin :-(
+    	y = c;
+    }
+
+    // consistency check 2: On sweighted datasets, negative y values can occur
+    // which usually result in absurd pulls (probably errors wrong)
+    if (y < 0 && std::abs((y-c)/e) < 3) {
+    	// swarn << "Found y<0 with reasonable pulls." << endmsg;
+    } else if (y < 0 && std::abs((y-c)/e) > 3) {
+    	// serr << "Found y<0 with unreasonable pulls." << endmsg;
+    	// serr << " Difference between y and e = " << std::abs(std::abs(y)-std::abs(e)) << endmsg;
+    	// serr << " data->GetErrorYlow(i)  = " << data->GetErrorYlow(i) << endmsg;
+    	// serr << " data->GetErrorYhigh(i) = " << data->GetErrorYhigh(i) << endmsg;
+    	// serr << " data->GetErrorY(i)     = " << data->GetErrorY(i) << endmsg;
+
+    	// Only way to handle: ignore this bin :-(
+    	y = c;
+    }
+
+    // sdebug << "doocore::lutils::GetPulls(...): i = " << i << ", x = " << x << ", y = " << y << ", c = " << c << ", e = " << e << ", p = " << (y-c)/e << endmsg;
     
     //pulls
     if (normalize) {
       limits.push_back(x+data->GetErrorXhigh(i));
       values.push_back((y-c)/e);
       errors.push_back(0);
-      
     }
     //residuals
     else {
@@ -892,7 +977,38 @@ TH1D doocore::lutils::GetPulls(RooPlot * pFrame, bool normalize) {
     pulls.SetBinContent(i,values[i-1]);
     pulls.SetBinError(i,errors[i-1]);
   }
+
+  // for (unsigned int i = 0; i <= values.size(); ++i) {
+  //   std::cout << pulls.GetBinContent(i) << std::endl;
+  // }
   
+  return pulls;
+}
+
+TH1D doocore::lutils::GetPulls(TH1D* h1, TH1D* h2) {
+  std::vector<double> limits;
+  std::vector<double> values;
+
+  limits.push_back(h1->GetBinLowEdge(1));
+  limits.push_back(h1->GetBinLowEdge(h1->GetNbinsX()+1)); //lower edge of overlow bin
+
+  double delta_y;
+  double error_y;
+
+  for(unsigned int i = 0; i < h1->GetNbinsX(); i++){
+    delta_y = h1->GetBinContent(i) - h2->GetBinContent(i); 
+    error_y = sqrt(h1->GetBinError(i) * h1->GetBinError(i) + h2->GetBinError(i) * h2->GetBinError(i));
+    if(error_y>0)
+    	values.push_back(delta_y / error_y);
+    else
+    	values.push_back(0);
+  }
+
+  TH1D pulls("pulls","Pulls",values.size(),limits[0],limits[1]);
+  for(unsigned int i=0; i<values.size(); i++){
+    pulls.SetBinContent(i, values[i]);
+  }
+
   return pulls;
 }
 
@@ -1001,6 +1117,144 @@ void doocore::lutils::PlotPullDistributionWithGaussian(const TH1& pulls, TPad& p
 	gPad->RedrawAxis();
 }
 
+void doocore::lutils::PlotPulls(TString pName, TH1D* h1, TH1D* h2, TString pDir, bool plot_logy, bool plot_logx, TLegend * label, std::string gauss_suffix) {
+  gStyle->SetTitle(0);
+  
+  TCanvas c1("c_Utils","c_Utils",900,900);
+
+  double top_label_size   = 0;
+  double top_title_offset = 0;
+  double title2label_size_ratio = 0;
+
+  double bottom_label_size = 0;
+  double bottom_title_offset = 0;
+
+  double plot_min = h1->GetXaxis()->GetXmin();
+  double plot_max = h1->GetXaxis()->GetXmax();
+
+  //Used function is actually independent of plotdummy - change PreparePadForPulls() signature later
+  RooPlot* plotdummy = NULL;
+  PreparePadForPulls(&c1, plot_logx, plot_logy, top_label_size, top_title_offset, title2label_size_ratio, bottom_label_size, bottom_title_offset);  
+  
+  TH1D pulls = GetPulls(h1,h2);
+  
+  TH1D * pulls1 = (TH1D*) pulls.Clone("pulls1");
+  TH1D * pulls2 = (TH1D*) pulls.Clone("pulls2");
+  TH1D * pulls3 = (TH1D*) pulls.Clone("pulls3");
+  TH1D * pulls4 = (TH1D*) pulls.Clone("pulls4");
+  
+  //Additional pull histograms for color coding only used if normalize = true
+  pulls1->SetFillColor(18);
+  pulls2->SetFillColor(16);
+  pulls3->SetFillColor(14);
+  pulls4->SetFillColor(12);
+  
+  pulls1->SetLineWidth(2);
+  pulls2->SetLineWidth(2);
+  pulls3->SetLineWidth(2);
+  pulls4->SetLineWidth(2);
+  
+  for (unsigned int i = 1; i <= pulls.GetNbinsX(); ++i) {
+    pulls1->SetBinContent(i,0);
+    pulls2->SetBinContent(i,0);
+    pulls3->SetBinContent(i,0);
+    pulls4->SetBinContent(i,0);
+    
+    if (TMath::Abs(pulls.GetBinContent(i)) < 1) {
+      pulls1->SetBinContent(i,pulls.GetBinContent(i));
+    }
+    else if (TMath::Abs(pulls.GetBinContent(i)) < 2) {
+      pulls2->SetBinContent(i,pulls.GetBinContent(i));
+    }
+    else if (TMath::Abs(pulls.GetBinContent(i)) < 3) {
+      pulls3->SetBinContent(i,pulls.GetBinContent(i));
+    }
+    else {
+      pulls4->SetBinContent(i,pulls.GetBinContent(i));
+    }
+  }
+  //end of histogram creation
+
+  c1.cd(1);
+
+  //SavePlotXTitle
+  TString temp_xtitle =  h1->GetXaxis()->GetTitle();
+
+  h1->SetLabelSize(0.0,"x");
+  h1->SetLabelSize(top_label_size,"y");
+  h1->SetXTitle("");
+  h1->SetTitleSize(top_label_size*title2label_size_ratio,"y");
+  h1->GetYaxis()->SetTitleOffset(top_title_offset);
+
+  double max = h1->GetMaximum() > h2->GetMaximum() ? h1->GetMaximum() : h2->GetMaximum();
+  h1->SetMaximum(1.3*max);
+    
+  //pFrame->Draw();
+  h1->SetLineColor(2);
+  h2->SetLineColor(4);
+
+  h1->Draw("E");
+  h2->Draw("E SAME");
+
+  // lower frame with residuals plot
+  c1.cd(2);
+  
+  pulls.SetXTitle(temp_xtitle);
+  pulls.GetXaxis()->SetLimits(plot_min,plot_max);
+  
+  TLine zero_line(plot_min, 0, plot_max, 0);
+  
+  //some boxes for new residual plots:
+  TBox lower_box(plot_min, -1., plot_max, -2.);
+  TBox upper_box(plot_min, +1., plot_max, +2.);
+  
+  upper_box.SetFillColor(11);
+  upper_box.SetFillStyle(1001);
+  upper_box.SetLineWidth(0);
+  lower_box.SetFillColor(11);
+  lower_box.SetFillStyle(1001);
+  lower_box.SetLineWidth(0);
+  
+  //Style for pull histogram
+  pulls.SetLineWidth(2);
+  pulls.SetAxisRange(-5.8,5.8,"Y");
+  pulls.SetTitle("");
+  pulls.SetYTitle("Pull");
+  
+  pulls.SetLabelSize(bottom_label_size, "xy");
+  pulls.SetTitleSize(bottom_label_size*title2label_size_ratio, "xy");
+  pulls.GetYaxis()->SetTitleOffset(bottom_title_offset);  
+  pulls.GetYaxis()->SetNdivisions(5,5,0);
+
+  //Draw pull
+  pulls.Draw();
+  zero_line.Draw();
+  //Draw color coded pull graphs
+  upper_box.Draw();
+  lower_box.Draw();
+  pulls1->Draw("same");
+  pulls2->Draw("same");
+  pulls3->Draw("same");
+  pulls4->Draw("same");
+  
+  gPad->RedrawAxis(); 
+
+  //Draw label, possibly better on c1.cd(1) Tobi 2013-04-16
+  c1.cd(0);
+	if (label) {
+  	label->SetTextSize(0.05);
+  	label->Draw();
+	}
+  
+  printPlot(&c1, pName, pDir);
+
+	//produce a plot with distribution of pulls
+	PlotGauss(pName+gauss_suffix, pulls, pDir);
+
+  // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
+  h1->SetXTitle(temp_xtitle);
+}
+
 void doocore::lutils::PlotGauss(TString pName, const TH1 & pulls, TString pDir, double chi2_reduced, double chi2_pvalue) {
 	TCanvas c1("c_Utils","c_Utils",900,900);
   
@@ -1058,10 +1312,11 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   pulls3->SetFillColor(14);
   pulls4->SetFillColor(12);
   
-  pulls1->SetLineWidth(2);
-  pulls2->SetLineWidth(2);
-  pulls3->SetLineWidth(2);
-  pulls4->SetLineWidth(2);
+  double line_width=GlobalLineWidth;
+  pulls1->SetLineWidth(line_width);
+  pulls2->SetLineWidth(line_width);
+  pulls3->SetLineWidth(line_width);
+  pulls4->SetLineWidth(line_width);
   
   for (int i = 1; i <= pulls.GetNbinsX(); ++i) {
     pulls1->SetBinContent(i,0);
@@ -1118,7 +1373,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   lower_box.SetLineWidth(0);
   
   //Style for pull histogram
-  pulls.SetLineWidth(2);
+  pulls.SetLineWidth(line_width);
   pulls.SetAxisRange(-5.8,5.8,"Y");
   pulls.SetTitle("");
   pulls.SetYTitle("Pull");
@@ -1130,6 +1385,7 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
 
   //Draw pull
   pulls.Draw();
+  pulls.GetYaxis()->SetRangeUser(-5.8,5.8);
   zero_line.Draw();
   //Draw color coded pull graphs
   upper_box.Draw();
@@ -1149,9 +1405,24 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TLatex& label, 
   
   printPlot(&c1, pName, pDir);
 
-	//produce a plot with distribution of pulls
-	PlotGauss(pName+gauss_suffix, pulls, pDir, chi2_reduced, chi2_pvalue);
+  // c1.cd(2);
+  // gPad->RedrawAxis(); 
 
+  // TPluginHandler* h = gROOT->GetPluginManager()->FindHandler("TVirtualPS", "tex");
+  // h->LoadPlugin();  
+  // h->ExecPlugin(0);
+  // TTeXDump* td = dynamic_cast<TTeXDump*>(gVirtualPS);
+  // if (td != nullptr) {
+  // 	td->SetLineScale(10);
+  // }
+
+  printPlotTex(&c1, pName, pDir);
+
+	//produce a plot with distribution of pulls
+  if (gauss_suffix != "nogauss") {
+    PlotGauss(pName+gauss_suffix, pulls, pDir, chi2_reduced, chi2_pvalue);
+  }
+  
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
   
@@ -1285,7 +1556,9 @@ void doocore::lutils::PlotPulls(TString pName, RooPlot * pFrame, TString pDir, b
   printPlot(&c1, pName, pDir);
 
 	//produce a plot with distribution of pulls
-	PlotGauss(pName+gauss_suffix, pulls, pDir);
+  if (gauss_suffix != "nogauss") {
+    PlotGauss(pName+gauss_suffix, pulls, pDir);
+  }
 
   // residFrame will also delete resid, as it is owned after RooPlot::addPlotable(...)
   pFrame->SetXTitle(temp_xtitle);
@@ -1487,7 +1760,7 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
       entries.push_back(dynamic_cast<RooRealVar*>(args->find(var_name.c_str()))->getVal());
     }
   }
-  
+
 //  if (debug) sdebug << "#non-finite entries neglected: " << num_entries-entries.size() << endmsg;
   
   std::sort(entries.begin(), entries.end());
@@ -1498,46 +1771,57 @@ std::pair<double,double> doocore::lutils::MedianLimitsForTuple(const RooDataSet&
 //  }
   
   
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) range: " << entries.front() << " - " << entries.back() << endmsg;
-  
-  minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
-  minmax.second = -4*entries[idx_median]+5*entries[(int)(entries.size()-idx_median*0.32)];
-  
-//  if (debug) sdebug << "idx_median = " << idx_median << ", entries[idx_median] = " << entries[idx_median] << endmsg;
-//  if (debug) sdebug << "(int)(idx_median*0.32) = " << (int)(idx_median*0.32) << endmsg;
-//  if (debug) sdebug << "(int)(entries.size()-idx_median*0.32) = " << (int)(entries.size()-idx_median*0.32) << endmsg;
-//  if (debug) sdebug << "-4*entries[idx_median] = " << -4*entries[idx_median] << endmsg;
-//  if (debug) sdebug << "5*entries[(int)(idx_median*0.32)] = " << 5*entries[(int)(idx_median*0.32)] << endmsg;
-//  if (debug) sdebug << "5*entries[(int)(entries.size()-idx_median*0.32)] = " << 5*entries[(int)(entries.size()-idx_median*0.32)] << endmsg;
-//  if (debug) sdebug << "first: " << minmax.first << endmsg;
-//  if (debug) sdebug << "second: " << minmax.second << endmsg;
-  
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after quantiles: " << minmax.first << " - " << minmax.second << endmsg;
-  
-  // if computed range is larger than min/max value choose those
-  if (minmax.first < entries.front()){
-  	minmax.first = entries.front();
-  }
-  if (minmax.second > entries.back()){
-  	minmax.second = entries.back();
+  if (debug) {
+    sdebug << "num_entries = " << num_entries << endmsg;
+    sdebug << "entries.size() = " << entries.size() << endmsg;
   }
   
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after overflow check: " << minmax.first << " - " << minmax.second << endmsg;
+  if (!entries.empty()) {
+    if (debug) {
+      sdebug << "doocore::lutils::MedianLimitsForTuple(...) range: " << entries.front() << " - " << entries.back() << endmsg;
+      sdebug << "idx_median = " << idx_median << ", entries[idx_median] = " << entries[idx_median] << endmsg;
+      sdebug << "(int)(idx_median*0.32) = " << (int)(idx_median*0.32) << endmsg;
+      sdebug << "(int)(entries.size()-idx_median*0.32) = " << (int)(entries.size()-idx_median*0.32) << endmsg;
+      sdebug << "-4*entries[idx_median] = " << -4*entries[idx_median] << endmsg;
+      sdebug << "5*entries[(int)(idx_median*0.32)] = " << 5*entries[(int)(idx_median*0.32)] << endmsg;
+      sdebug << "5*entries[(int)(entries.size()-idx_median*0.32)] = " << 5*entries[(int)(entries.size()-idx_median*0.32)] << endmsg;
+      sdebug << "first: " << minmax.first << endmsg;
+      sdebug << "second: " << minmax.second << endmsg;
+    }
 
-  if (minmax.first >= minmax.second) {
-    minmax.first  = entries[idx_median]*(minmax.first  > 0 ? 0.98 : 1.02);
-    minmax.second = entries[idx_median]*(minmax.second > 0 ? 1.02 : 0.98);
+    minmax.first  = -4*entries[idx_median]+5*entries[(int)(idx_median*0.32)];
+    minmax.second = -4*entries[idx_median]+5*entries[(int)(entries.size()-idx_median*0.32)];
+
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after quantiles: " << minmax.first << " - " << minmax.second << endmsg;
+  
+    // if computed range is larger than min/max value choose those
+    if (minmax.first < entries.front()){
+      minmax.first = entries.front();
+    }
+    if (minmax.second > entries.back()){
+      minmax.second = entries.back();
+    }
+    
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after overflow check: " << minmax.first << " - " << minmax.second << endmsg;
+
+    if (minmax.first >= minmax.second) {
+      minmax.first  = entries[idx_median]*(minmax.first  > 0 ? 0.98 : 1.02);
+      minmax.second = entries[idx_median]*(minmax.second > 0 ? 1.02 : 0.98);
+    }
+    
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after flip/equality check: " << minmax.first << " - " << minmax.second << endmsg;
+    
+    // if everything fails, just take all
+    if (minmax.first == 0 && minmax.second == 0) {
+      minmax.first  = entries[0]-0.1*(entries[entries.size()-1]-entries[0]);
+      minmax.second = entries[num_entries-1]+0.1*(entries[entries.size()-1]-entries[0]);
+    }
+    
+    if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after zero check: " << minmax.first << " - " << minmax.second << endmsg;
+  } else {
+    minmax.first  = -1;
+    minmax.second = +1;
   }
-  
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after flip/equality check: " << minmax.first << " - " << minmax.second << endmsg;
-  
-  // if everything fails, just take all
-  if (minmax.first == 0 && minmax.second == 0) {
-    minmax.first  = entries[0]-0.1*(entries[entries.size()-1]-entries[0]);
-    minmax.second = entries[num_entries-1]+0.1*(entries[entries.size()-1]-entries[0]);
-  }
-  
-  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) after zero check: " << minmax.first << " - " << minmax.second << endmsg;
   
   // if still empty range, go from -1 to +1
   if (minmax.first == 0 && minmax.second == 0) {
@@ -1685,4 +1969,49 @@ RooBinning doocore::lutils::GetQuantileBinning(RooDataSet* data, std::string var
   return Binning;
 }
 
+std::pair<double,double> doocore::lutils::MinMaxLimitsForDataSet(const RooDataSet& dataset, std::string var_name) {
+  bool debug = false;
+
+  int num_entries = dataset.numEntries();
+  std::pair<double, double> minmax;
+
+  if (num_entries == 0) {
+    minmax.first  = 0;
+    minmax.second = 1;
+    return minmax;
+  }
+
+  std::vector<double> entries;
+
+  // convert entries into vector (for sorting)
+  const RooArgSet* args = NULL;
+  for (int i = 0; i < num_entries; ++i) {
+    args = dataset.get(i);
+    if (isfinite(dynamic_cast<RooRealVar*>(args->find(var_name.c_str()))->getVal())) {
+      entries.push_back(dynamic_cast<RooRealVar*>(args->find(var_name.c_str()))->getVal());
+    }
+  }
+
+  // if (debug) sdebug << "#non-finite entries neglected: " << num_entries-entries.size() << endmsg;
+
+  std::sort(entries.begin(), entries.end());
+
+  // for (int i = 0; i < entries.size(); ++i) {
+    // if (debug) sdebug << entries[i] << endmsg;
+  // }
+
+  if (debug) sdebug << "doocore::lutils::MedianLimitsForTuple(...) range: " << entries.front() << " - " << entries.back() << endmsg;
+
+  minmax.first = entries.front();
+  minmax.second = entries.back();
+
+  // just take a little more
+  minmax.first  = minmax.first*(minmax.first  > 0 ? 0.9998 : 1.0002);
+  minmax.second = minmax.second*(minmax.second > 0 ? 1.0002 : 0.9998);
+
+  // if (debug) sdebug << "first: " << minmax.first << endmsg;
+  // if (debug) sdebug << "second: " << minmax.second << endmsg;
+
+  return minmax;
+}
 

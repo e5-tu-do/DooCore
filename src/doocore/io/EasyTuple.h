@@ -117,6 +117,16 @@ class EasyTuple {
    *  @param argset RooArgSet of parameters to activate
    */
   EasyTuple(TTree* tree, const RooArgSet& argset=RooArgSet());
+
+  /**
+   *  @brief Constructor for EasyTuple based on a given RooDataSet
+   *
+   *  Based on the supplied RooDataSet an EasyTuple is constructed. EasyTuple 
+   *  will assume ownership over the supplied dataset.
+   *
+   *  @param dataset RooDataSet to use
+   */
+  EasyTuple(RooDataSet& dataset, const RooArgSet& argset=RooArgSet());
   
   /**
    *  @brief Copy constructor for EasyTuple
@@ -223,6 +233,17 @@ class EasyTuple {
                                const RooCmdArg& arg6 = RooCmdArg(),
                                const RooCmdArg& arg7 = RooCmdArg());
   
+
+  /**
+   *  @brief Write dataset to TTree in a TFile
+   *
+   *  This function can be used to write a stored RooDataSet back into a TTree.
+   *
+   *  @param file_name file name of TFile to use
+   *  @param tree_name tree name in TFile to use
+   */
+  void WriteDataSetToTree(const std::string& file_name, const std::string& tree_name);
+
   /**
    *  @brief Access variable in dataset
    *

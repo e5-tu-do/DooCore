@@ -1,0 +1,7 @@
+before_script:
+  - apt-get update -q && apt-get install -y -q doxygen
+pages:
+  script:
+  - doxygen doxygen.conf
+  only:
+  - master
