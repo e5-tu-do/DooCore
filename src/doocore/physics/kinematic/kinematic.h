@@ -367,6 +367,40 @@ double MotherFourBodyDecayMass(double d1_px, double d1_py,
   return TMath::Sqrt(m_E*m_E - (m_px*m_px + m_py*m_py + m_pz*m_pz));
 }
 
+double TwoBodyDecayAngle(double m_px, double m_py, double m_pz, double m_m,
+                         double d_px, double d_py, double d_pz, double d_m,
+                         double gd_px, double gd_py, double gd_pz, double gd_m) {
+  double m_E = TMath::Sqrt(m_px*m_px + m_py*m_py + m_pz*m_pz + m_m*m_m);
+  double d_E = TMath::Sqrt(d_px*d_px + d_py*d_py + d_pz*d_pz + d_m*d_m);
+  double gd_E = TMath::Sqrt(gd_px*gd_px + gd_py*gd_py + gd_pz*gd_pz + gd_m*gd_m);
+
+  double m_times_d = m_E*d_E - m_px*d_px - m_py*d_py - m_pz*d_pz;
+  double m_times_gd = m_E*gd_E - m_px*gd_px - m_py*gd_py - m_pz*gd_pz;
+  double d_times_gd = d_E*gd_E - d_px*gd_px - d_py*gd_py - d_pz*gd_pz;
+
+  return (m_times_gd*d_m*d_m - m_times_d*d_times_gd)/TMath::Sqrt((m_times_d*m_times_d - d_m*d_m*m_m*m_m)*(d_times_gd*d_times_gd - d_m*d_m*gd_m*gd_m));
+}
+
+double ThreeBodyDecayAngle(double   m_px, double   m_py, double   m_pz, double   m_m,
+                           double   d_px, double   d_py, double   d_pz, double   d_m,
+                           double gd1_px, double gd1_py, double gd1_pz, double gd1_m,
+                           double gd2_px, double gd2_py, double gd2_pz, double gd2_m) {
+  double m_E = TMath::Sqrt(m_px*m_px + m_py*m_py + m_pz*m_pz + m_m*m_m);
+  double d_E = TMath::Sqrt(d_px*d_px + d_py*d_py + d_pz*d_pz + d_m*d_m);
+  double gd1_E = TMath::Sqrt(gd1_px*gd1_px + gd1_py*gd1_py + gd1_pz*gd1_pz + gd1_m*gd1_m);
+  double gd2_E = TMath::Sqrt(gd2_px*gd2_px + gd2_py*gd2_py + gd2_pz*gd2_pz + gd2_m*gd2_m);
+
+  double m_times_d = m_E*d_E - m_px*d_px - m_py*d_py - m_pz*d_pz;
+  double l_px = d_py*(gd1_pz*gd2_E - gd1_E*gd2_pz) + d_pz*(gd1_E*gd2_py - gd1_py*gd2_E) + d_E*(gd1_py*gd2_pz - gd1_pz*gd2_py);
+  double l_py = d_px*(gd1_E*gd2_pz - gd1_pz*gd2_E) + d_pz*(gd1_px*gd2_E - gd1_E*gd2_px) + d_E*(gd1_pz*gd2_px - gd1_px*gd2_pz);
+  double l_pz = d_px*(gd1_py*gd2_E - gd1_E*gd2_py) + d_py*(gd1_E*gd2_px - gd1_px*gd2_E) + d_E*(gd1_px*gd2_py - gd1_py*gd2_px);
+  double l_E = d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py);
+  double m_times_l = m_E*l_E - m_px*l_px - m_py*l_py - m_pz*l_pz;
+  double l_m2 = l_E*l_E - l_px*l_px - l_py*l_py - l_pz*l_pz;
+
+  return d_m*m_times_l/TMath::Sqrt(-(m_times_d*m_times_d - m_m*m_m*d_m*d_m)*l_m2);
+}
+
 } // namespace kinematic
 } // namespace physics
 } // namespace doofit
