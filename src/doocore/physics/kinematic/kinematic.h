@@ -401,6 +401,95 @@ double ThreeBodyDecayAngle(double   m_px, double   m_py, double   m_pz, double  
   return d_m*m_times_l/TMath::Sqrt(-(m_times_d*m_times_d - m_m*m_m*d_m*d_m)*l_m2);
 }
 
+// double ThreeBodyDecayAngle(double   m_px, double   m_py, double   m_pz, double   m_m,
+//                            double   d_px, double   d_py, double   d_pz, double   d_m,
+//                            double gd1_px, double gd1_py, double gd1_pz, double gd1_m,
+//                            double gd2_px, double gd2_py, double gd2_pz, double gd2_m) {
+//   double m_E = TMath::Sqrt(m_px*m_px + m_py*m_py + m_pz*m_pz + m_m*m_m);
+//   double d_E = TMath::Sqrt(d_px*d_px + d_py*d_py + d_pz*d_pz + d_m*d_m);
+//   double gd1_E = TMath::Sqrt(gd1_px*gd1_px + gd1_py*gd1_py + gd1_pz*gd1_pz + gd1_m*gd1_m);
+//   double gd2_E = TMath::Sqrt(gd2_px*gd2_px + gd2_py*gd2_py + gd2_pz*gd2_pz + gd2_m*gd2_m);
+
+//   double l_px = d_py*(gd1_pz*gd2_E - gd1_E*gd2_pz) + d_pz*(gd1_E*gd2_py - gd1_py*gd2_E) + d_E*(gd1_py*gd2_pz - gd1_pz*gd2_py);
+//   double l_py = d_px*(gd1_E*gd2_pz - gd1_pz*gd2_E) + d_pz*(gd1_px*gd2_E - gd1_E*gd2_px) + d_E*(gd1_pz*gd2_px - gd1_px*gd2_pz);
+//   double l_pz = d_px*(gd1_py*gd2_E - gd1_E*gd2_py) + d_py*(gd1_E*gd2_px - gd1_px*gd2_E) + d_E*(gd1_px*gd2_py - gd1_py*gd2_px);
+//   double l_E = d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py);
+//   double l_m2 = l_E*l_E - l_px*l_px - l_py*l_py - l_pz*l_pz;
+
+//   double m_times_d = m_E*d_E - m_px*d_px - m_py*d_py - m_pz*d_pz;
+//   double l_times_d = l_E*d_E - l_px*d_px - l_py*d_py - l_pz*d_pz;
+//   double m_times_l = m_E*l_E - m_px*l_px - m_py*l_py - m_pz*l_pz;
+
+//   return (m_times_d*l_times_d - d_m*d_m*m_times_l)/TMath::Sqrt((m_times_d*m_times_d - m_m*m_m*d_m*d_m)*(l_times_d*l_times_d - l_m2*d_m*d_m));
+// }
+
+//double AzimuthalAngleInDecayPlane(double   m_px, double   m_py, double   m_pz, double   m_m,
+//                                  double   d_px, double   d_py, double   d_pz, double   d_m,
+//                                  double gd1_px, double gd1_py, double gd1_pz, double gd1_m,
+//                                  double gd2_px, double gd2_py, double gd2_pz, double gd2_m) {
+//  double m_E = TMath::Sqrt(m_px*m_px + m_py*m_py + m_pz*m_pz + m_m*m_m);
+//  double d_E = TMath::Sqrt(d_px*d_px + d_py*d_py + d_pz*d_pz + d_m*d_m);
+//  double gd1_E = TMath::Sqrt(gd1_px*gd1_px + gd1_py*gd1_py + gd1_pz*gd1_pz + gd1_m*gd1_m);
+//  double gd2_E = TMath::Sqrt(gd2_px*gd2_px + gd2_py*gd2_py + gd2_pz*gd2_pz + gd2_m*gd2_m);
+//
+//  double l_px = d_py*(gd1_pz*gd2_E - gd1_E*gd2_pz) + d_pz*(gd1_E*gd2_py - gd1_py*gd2_E) + d_E*(gd1_py*gd2_pz - gd1_pz*gd2_py);
+//  double l_py = d_px*(gd1_E*gd2_pz - gd1_pz*gd2_E) + d_pz*(gd1_px*gd2_E - gd1_E*gd2_px) + d_E*(gd1_pz*gd2_px - gd1_px*gd2_pz);
+//  double l_pz = d_px*(gd1_py*gd2_E - gd1_E*gd2_py) + d_py*(gd1_E*gd2_px - gd1_px*gd2_E) + d_E*(gd1_px*gd2_py - gd1_py*gd2_px);
+//  double l_E = d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py);
+//  double l_m2 = l_E*l_E - l_px*l_px - l_py*l_py - l_pz*l_pz;
+//  double m_times_d = m_E*d_E - m_px*d_px - m_py*d_py - m_pz*d_pz;
+//  double m_times_l = m_E*l_E - m_px*l_px - m_py*l_py - m_pz*l_pz;
+//  double m_times_gd1 = m_E*gd1_E - m_px*gd1_px - m_py*gd1_py - m_pz*gd1_pz;
+//  double l_times_gd1 = l_E*gd1_E - l_px*gd1_px - l_py*gd1_py - l_pz*gd1_pz;
+//  double l_times_d = l_E*d_E - l_px*d_px - l_py*d_py - l_pz*d_pz;
+//  double gd1_times_d = gd1_E*d_E - gd1_px*d_px - gd1_py*d_py - gd1_pz*d_pz;
+//  double m_abs = TMath::Sqrt(pow(m_times_d/d_m,2)-m_m*m_m);
+//  double gd1_abs = TMath::Sqrt(pow(gd1_times_d/d_m,2) - gd1_m*gd1_m);
+//  double cos_phi = -m_times_l/(m_abs*TMath::Sqrt(-l_m2));
+//  double m_parallel_abs = m_abs*TMath::Sqrt(1 - cos_phi*cos_phi);
+//  double m_parallel_times_gd1 =  m_times_d                          *gd1_times_d/(d_m*d_m) + m_times_l*l_times_gd1/l_m2 - m_times_gd1;
+//  // double m_parallel_times_gd1 = (m_times_d - m_times_l*l_times_d/l_m2)*gd1_times_d/(d_m*d_m) + m_times_l*l_times_gd1/l_m2 - m_times_gd1;
+//
+//  return -m_parallel_times_gd1/(m_parallel_abs*gd1_abs);
+//  // return m_parallel_times_gd1;
+//  // return m_parallel_abs;
+//  // return gd1_abs;
+//  // return m_times_d*gd1_times_d/(d_m*d_m);
+//  // return m_times_l*l_times_gd1/l_m2;
+//  // return m_times_gd1;
+//}
+double AzimuthalAngleInDecayPlane(double   m_px, double   m_py, double   m_pz, double   m_m,
+                                  double   d_px, double   d_py, double   d_pz, double   d_m,
+                                  double gd1_px, double gd1_py, double gd1_pz, double gd1_m,
+                                  double gd2_px, double gd2_py, double gd2_pz, double gd2_m) {
+  double m_E = TMath::Sqrt(m_px*m_px + m_py*m_py + m_pz*m_pz + m_m*m_m);
+  double d_E = TMath::Sqrt(d_px*d_px + d_py*d_py + d_pz*d_pz + d_m*d_m);
+  double gd1_E = TMath::Sqrt(gd1_px*gd1_px + gd1_py*gd1_py + gd1_pz*gd1_pz + gd1_m*gd1_m);
+  double gd2_E = TMath::Sqrt(gd2_px*gd2_px + gd2_py*gd2_py + gd2_pz*gd2_pz + gd2_m*gd2_m);
+
+  double l_px = d_py*(gd1_pz*gd2_E - gd1_E*gd2_pz) + d_pz*(gd1_E*gd2_py - gd1_py*gd2_E) + d_E*(gd1_py*gd2_pz - gd1_pz*gd2_py);
+  double l_py = d_px*(gd1_E*gd2_pz - gd1_pz*gd2_E) + d_pz*(gd1_px*gd2_E - gd1_E*gd2_px) + d_E*(gd1_pz*gd2_px - gd1_px*gd2_pz);
+  double l_pz = d_px*(gd1_py*gd2_E - gd1_E*gd2_py) + d_py*(gd1_E*gd2_px - gd1_px*gd2_E) + d_E*(gd1_px*gd2_py - gd1_py*gd2_px);
+  double l_E = d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py);
+  double l_m2 = l_E*l_E - l_px*l_px - l_py*l_py - l_pz*l_pz;
+
+  double gd1_times_d = gd1_E*d_E - gd1_px*d_px - gd1_py*d_py - gd1_pz*d_pz;
+  double m_times_d = m_E*d_E - m_px*d_px - m_py*d_py - m_pz*d_pz;
+  double m_times_gd1 = m_E*gd1_E - m_px*gd1_px - m_py*gd1_py - m_pz*gd1_pz;
+  double l_times_d = l_E*d_E - l_px*d_px - l_py*d_py - l_pz*d_pz;
+  double l_times_gd1 = l_E*gd1_E - l_px*gd1_px - l_py*gd1_py - l_pz*gd1_pz;
+  double m_times_l = m_E*l_E - m_px*l_px - m_py*l_py - m_pz*l_pz;
+
+  double gd1_vec_times_l_vec = gd1_times_d*l_times_d/(d_m*d_m) - l_times_gd1;
+  double m_vec_times_l_vec = m_times_d*l_times_d/(d_m*d_m) - m_times_l;
+  double l_vec_abs_squared = l_times_d*l_times_d/(d_m*d_m) - l_m2;
+  double numerator = gd1_times_d*m_times_d/(d_m*d_m) - m_times_gd1 - gd1_vec_times_l_vec*m_vec_times_l_vec/l_vec_abs_squared;
+  double gd1_abs = TMath::Sqrt(gd1_times_d*gd1_times_d/(d_m*d_m) - gd1_m*gd1_m);
+  double m_parallel_abs = TMath::Sqrt(m_times_d*m_times_d/(d_m*d_m) - m_m*m_m - pow(m_times_d*l_times_d/d_m - d_m*m_times_l,2)/(l_times_d*l_times_d - d_m*d_m*l_m2));
+
+  return -numerator/(gd1_abs*m_parallel_abs);
+}
+
 } // namespace kinematic
 } // namespace physics
 } // namespace doofit
