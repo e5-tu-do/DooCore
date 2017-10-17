@@ -533,19 +533,34 @@ double AzimuthalAngleInDecayPlane(double   m_px, double   m_py, double   m_pz, d
   return TMath::ACos(-numerator/(gd1_abs*m_parallel_abs));
 }
 
-TLorentzVector Lvector(double   m_px, double   m_py, double   m_pz, double   m_m,
-                       double   d_px, double   d_py, double   d_pz, double   d_m,
+TLorentzVector Lvector(double   d_px, double   d_py, double   d_pz, double   d_m,
                        double gd1_px, double gd1_py, double gd1_pz, double gd1_m,
                        double gd2_px, double gd2_py, double gd2_pz, double gd2_m) {
-  TLorentzVector mother_boosted, daughter_boosted, granddaughter1_boosted, granddaughter2_boosted, l_boosted;
-  mother_boosted.SetXYZM(m_px,m_py,m_pz,m_m);
+  TLorentzVector  lvector;
+
+  double d_E = TMath::Sqrt(d_px*d_px + d_py*d_py + d_pz*d_pz + d_m*d_m);
+  double gd1_E = TMath::Sqrt(gd1_px*gd1_px + gd1_py*gd1_py + gd1_pz*gd1_pz + gd1_m*gd1_m);
+  double gd2_E = TMath::Sqrt(gd2_px*gd2_px + gd2_py*gd2_py + gd2_pz*gd2_pz + gd2_m*gd2_m);
+
+  double l_px = d_py*(gd1_pz*gd2_E - gd1_E*gd2_pz) + d_pz*(gd1_E*gd2_py - gd1_py*gd2_E) + d_E*(gd1_py*gd2_pz - gd1_pz*gd2_py);
+  double l_py = d_px*(gd1_E*gd2_pz - gd1_pz*gd2_E) + d_pz*(gd1_px*gd2_E - gd1_E*gd2_px) + d_E*(gd1_pz*gd2_px - gd1_px*gd2_pz);
+  double l_pz = d_px*(gd1_py*gd2_E - gd1_E*gd2_py) + d_py*(gd1_E*gd2_px - gd1_px*gd2_E) + d_E*(gd1_px*gd2_py - gd1_py*gd2_px);
+  double l_E = d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py);
+  lvector.SetPxPyPzE(l_px,l_py,l_pz,l_E);
+
+  return lvector;
+}
+
+TLorentzVector Lvector_boosted(double   d_px, double   d_py, double   d_pz, double   d_m,
+                               double gd1_px, double gd1_py, double gd1_pz, double gd1_m,
+                               double gd2_px, double gd2_py, double gd2_pz, double gd2_m) {
+  TLorentzVector daughter_boosted, granddaughter1_boosted, granddaughter2_boosted, l_boosted;
   daughter_boosted.SetXYZM(d_px,d_py,d_pz,d_m);
   granddaughter1_boosted.SetXYZM(gd1_px,gd1_py,gd1_pz,gd1_m);
   granddaughter2_boosted.SetXYZM(gd2_px,gd2_py,gd2_pz,gd2_m);
 
   TVector3 boost_vector = daughter_boosted.BoostVector();
 
-  mother_boosted.Boost(-boost_vector);
   daughter_boosted.Boost(-boost_vector);
   granddaughter1_boosted.Boost(-boost_vector);
   granddaughter2_boosted.Boost(-boost_vector);
@@ -574,29 +589,18 @@ TLorentzVector Lvector(double   m_px, double   m_py, double   m_pz, double   m_m
   return l_boosted;
 }
 
-TLorentzVector Daughtervector(double   m_px, double   m_py, double   m_pz, double   m_m,
-                              double   d_px, double   d_py, double   d_pz, double   d_m,
-                              double gd1_px, double gd1_py, double gd1_pz, double gd1_m,
-                              double gd2_px, double gd2_py, double gd2_pz, double gd2_m) {
-  TLorentzVector mother_boosted, daughter_boosted, granddaughter1_boosted, granddaughter2_boosted, l_boosted;
-  mother_boosted.SetXYZM(m_px,m_py,m_pz,m_m);
+TLorentzVector Daughtervector_boosted(double d_px, double d_py, double d_pz, double d_m) {
+  TLorentzVector daughter_boosted;
   daughter_boosted.SetXYZM(d_px,d_py,d_pz,d_m);
-  granddaughter1_boosted.SetXYZM(gd1_px,gd1_py,gd1_pz,gd1_m);
-  granddaughter2_boosted.SetXYZM(gd2_px,gd2_py,gd2_pz,gd2_m);
-
   TVector3 boost_vector = daughter_boosted.BoostVector();
-
-  mother_boosted.Boost(-boost_vector);
   daughter_boosted.Boost(-boost_vector);
-  granddaughter1_boosted.Boost(-boost_vector);
-  granddaughter2_boosted.Boost(-boost_vector);
-
-  double d_E_boosted = daughter_boosted.E();
-  double d_px_boosted = daughter_boosted.Px();
-  double d_py_boosted = daughter_boosted.Py();
-  double d_pz_boosted = daughter_boosted.Pz();
 
   return daughter_boosted;
+}
+
+double FourMomentumProduct(double u_x, double u_y, double u_z, double u_E,
+                           double v_x, double v_y, double v_z, double v_E) {
+  return u_E*v_E - u_x*v_x - u_y*v_y - u_z*v_z;
 }
 
 } // namespace kinematic
