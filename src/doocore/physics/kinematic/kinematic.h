@@ -394,143 +394,39 @@ double ThreeBodyDecayAngle(double   m_px, double   m_py, double   m_pz, double  
   double l_px = d_py*(gd1_pz*gd2_E - gd1_E*gd2_pz) + d_pz*(gd1_E*gd2_py - gd1_py*gd2_E) + d_E*(gd1_py*gd2_pz - gd1_pz*gd2_py);
   double l_py = d_px*(gd1_E*gd2_pz - gd1_pz*gd2_E) + d_pz*(gd1_px*gd2_E - gd1_E*gd2_px) + d_E*(gd1_pz*gd2_px - gd1_px*gd2_pz);
   double l_pz = d_px*(gd1_py*gd2_E - gd1_E*gd2_py) + d_py*(gd1_E*gd2_px - gd1_px*gd2_E) + d_E*(gd1_px*gd2_py - gd1_py*gd2_px);
-  double l_E = d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py);
+  double l_E = -(d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py));
   double m_times_l = m_E*l_E - m_px*l_px - m_py*l_py - m_pz*l_pz;
   double l_m2 = l_E*l_E - l_px*l_px - l_py*l_py - l_pz*l_pz;
 
   return d_m*m_times_l/TMath::Sqrt(-(m_times_d*m_times_d - m_m*m_m*d_m*d_m)*l_m2);
 }
 
-// double ThreeBodyDecayAngle(double   m_px, double   m_py, double   m_pz, double   m_m,
-//                            double   d_px, double   d_py, double   d_pz, double   d_m,
-//                            double gd1_px, double gd1_py, double gd1_pz, double gd1_m,
-//                            double gd2_px, double gd2_py, double gd2_pz, double gd2_m) {
-//   TLorentzVector mother_boosted, daughter_boosted, granddaughter1_boosted, granddaughter2_boosted, l_boosted;
-//   mother_boosted.SetXYZM(m_px,m_py,m_pz,m_m);
-//   daughter_boosted.SetXYZM(d_px,d_py,d_pz,d_m);
-//   granddaughter1_boosted.SetXYZM(gd1_px,gd1_py,gd1_pz,gd1_m);
-//   granddaughter2_boosted.SetXYZM(gd2_px,gd2_py,gd2_pz,gd2_m);
-
-//   TVector3 boost_vector = daughter_boosted.BoostVector();
-
-//   mother_boosted.Boost(-boost_vector);
-//   daughter_boosted.Boost(-boost_vector);
-//   granddaughter1_boosted.Boost(-boost_vector);
-//   granddaughter2_boosted.Boost(-boost_vector);
-
-//   double d_E_boosted = daughter_boosted.E();
-//   double d_px_boosted = daughter_boosted.Px();
-//   double d_py_boosted = daughter_boosted.Py();
-//   double d_pz_boosted = daughter_boosted.Pz();
-
-//   double gd1_E_boosted = granddaughter1_boosted.E();
-//   double gd1_px_boosted = granddaughter1_boosted.Px();
-//   double gd1_py_boosted = granddaughter1_boosted.Py();
-//   double gd1_pz_boosted = granddaughter1_boosted.Pz();
-
-//   double gd2_E_boosted = granddaughter2_boosted.E();
-//   double gd2_px_boosted = granddaughter2_boosted.Px();
-//   double gd2_py_boosted = granddaughter2_boosted.Py();
-//   double gd2_pz_boosted = granddaughter2_boosted.Pz();
-
-//   double l_px_boosted = d_py_boosted*(gd1_pz_boosted*gd2_E_boosted - gd1_E_boosted*gd2_pz_boosted) + d_pz_boosted*(gd1_E_boosted*gd2_py_boosted - gd1_py_boosted*gd2_E_boosted) + d_E_boosted*(gd1_py_boosted*gd2_pz_boosted - gd1_pz_boosted*gd2_py_boosted);
-//   double l_py_boosted = d_px_boosted*(gd1_E_boosted*gd2_pz_boosted - gd1_pz_boosted*gd2_E_boosted) + d_pz_boosted*(gd1_px_boosted*gd2_E_boosted - gd1_E_boosted*gd2_px_boosted) + d_E_boosted*(gd1_pz_boosted*gd2_px_boosted - gd1_px_boosted*gd2_pz_boosted);
-//   double l_pz_boosted = d_px_boosted*(gd1_py_boosted*gd2_E_boosted - gd1_E_boosted*gd2_py_boosted) + d_py_boosted*(gd1_E_boosted*gd2_px_boosted - gd1_px_boosted*gd2_E_boosted) + d_E_boosted*(gd1_px_boosted*gd2_py_boosted - gd1_py_boosted*gd2_px_boosted);
-//   double l_E_boosted = d_px_boosted*(gd1_pz_boosted*gd2_py_boosted - gd1_py_boosted*gd2_pz_boosted) + d_py_boosted*(gd1_px_boosted*gd2_pz_boosted - gd1_pz_boosted*gd2_px_boosted) + d_pz_boosted*(gd1_py_boosted*gd2_px_boosted - gd1_px_boosted*gd2_py_boosted);
-//   l_boosted.SetPxPyPzE(l_px_boosted,l_py_boosted,l_pz_boosted,l_E_boosted);
-//   double l_m2_boosted = l_boosted.M2();
-
-//   double m_times_d = mother_boosted*daughter_boosted;
-//   double l_times_d = l_boosted*daughter_boosted;
-//   double m_times_l = mother_boosted*l_boosted;
-
-//   return (m_times_d*l_times_d - d_m*d_m*m_times_l)/TMath::Sqrt((m_times_d*m_times_d - m_m*m_m*d_m*d_m)*(l_times_d*l_times_d - l_m2_boosted*d_m*d_m));
-// }
-
-//double AzimuthalAngleInDecayPlane(double   m_px, double   m_py, double   m_pz, double   m_m,
-//                                  double   d_px, double   d_py, double   d_pz, double   d_m,
-//                                  double gd1_px, double gd1_py, double gd1_pz, double gd1_m,
-//                                  double gd2_px, double gd2_py, double gd2_pz, double gd2_m) {
-//  double m_E = TMath::Sqrt(m_px*m_px + m_py*m_py + m_pz*m_pz + m_m*m_m);
-//  double d_E = TMath::Sqrt(d_px*d_px + d_py*d_py + d_pz*d_pz + d_m*d_m);
-//  double gd1_E = TMath::Sqrt(gd1_px*gd1_px + gd1_py*gd1_py + gd1_pz*gd1_pz + gd1_m*gd1_m);
-//  double gd2_E = TMath::Sqrt(gd2_px*gd2_px + gd2_py*gd2_py + gd2_pz*gd2_pz + gd2_m*gd2_m);
-//
-//  double l_px = d_py*(gd1_pz*gd2_E - gd1_E*gd2_pz) + d_pz*(gd1_E*gd2_py - gd1_py*gd2_E) + d_E*(gd1_py*gd2_pz - gd1_pz*gd2_py);
-//  double l_py = d_px*(gd1_E*gd2_pz - gd1_pz*gd2_E) + d_pz*(gd1_px*gd2_E - gd1_E*gd2_px) + d_E*(gd1_pz*gd2_px - gd1_px*gd2_pz);
-//  double l_pz = d_px*(gd1_py*gd2_E - gd1_E*gd2_py) + d_py*(gd1_E*gd2_px - gd1_px*gd2_E) + d_E*(gd1_px*gd2_py - gd1_py*gd2_px);
-//  double l_E = d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py);
-//  double l_m2 = l_E*l_E - l_px*l_px - l_py*l_py - l_pz*l_pz;
-//  double m_times_d = m_E*d_E - m_px*d_px - m_py*d_py - m_pz*d_pz;
-//  double m_times_l = m_E*l_E - m_px*l_px - m_py*l_py - m_pz*l_pz;
-//  double m_times_gd1 = m_E*gd1_E - m_px*gd1_px - m_py*gd1_py - m_pz*gd1_pz;
-//  double l_times_gd1 = l_E*gd1_E - l_px*gd1_px - l_py*gd1_py - l_pz*gd1_pz;
-//  double l_times_d = l_E*d_E - l_px*d_px - l_py*d_py - l_pz*d_pz;
-//  double gd1_times_d = gd1_E*d_E - gd1_px*d_px - gd1_py*d_py - gd1_pz*d_pz;
-//  double m_abs = TMath::Sqrt(pow(m_times_d/d_m,2)-m_m*m_m);
-//  double gd1_abs = TMath::Sqrt(pow(gd1_times_d/d_m,2) - gd1_m*gd1_m);
-//  double cos_phi = -m_times_l/(m_abs*TMath::Sqrt(-l_m2));
-//  double m_parallel_abs = m_abs*TMath::Sqrt(1 - cos_phi*cos_phi);
-//  double m_parallel_times_gd1 =  m_times_d                          *gd1_times_d/(d_m*d_m) + m_times_l*l_times_gd1/l_m2 - m_times_gd1;
-//  // double m_parallel_times_gd1 = (m_times_d - m_times_l*l_times_d/l_m2)*gd1_times_d/(d_m*d_m) + m_times_l*l_times_gd1/l_m2 - m_times_gd1;
-//
-//  return -m_parallel_times_gd1/(m_parallel_abs*gd1_abs);
-//}
-
 double AzimuthalAngleInDecayPlane(double   m_px, double   m_py, double   m_pz, double   m_m,
                                   double   d_px, double   d_py, double   d_pz, double   d_m,
                                   double gd1_px, double gd1_py, double gd1_pz, double gd1_m,
                                   double gd2_px, double gd2_py, double gd2_pz, double gd2_m) {
-  TLorentzVector mother_boosted, daughter_boosted, granddaughter1_boosted, granddaughter2_boosted, l_boosted;
-  mother_boosted.SetXYZM(m_px,m_py,m_pz,m_m);
-  daughter_boosted.SetXYZM(d_px,d_py,d_pz,d_m);
-  granddaughter1_boosted.SetXYZM(gd1_px,gd1_py,gd1_pz,gd1_m);
-  granddaughter2_boosted.SetXYZM(gd2_px,gd2_py,gd2_pz,gd2_m);
+  double m_E = TMath::Sqrt(m_px*m_px + m_py*m_py + m_pz*m_pz + m_m*m_m);
+  double d_E = TMath::Sqrt(d_px*d_px + d_py*d_py + d_pz*d_pz + d_m*d_m);
+  double gd1_E = TMath::Sqrt(gd1_px*gd1_px + gd1_py*gd1_py + gd1_pz*gd1_pz + gd1_m*gd1_m);
+  double gd2_E = TMath::Sqrt(gd2_px*gd2_px + gd2_py*gd2_py + gd2_pz*gd2_pz + gd2_m*gd2_m);
 
-  TVector3 boost_vector = daughter_boosted.BoostVector();
+  double l_px = d_py*(gd1_pz*gd2_E - gd1_E*gd2_pz) + d_pz*(gd1_E*gd2_py - gd1_py*gd2_E) + d_E*(gd1_py*gd2_pz - gd1_pz*gd2_py);
+  double l_py = d_px*(gd1_E*gd2_pz - gd1_pz*gd2_E) + d_pz*(gd1_px*gd2_E - gd1_E*gd2_px) + d_E*(gd1_pz*gd2_px - gd1_px*gd2_pz);
+  double l_pz = d_px*(gd1_py*gd2_E - gd1_E*gd2_py) + d_py*(gd1_E*gd2_px - gd1_px*gd2_E) + d_E*(gd1_px*gd2_py - gd1_py*gd2_px);
+  double l_E = d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py);
+  double l_m2 = l_E*l_E - l_px*l_px - l_py*l_py - l_pz*l_pz;
+  double m_times_d = m_E*d_E - m_px*d_px - m_py*d_py - m_pz*d_pz;
+  double m_times_l = m_E*l_E - m_px*l_px - m_py*l_py - m_pz*l_pz;
+  double m_times_gd1 = m_E*gd1_E - m_px*gd1_px - m_py*gd1_py - m_pz*gd1_pz;
+  double l_times_gd1 = l_E*gd1_E - l_px*gd1_px - l_py*gd1_py - l_pz*gd1_pz;
+  double gd1_times_d = gd1_E*d_E - gd1_px*d_px - gd1_py*d_py - gd1_pz*d_pz;
+  double m_abs = TMath::Sqrt(pow(m_times_d/d_m,2)-m_m*m_m);
+  double gd1_abs = TMath::Sqrt(pow(gd1_times_d/d_m,2) - gd1_m*gd1_m);
+  double cos_phi = -m_times_l/(m_abs*TMath::Sqrt(-l_m2));
+  double m_parallel_abs = m_abs*TMath::Sqrt(1 - cos_phi*cos_phi);
+  double m_parallel_times_gd1 =  m_times_d *gd1_times_d/(d_m*d_m) + m_times_l*l_times_gd1/l_m2 - m_times_gd1;
 
-  mother_boosted.Boost(-boost_vector);
-  daughter_boosted.Boost(-boost_vector);
-  granddaughter1_boosted.Boost(-boost_vector);
-  granddaughter2_boosted.Boost(-boost_vector);
-
-  double d_E_boosted = daughter_boosted.E();
-  double d_px_boosted = daughter_boosted.Px();
-  double d_py_boosted = daughter_boosted.Py();
-  double d_pz_boosted = daughter_boosted.Pz();
-
-  double gd1_E_boosted = granddaughter1_boosted.E();
-  double gd1_px_boosted = granddaughter1_boosted.Px();
-  double gd1_py_boosted = granddaughter1_boosted.Py();
-  double gd1_pz_boosted = granddaughter1_boosted.Pz();
-
-  double gd2_E_boosted = granddaughter2_boosted.E();
-  double gd2_px_boosted = granddaughter2_boosted.Px();
-  double gd2_py_boosted = granddaughter2_boosted.Py();
-  double gd2_pz_boosted = granddaughter2_boosted.Pz();
-
-  double l_px_boosted = d_py_boosted*(gd1_pz_boosted*gd2_E_boosted - gd1_E_boosted*gd2_pz_boosted) + d_pz_boosted*(gd1_E_boosted*gd2_py_boosted - gd1_py_boosted*gd2_E_boosted) + d_E_boosted*(gd1_py_boosted*gd2_pz_boosted - gd1_pz_boosted*gd2_py_boosted);
-  double l_py_boosted = d_px_boosted*(gd1_E_boosted*gd2_pz_boosted - gd1_pz_boosted*gd2_E_boosted) + d_pz_boosted*(gd1_px_boosted*gd2_E_boosted - gd1_E_boosted*gd2_px_boosted) + d_E_boosted*(gd1_pz_boosted*gd2_px_boosted - gd1_px_boosted*gd2_pz_boosted);
-  double l_pz_boosted = d_px_boosted*(gd1_py_boosted*gd2_E_boosted - gd1_E_boosted*gd2_py_boosted) + d_py_boosted*(gd1_E_boosted*gd2_px_boosted - gd1_px_boosted*gd2_E_boosted) + d_E_boosted*(gd1_px_boosted*gd2_py_boosted - gd1_py_boosted*gd2_px_boosted);
-  double l_E_boosted = d_px_boosted*(gd1_pz_boosted*gd2_py_boosted - gd1_py_boosted*gd2_pz_boosted) + d_py_boosted*(gd1_px_boosted*gd2_pz_boosted - gd1_pz_boosted*gd2_px_boosted) + d_pz_boosted*(gd1_py_boosted*gd2_px_boosted - gd1_px_boosted*gd2_py_boosted);
-  l_boosted.SetPxPyPzE(l_px_boosted,l_py_boosted,l_pz_boosted,l_E_boosted);
-  double l_m2_boosted = l_boosted.M2();
-
-  double gd1_times_d = granddaughter1_boosted*daughter_boosted;
-  double m_times_d = mother_boosted*daughter_boosted;
-  double m_times_gd1 = mother_boosted*granddaughter1_boosted;
-  double l_times_d = l_boosted*daughter_boosted;
-  double l_times_gd1 = l_boosted*granddaughter1_boosted;
-  double m_times_l = mother_boosted*l_boosted;
-
-  double gd1_vec_times_l_vec = gd1_times_d*l_times_d/(d_m*d_m) - l_times_gd1;
-  double m_vec_times_l_vec = m_times_d*l_times_d/(d_m*d_m) - m_times_l;
-  double l_vec_abs_squared = l_times_d*l_times_d/(d_m*d_m) - l_m2_boosted;
-  double numerator = gd1_times_d*m_times_d/(d_m*d_m) - m_times_gd1 - gd1_vec_times_l_vec*m_vec_times_l_vec/l_vec_abs_squared;
-  double gd1_abs = TMath::Sqrt(gd1_times_d*gd1_times_d/(d_m*d_m) - gd1_m*gd1_m);
-  double m_parallel_abs = TMath::Sqrt(m_times_d*m_times_d/(d_m*d_m) - m_m*m_m - pow(m_times_d*l_times_d/d_m - d_m*m_times_l,2)/(l_times_d*l_times_d - d_m*d_m*l_m2_boosted));
-
-  return TMath::ACos(-numerator/(gd1_abs*m_parallel_abs));
+  return TMath::ACos(-m_parallel_times_gd1/(m_parallel_abs*gd1_abs));
 }
 
 TLorentzVector Lvector(double   d_px, double   d_py, double   d_pz, double   d_m,
@@ -545,7 +441,7 @@ TLorentzVector Lvector(double   d_px, double   d_py, double   d_pz, double   d_m
   double l_px = d_py*(gd1_pz*gd2_E - gd1_E*gd2_pz) + d_pz*(gd1_E*gd2_py - gd1_py*gd2_E) + d_E*(gd1_py*gd2_pz - gd1_pz*gd2_py);
   double l_py = d_px*(gd1_E*gd2_pz - gd1_pz*gd2_E) + d_pz*(gd1_px*gd2_E - gd1_E*gd2_px) + d_E*(gd1_pz*gd2_px - gd1_px*gd2_pz);
   double l_pz = d_px*(gd1_py*gd2_E - gd1_E*gd2_py) + d_py*(gd1_E*gd2_px - gd1_px*gd2_E) + d_E*(gd1_px*gd2_py - gd1_py*gd2_px);
-  double l_E = d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py);
+  double l_E = -(d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py));
   lvector.SetPxPyPzE(l_px,l_py,l_pz,l_E);
 
   return lvector;
@@ -583,7 +479,7 @@ TLorentzVector Lvector_boosted(double   d_px, double   d_py, double   d_pz, doub
   double l_px_boosted = d_py_boosted*(gd1_pz_boosted*gd2_E_boosted - gd1_E_boosted*gd2_pz_boosted) + d_pz_boosted*(gd1_E_boosted*gd2_py_boosted - gd1_py_boosted*gd2_E_boosted) + d_E_boosted*(gd1_py_boosted*gd2_pz_boosted - gd1_pz_boosted*gd2_py_boosted);
   double l_py_boosted = d_px_boosted*(gd1_E_boosted*gd2_pz_boosted - gd1_pz_boosted*gd2_E_boosted) + d_pz_boosted*(gd1_px_boosted*gd2_E_boosted - gd1_E_boosted*gd2_px_boosted) + d_E_boosted*(gd1_pz_boosted*gd2_px_boosted - gd1_px_boosted*gd2_pz_boosted);
   double l_pz_boosted = d_px_boosted*(gd1_py_boosted*gd2_E_boosted - gd1_E_boosted*gd2_py_boosted) + d_py_boosted*(gd1_E_boosted*gd2_px_boosted - gd1_px_boosted*gd2_E_boosted) + d_E_boosted*(gd1_px_boosted*gd2_py_boosted - gd1_py_boosted*gd2_px_boosted);
-  double l_E_boosted = d_px_boosted*(gd1_pz_boosted*gd2_py_boosted - gd1_py_boosted*gd2_pz_boosted) + d_py_boosted*(gd1_px_boosted*gd2_pz_boosted - gd1_pz_boosted*gd2_px_boosted) + d_pz_boosted*(gd1_py_boosted*gd2_px_boosted - gd1_px_boosted*gd2_py_boosted);
+  double l_E_boosted = -(d_px_boosted*(gd1_pz_boosted*gd2_py_boosted - gd1_py_boosted*gd2_pz_boosted) + d_py_boosted*(gd1_px_boosted*gd2_pz_boosted - gd1_pz_boosted*gd2_px_boosted) + d_pz_boosted*(gd1_py_boosted*gd2_px_boosted - gd1_px_boosted*gd2_py_boosted));
   l_boosted.SetPxPyPzE(l_px_boosted,l_py_boosted,l_pz_boosted,l_E_boosted);
 
   return l_boosted;
