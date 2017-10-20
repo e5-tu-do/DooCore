@@ -413,7 +413,7 @@ double AzimuthalAngleInDecayPlane(double   m_px, double   m_py, double   m_pz, d
   double l_px = d_py*(gd1_pz*gd2_E - gd1_E*gd2_pz) + d_pz*(gd1_E*gd2_py - gd1_py*gd2_E) + d_E*(gd1_py*gd2_pz - gd1_pz*gd2_py);
   double l_py = d_px*(gd1_E*gd2_pz - gd1_pz*gd2_E) + d_pz*(gd1_px*gd2_E - gd1_E*gd2_px) + d_E*(gd1_pz*gd2_px - gd1_px*gd2_pz);
   double l_pz = d_px*(gd1_py*gd2_E - gd1_E*gd2_py) + d_py*(gd1_E*gd2_px - gd1_px*gd2_E) + d_E*(gd1_px*gd2_py - gd1_py*gd2_px);
-  double l_E = d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py);
+  double l_E = -(d_px*(gd1_pz*gd2_py - gd1_py*gd2_pz) + d_py*(gd1_px*gd2_pz - gd1_pz*gd2_px) + d_pz*(gd1_py*gd2_px - gd1_px*gd2_py));
   double l_m2 = l_E*l_E - l_px*l_px - l_py*l_py - l_pz*l_pz;
   double m_times_d = m_E*d_E - m_px*d_px - m_py*d_py - m_pz*d_pz;
   double m_times_l = m_E*l_E - m_px*l_px - m_py*l_py - m_pz*l_pz;
