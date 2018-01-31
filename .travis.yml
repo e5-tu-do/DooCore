@@ -3,6 +3,10 @@ addons:
   apt:
     packages:
       - doxygen
+      - doxygen-doc
+      - doxygen-latex
+      - doxygen-gui
+      - graphviz
 
 after_success:
   - bash ./.create_doxygen_and_deploy.sh
