@@ -8,16 +8,16 @@ branches:
   - master
 
 script:
-  - cd $TRAVIS_BUILD_DIR
-  - chmod +x .create_doxygen_and_deploy.sh
+  # - cd $TRAVIS_BUILD_DIR
+  # - chmod +x .create_doxygen_and_deploy.sh
   - ./.create_doxygen_and_deploy.sh
 
 install: true
 
-after_success:
-  - cd $TRAVIS_BUILD_DIR
-  - chmod +x .create_doxygen_and_deploy.sh
-  - ./.create_doxygen_and_deploy.sh
+# after_success:
+#   - cd $TRAVIS_BUILD_DIR
+#   - chmod +x .create_doxygen_and_deploy.sh
+#   - ./.create_doxygen_and_deploy.sh
 
 # before_script:
 #   - apt-get update -q && apt-get install -y -q doxygen
