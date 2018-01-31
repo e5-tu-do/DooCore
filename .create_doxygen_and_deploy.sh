@@ -1,6 +1,7 @@
 #!/bin/sh
 
 echo 'Generating Doxygen code documentation...'
+doxygen --version
 doxygen doxygen.conf
 
 if [ -d "html" ] && [ -f "html/index.html" ]; then
