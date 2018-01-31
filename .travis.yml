@@ -3,6 +3,15 @@ addons:
     packages:
       - doxygen
 
+branches:
+  only:
+  - master
+
+script:
+  - cd $TRAVIS_BUILD_DIR
+  - chmod +x .create_doxygen_and_deploy.sh
+  - ./.create_doxygen_and_deploy.sh
+
 install: true
 
 after_success:
