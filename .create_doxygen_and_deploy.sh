@@ -3,7 +3,7 @@
 echo 'Generating Doxygen code documentation...'
 # doxygen doxygen.conf
 echo 'This is the encrypted user:'
-echo ${doocore-USER}
+echo $FOO
 
 if [ -d "html" ] && [ -f "html/index.html" ]; then
 
