@@ -1,31 +1,20 @@
 addons:
   apt:
     packages:
-      - doxygen
-      - doxygen-doc
-      - doxygen-latex
-      - doxygen-gui
-      - graphviz
+    - doxygen
+    - doxygen-doc
+    - doxygen-latex
+    - doxygen-gui
+    - graphviz
 
 branches:
   only:
   - master
 
+env:
+  global:
+    secure: ZsU7YLITB9ZNm6qdsBtOkQeYAH851iKRgSYeEm+obshiKY+rmqNj4ezk1+rIhFI5XIU7zhAD5hhP3icyGx2V1e6hIgj8RfIgycCJVmdggovS0KtQvwwVYRACCkVAi1xRAmL1GWVYDNhHEy0qCFRbPUdYidAeHS+mIVDGXBtaLQs0jPdKdSZ1XlXDCOtqv2KalJF/Em18m6w3pG+j7ymGnCaIJTq/oQWvqWgbjfSyufDTAG3f7LalMUoPfAHLalNlu96yWFBZJeCe5JQlZ8wi93aMsXyqeTkEDUh+EbSAMkZBR4l9qpI1v4U6hn1MH8fhJrp+pb7YhNsEsB+rRlRbSZdoS6ti1vQBKH8ib7Ce7mWivuYppcAVYaXK4E39ZUC0nLnA7YKSqg2+WW2A4VDKOIPhJoRa65/Fnh1tYAvn4nP6Z7hCpzMbOt2jAhh4x/EbWeL1x8ZPTniMVft6EcnWERpy+qSJMLQh68xswtdD46D74evzuicZXLbXZ65iYN7gfTMfJkzPYJm3Xc0Gfe+bo3cZmCcY/Fq+GIG2bzNM+z0GMAn53v+jKPDKr33R9TLU6IBEFFAX2QkzKX8rd8w5QEM9ZX7tjTTk5yhITEQQGYajHXCL12V8pGPG/8naqjudMSRT8NDAmCIbaARZjFqoiQevIsZwtgtBo7cgMCD85w4=
+
 script:
-  - chmod +x .create_doxygen_and_deploy.sh
-  - ./.create_doxygen_and_deploy.sh
-
-# install: true
-
-# after_success:
-#   - cd $TRAVIS_BUILD_DIR
-#   - chmod +x .create_doxygen_and_deploy.sh
-#   - ./.create_doxygen_and_deploy.sh
-
-# before_script:
-#   - apt-get update -q && apt-get install -y -q doxygen
-# pages:
-#   script:
-#   - doxygen doxygen.conf
-#   only:
-#   - master
+- chmod +x .create_doxygen_and_deploy.sh
+- "./.create_doxygen_and_deploy.sh"
