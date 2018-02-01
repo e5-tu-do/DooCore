@@ -1,7 +1,7 @@
 addons:
   apt:
     packages:
-      - doxygen=1.8.11-1
+      - doxygen
       - doxygen-doc
       - doxygen-latex
       - doxygen-gui
@@ -15,7 +15,7 @@ script:
   - chmod +x .create_doxygen_and_deploy.sh
   - ./.create_doxygen_and_deploy.sh
 
-install: true
+# install: true
 
 # after_success:
 #   - cd $TRAVIS_BUILD_DIR
