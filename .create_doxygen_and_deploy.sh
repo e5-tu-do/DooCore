@@ -1,9 +1,9 @@
 #!/bin/sh
 
 echo 'Generating Doxygen code documentation...'
-# doxygen doxygen.conf
-echo 'This is the encrypted user:'
-echo $doocore_USER
+echo 'Using the following version of doxygen:'
+doxygen --version
+doxygen doxygen.conf
 
 if [ -d "html" ] && [ -f "html/index.html" ]; then
 
