@@ -1,10 +1,9 @@
 #!/bin/sh
 
 echo 'Generating Doxygen code documentation...'
-doxygen --version
-apt-cache policy doxygen
-doxygen doxygen.conf
-echo 'This is the encrypted user: $doocore-USER'
+# doxygen doxygen.conf
+echo 'This is the encrypted user:'
+echo ${doocore-USER}
 
 if [ -d "html" ] && [ -f "html/index.html" ]; then
 
