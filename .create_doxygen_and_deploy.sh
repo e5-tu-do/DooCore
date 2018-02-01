@@ -7,7 +7,10 @@ doxygen doxygen.conf
 
 if [ -d "html" ] && [ -f "html/index.html" ]; then
 
-    echo 'Uploading documentation to docs.e5.physik.tu-dortmund.de...'
+    echo 'Uploading documentation to docs.e5.physik.tu-dortmund.de using curl...'
+    #first try to upload a single file
+    cd html && curl -f -u $DOCS_USER:$DOCS_PASSWORD -k -L -T index.html $DOCS_URL/index.html
+
 else
     echo '' >&2
     echo 'Warning: No documentation (html) files have been found!' >&2
