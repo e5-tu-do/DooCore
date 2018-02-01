@@ -2,6 +2,7 @@
 
 echo 'Generating Doxygen code documentation...'
 doxygen --version
+apt-cache policy doxygen
 doxygen doxygen.conf
 
 if [ -d "html" ] && [ -f "html/index.html" ]; then
