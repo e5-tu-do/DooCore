@@ -13,8 +13,6 @@ then
 	# first add remote host to known hosts
 	ssh-keyscan -t rsa -p 10023 $DEPLOY_HOST 2> /dev/null | sort -u - ~/.ssh/known_hosts -o ~/.ssh/known_hosts
 	echo ''
-	sshd -V
-	echo ''
 	echo 'known hosts after:'
 	cat ~/.ssh/known_hosts
 	echo ''
