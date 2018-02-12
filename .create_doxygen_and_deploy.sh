@@ -11,8 +11,13 @@ if [ -d "html" ] && [ -f "html/index.html" ];
 then
 	# add remote ssh-key to key-storage
 	# first add remote host to known hosts
+	echo ''
+	echo 'known hosts before:'
+	cat ~/.ssh/known_hosts
 	ssh-keyscan -t rsa -p 10023 $DEPLOY_HOST 2> /dev/null | sort -u - ~/.ssh/known_hosts -o ~/.ssh/known_hosts
-
+	echo ''
+	echo 'known hosts after:'
+	cat ~/.ssh/known_hosts
 	# decrypt private shh key
 	openssl aes-256-cbc -K $encrypted_26877b322e98_key -iv $encrypted_26877b322e98_iv -in id_rsa_doocore.enc -out id_rsa_doocore -d
 	# start ssh-agent and add the key
