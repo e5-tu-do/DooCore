@@ -18,7 +18,7 @@ then
 	echo ''
 	echo 'known hosts between:'
 	cat ~/.ssh/known_hosts
-	ssh-keyscan -t rsa -p 10023 $DEPLOY_HOST 2> /dev/null #| sort -u - ~/.ssh/known_hosts -o ~/.ssh/known_hosts
+	ssh-keyscan -t rsa -p 10023 $DEPLOY_HOST 2> /dev/null | sort -u - ~/.ssh/known_hosts -o ~/.ssh/known_hosts
 	echo ''
 	echo 'known hosts after:'
 	cat ~/.ssh/known_hosts
