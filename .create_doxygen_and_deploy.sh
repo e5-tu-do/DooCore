@@ -17,8 +17,8 @@ then
 	openssl aes-256-cbc -K $encrypted_26877b322e98_key -iv $encrypted_26877b322e98_iv -in id_rsa_doocore.enc -out id_rsa_doocore -d
 	# start ssh-agent and add the key
 	eval "$(ssh-agent -s)"
-	chmod 600 id_rsa_doofit
-	ssh-add id_rsa_doofit
+	chmod 600 id_rsa_doocore
+	ssh-add id_rsa_doocore
 
 	echo "Uploading.."
 	# upload site
