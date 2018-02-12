@@ -11,9 +11,7 @@ if [ -d "html" ] && [ -f "html/index.html" ];
 then
 	# add remote ssh-key to key-storage
 	# first add remote host to known hosts
-	# ssh-keyscan -t rsa -p 10023 $DEPLOY_HOST 2> /dev/null | sort -u - ~/.ssh/known_hosts -o ~/.ssh/known_hosts
-	echo ''
-	echo '[docs.e5.physik.tu-dortmund.de]:10023 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDwlZuxrhqfzg5AMZSIoejsqn9HbtCVfAmaee01OKlCFf8UmT3HMruWLbpg43MPpdMfdp9K/vLC2u+r49RnE1BfYYNyC+IE48JiC4hALrXzjkUzQ62/DsrcZDhp7SUoA0mvzi6Evhz1nWGL0h0QNZWgSk7ZMWdabNJOBsjzXUWic8KrIa8uVhBXeH6bXTEoeig86E2UsK8wcMuaj11S8XX89A/h7t+wQKDhmoN9aMCIUnGq8YT42rulKnssKFa7qUqLFxI3j8l79gPyyqGmc9b9Za/kri9B/HENPcef1MamucvcfwwSE06++2X9xBpL9eVM4kYcvgyoS0wNdfBVG4RJ' >> ~/.ssh/known_hosts
+	ssh-keyscan -t rsa -p 10023 $DEPLOY_HOST 2> /dev/null | sort -u - ~/.ssh/known_hosts -o ~/.ssh/known_hosts
 	echo ''
 	echo 'known hosts after:'
 	cat ~/.ssh/known_hosts
