@@ -18,8 +18,8 @@ branches:
   # - cd deploy_doxygen && docker build --build-arg DECRYPTED_KEY=id_rsa_doocore.enc --build-arg PROJECT=DooCore -t quick_doxygen_uploader .
 script:
   - pwd
-  - cd .. && git clone git@github.com:alexbirne/deploy_doxygen.git
-  - doxygen doxygen.conf
+  - cd .. && git clone https://github.com/alexbirne/deploy_doxygen.git
+  - cd DooCore && doxygen doxygen.conf
   # - cd deploy_doxygen && docker run -it -e DEPLOY_HOST=docs.e5.physik.tu-dortmund.de -e DEPLOY_USER=doocore -e DEPLOY_PATH=/services/doocore -e DECRYPTED_SSH_KEY=id_rsa_doocore
 # - chmod +x .create_doxygen_and_deploy.sh
 # - "./.create_doxygen_and_deploy.sh"
