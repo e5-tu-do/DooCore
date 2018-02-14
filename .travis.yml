@@ -12,12 +12,14 @@ addons:
 branches:
   only:
   - master
-before_install:
+# before_install:
+  # - pwd
+  # - doxygen doxygen.conf
+  - git clone git@github.com:alexbirne/deploy_doxygen.git
+  # - cd deploy_doxygen && docker build --build-arg DECRYPTED_KEY=id_rsa_doocore.enc --build-arg PROJECT=DooCore -t quick_doxygen_uploader .
+script:
   - pwd
   - doxygen doxygen.conf
-  # - git clone git@github.com:alexbirne/deploy_doxygen.git
-  # - cd deploy_doxygen && docker build --build-arg DECRYPTED_KEY=id_rsa_doocore.enc --build-arg PROJECT=DooCore -t quick_doxygen_uploader .
-# script:
   # - cd deploy_doxygen && docker run -it -e DEPLOY_HOST=docs.e5.physik.tu-dortmund.de -e DEPLOY_USER=doocore -e DEPLOY_PATH=/services/doocore -e DECRYPTED_SSH_KEY=id_rsa_doocore
 # - chmod +x .create_doxygen_and_deploy.sh
 # - "./.create_doxygen_and_deploy.sh"
