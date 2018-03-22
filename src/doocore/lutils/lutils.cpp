@@ -222,6 +222,12 @@ void doocore::lutils::setStyle(TString option)
       belle2Style->SetPadBottomMargin(0.16);
       belle2Style->SetPadLeftMargin(0.16);
 
+      if (option.Contains("2d")) {
+        // sdebug << "2D!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endmsg;
+        belle2Style->SetPadBottomMargin(0.15);
+        belle2Style->SetPadRightMargin(0.18);
+      }
+
       // set title offsets (for axis label)
       belle2Style->SetTitleXOffset(1.4);
       belle2Style->SetTitleYOffset(1.4);
