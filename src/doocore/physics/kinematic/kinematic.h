@@ -499,6 +499,23 @@ double FourMomentumProduct(double u_x, double u_y, double u_z, double u_E,
   return u_E*v_E - u_x*v_x - u_y*v_y - u_z*v_z;
 }
 
+double OpeningAngleInRestFrame(double  m_px, double  m_py, double  m_pz, double  m_m,
+                               double d1_px, double d1_py, double d1_pz, double d1_m,
+                               double d2_px, double d2_py, double d2_pz, double d2_m) {
+  double m_E = TMath::Sqrt(m_px*m_px + m_py*m_py + m_pz*m_pz + m_m*m_m);
+  double d1_E = TMath::Sqrt(d1_px*d1_px + d1_py*d1_py + d1_pz*d1_pz + d1_m*d1_m);
+  double d2_E = TMath::Sqrt(d2_px*d2_px + d2_py*d2_py + d2_pz*d2_pz + d2_m*d2_m);
+
+  double m_times_d1 = FourMomentumProduct(m_px, m_py, m_pz, m_E, d1_px, d1_py, d1_pz, d1_E);
+  double m_times_d2 = FourMomentumProduct(m_px, m_py, m_pz, m_E, d2_px, d2_py, d2_pz, d2_E);
+  double d1_times_d2 = FourMomentumProduct(d1_px, d1_py, d1_pz, d1_E, d2_px, d2_py, d2_pz, d2_E);
+
+  double d1_abs = TMath::Sqrt(pow(m_times_d1/m_m,2) - d1_m*d1_m);
+  double d2_abs = TMath::Sqrt(pow(m_times_d2/m_m,2) - d2_m*d2_m);
+
+  return TMath::ACos((m_times_d1*m_times_d2/(m_m*m_m) - d1_times_d2)/(d1_abs*d2_abs));
+}
+
 } // namespace kinematic
 } // namespace physics
 } // namespace doofit
