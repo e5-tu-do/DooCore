@@ -516,6 +516,41 @@ double OpeningAngleInRestFrame(double  m_px, double  m_py, double  m_pz, double 
   return TMath::ACos((m_times_d1*m_times_d2/(m_m*m_m) - d1_times_d2)/(d1_abs*d2_abs));
 }
 
+/**
+ *  @brief Pointing angle between two vertices calculator
+ *
+ *  With this function the angle between the momentum vector of a
+ *  particle and the connection vector between its production and
+ *  its decay vertex is calculated.
+ *
+ *  @param x_pv x coordinate of production vertex
+ *  @param y_pv y coordinate of production vertex
+ *  @param z_pv z coordinate of production vertex
+ *  @param x_sv x coordinate of decay vertex
+ *  @param y_sv y coordinate of decay vertex
+ *  @param z_sv z coordinate of decay vertex
+ *  @param px particle's px
+ *  @param py particle's py
+ *  @param pz particle's pz
+ *  @return the absolute value of the cosine of the angle
+ */
+double PointingAngleBetweenVertices(double x_pv, double y_pv, double z_pv,
+                                    double x_sv, double y_sv, double z_sv,
+                                    double px, double py, double pz) {
+  double x_diff = x_pv - x_sv;
+  double y_diff = y_pv - y_sv;
+  double z_diff = z_pv - z_sv;
+
+  double diff_abs = TMath::Sqrt(pow(x_diff,2) + pow(y_diff,2) + pow(z_diff,2));
+
+  double p = TMath::Sqrt(pow(px,2) + pow(py,2) + pow(pz,2));
+
+  double numerator = x_diff * px + y_diff * py + z_diff * pz;
+  double denominator = diff_abs * p;
+
+  return abs(numerator) / denominator;
+}
+
 } // namespace kinematic
 } // namespace physics
 } // namespace doofit
