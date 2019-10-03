@@ -4,6 +4,8 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <thread>
+#include <chrono>
 
 // from POSIX/UNIX
 #include <sys/stat.h>
@@ -581,7 +583,7 @@ int doocore::lutils::fileNLines( TString strFilename )
 }
 
 void doocore::lutils::Sleep(double sleep_time) {
-  boost::this_thread::sleep(boost::posix_time::microseconds(sleep_time*1e6));
+	this_thread::sleep_for(chrono::seconds((int)sleep_time));
 }
 
 /*
